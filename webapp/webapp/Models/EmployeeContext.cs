@@ -11,8 +11,21 @@ namespace webapp.Models
 {
     public class EmployeeContext : DbContext
     {
-        public EmployeeContext(DbContextOptions<EmployeeContext> options) : base(options) {}
+        public EmployeeContext(DbContextOptions options) : base(options) {}
 
         public DbSet<Employee> Employees { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Employee>().HasData(new Employee
+            {
+                Id = 1,
+                name = "patrick"
+            }, new Employee
+            {
+                Id = 2,
+                name = "nick"
+            });
+        }
     }
 }

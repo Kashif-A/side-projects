@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using webapp.Models;
+using webapp.Models.DataManager;
+using webapp.Models.Repository;
 
 namespace webapp
 {
@@ -31,6 +34,7 @@ namespace webapp
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            services.AddScoped<IDataRepository<Employee>, EmployeeManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,7 +63,7 @@ namespace webapp
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "gggg";
 
                 if (env.IsDevelopment())
                 {

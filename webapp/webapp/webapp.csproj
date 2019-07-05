@@ -22,18 +22,6 @@
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="gggg\package-lock.json" />
-    <Content Remove="gggg\package.json" />
-    <Content Remove="gggg\public\manifest.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="gggg\package-lock.json" />
-    <None Include="gggg\package.json" />
-    <None Include="gggg\public\manifest.json" />
-  </ItemGroup>
-
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="true">

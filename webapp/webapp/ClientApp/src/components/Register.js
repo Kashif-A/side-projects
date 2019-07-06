@@ -17,6 +17,6 @@ export class Register extends Component {
         });
     }
     render() {
-        return (<div>{this.state.registerHTML}<div/>)
+        {this.state.registerHTML}
     }
 }

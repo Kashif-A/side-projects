@@ -10,17 +10,18 @@ export class Register extends Component {
     }
 
     componentDidMount() {
-        fetch("https://localhost:5001/account/register").then((response) => {
-            this.setState({
-                registerHTML: response.text()
+        fetch("http://localhost:55014/account/register").then((response) => {
+            let a = 'b'
+            response.text().then((registerHTML) => {
+                this.setState({
+                    registerHTML
+                })
             })
         });
     }
     render() {
         return (
-            <div>
-                <h1>{this.state.registerHTML}</h1>
-            </div>
+            this.state.registerHTML
         )
     }
 }

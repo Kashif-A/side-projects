@@ -2,9 +2,12 @@
   "name": "greeting-project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./lib/greet.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+        "greet": "./bin/index.js"
   },
   "keywords": [],
   "author": "",

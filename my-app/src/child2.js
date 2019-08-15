@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 
-export default class Child1 extends Component {
+export default class Child2 extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			stateItem: props.newValue
 		};
-		console.log('Child1 - constructor');
+		console.log('Child2 - constructor');
 		this.handleClick = this.handleClick.bind(this);
 	}
 	render() {
-		console.log('Child1 - render');
+		console.log('Child2 - render');
 		return (
 			<div style={{ width: 130, height: 100, backgroundColor: '#0216b8' }}>
-				<h1 style={{ color: 'white', paddingLeft: 20, paddingTop: 15 }}>Child1</h1>
+				<h1 style={{ color: 'white', paddingLeft: 20, paddingTop: 15 }}>Child2</h1>
 				<button style={{ width: 130 }} onClick={this.handleClick}>
 					PRESS ME
 				</button>
@@ -23,26 +23,26 @@ export default class Child1 extends Component {
 
 	//LIFECYCLE METHODS
 	UNSAFE_componentWillMount() {
-		console.log('Child1 - UNSAFE_componentWillMount');
+		console.log('Child2 - UNSAFE_componentWillMount');
 	}
 	componentDidMount() {
-		console.log('Child1 - componentDidMount');
+		console.log('Child2 - componentDidMount');
 	}
 	UNSAFE_componentWillReceiveProps() {
-		console.log('Child1 - UNSAFE_componentWillReceiveProps');
+		console.log('Child2 - UNSAFE_componentWillReceiveProps');
 	}
 	shouldComponentUpdate() {
-		console.log('Child1 - shouldComponentUpdate');
+		console.log('Child2 - shouldComponentUpdate');
 		return true;
 	}
 	UNSAFE_componentWillUpdate() {
-		console.log('Child1 - UNSAFE_componentWillUpdate');
+		console.log('Child2 - UNSAFE_componentWillUpdate');
 	}
 	componentDidUpdate() {
-		console.log('Child1 - componentDidUpdate');
+		console.log('Child2 - componentDidUpdate');
 	}
 	componentWillUnmount() {
-		console.log('Child1 - componentWillUnmount');
+		console.log('Child2 - componentWillUnmount');
 	}
 
 	handleClick(newValue) {

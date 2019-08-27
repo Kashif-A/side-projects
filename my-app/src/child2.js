@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+import ChildOfChild from './ChildOfChild';
 
 export default class Child2 extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			stateItem: props.newValue
+			stateItem: 1
 		};
-		console.log('Child2 - constructor');
-		this.handleClick = this.handleClick.bind(this);
+		console.log('Child2 - constructor')
+		this.handleClick = this.handleClick.bind(this)
 	}
 	render() {
 		console.log('Child2 - render');
@@ -17,37 +18,40 @@ export default class Child2 extends Component {
 				<button style={{ width: 130 }} onClick={this.handleClick}>
 					PRESS ME
 				</button>
+				{/* <ChildOfChild /> */}
 			</div>
 		);
 	}
 
-	//LIFECYCLE METHODS
-	UNSAFE_componentWillMount() {
-		console.log('Child2 - UNSAFE_componentWillMount');
-	}
-	componentDidMount() {
-		console.log('Child2 - componentDidMount');
-	}
-	UNSAFE_componentWillReceiveProps() {
-		console.log('Child2 - UNSAFE_componentWillReceiveProps');
-	}
-	shouldComponentUpdate() {
-		console.log('Child2 - shouldComponentUpdate');
-		return true;
-	}
-	UNSAFE_componentWillUpdate() {
-		console.log('Child2 - UNSAFE_componentWillUpdate');
-	}
-	componentDidUpdate() {
-		console.log('Child2 - componentDidUpdate');
-	}
-	componentWillUnmount() {
-		console.log('Child2 - componentWillUnmount');
-	}
+	// LIFECYCLE METHODS
+	// UNSAFE_componentWillMount() {
+	// 	console.log('Child2 - UNSAFE_componentWillMount');
+	// }
+	// componentDidMount() {
+	// 	console.log('Child2 - componentDidMount');
+	// }
+	// UNSAFE_componentWillReceiveProps() {
+	// 	console.log('Child2 - UNSAFE_componentWillReceiveProps');
+	// }
+	// shouldComponentUpdate(nextProps, nextState) {
+  //   console.log('Child2 - shouldComponentUpdate')
+  //   console.log(nextProps === this.props)
+	// 	console.log(nextState === this.state)
+	// 	return true
+	// }
+	// UNSAFE_componentWillUpdate() {
+	// 	console.log('Child2 - UNSAFE_componentWillUpdate');
+	// }
+	// componentDidUpdate() {
+	// 	console.log('Child2 - componentDidUpdate');
+	// }
+	// componentWillUnmount() {
+	// 	console.log('Child2 - componentWillUnmount');
+	// }
 
 	handleClick(newValue) {
 		this.setState({
-			stateItem: this.state.stateItem + 1
+			stateItem: 1
 		});
 	}
 }

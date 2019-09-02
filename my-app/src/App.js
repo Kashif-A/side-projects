@@ -1,72 +1,35 @@
-import React, { Component } from 'react';
-// import Child1 from './child1';
-// import Child2 from './child2';
+import React, {Component} from 'react';
+import {Route, Switch, Link, BrowserRouter as Router} from 'react-router-dom';
 
-export default class App extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			stateItem: 1
-		};
-		React.createRef('gucci')
-		console.log('APP - constructor');
-		this.handleClick = this.handleClick.bind(this);
-	}
-	render() {
-		console.log('APP - render');
-		return (
-			// <div>
-			// 	<div style={{ width: 130, height: 100, backgroundColor: '#3236a8' }}>
-			// 		<h1 style={{ color: 'white', paddingLeft: 40, paddingTop: 15 }}>App</h1>
-			// 		<button style={{ width: 130 }} onClick={this.handleClick}>
-			// 			PRESS ME
-			// 		</button>
-			// 	</div>
-			// 	<br />
-			// 	<br />
-			// 	<br />
-			// 	<div>
-			// 		<Child1 />
-			// 	</div>
-			// 	<br />
-			// 	<br />
-			// 	<br />
-			// 	<div>
-			// 		<Child2 />
-			// 	</div>
-			// 	<div />
-			// </div>
-			<h1>Test</h1>
-		);
-	}
+import child1 from './child1'
+import child2 from './child2'
+// import asyncComponent from './asyncComponent'
 
-	// LIFECYCLE METHODS
-	UNSAFE_componentWillMount() {
-		console.log('APP - UNSAFE_componentWillMount');
-	}
-	componentDidMount() {
-		console.log('APP - componentDidMount');
-	}
-	UNSAFE_componentWillReceiveProps() {
-		console.log('APP - UNSAFE_componentWillReceiveProps');
-	}
-	shouldComponentUpdate() {
-		console.log('APP - shouldComponentUpdate');
-		return true;
-	}
-	UNSAFE_componentWillUpdate() {
-		console.log('APP - UNSAFE_componentWillUpdate');
-	}
-	componentDidUpdate() {
-		console.log('APP - componentDidUpdate');
-	}
-	componentWillUnmount() {
-		console.log('APP - componentWillUnmount');
-	}
+// const AsyncChild2   = asyncComponent(() => {
+//     return import('./child2');
+// });
 
-	handleClick() {
-		this.setState({
-			stateItem: this.state.stateItem + 1
-		});
-	}
+class Routes extends Component {
+    render() {
+        return (
+            <Router>
+                <div>
+                    <ul>
+                        <li>
+                            <Link to="/">child1</Link>
+                        </li>
+                        <li>
+                            <Link to="/child2">child2</Link>
+                        </li>
+                    </ul>
+                </div>
+            <Switch>
+                <Route exact path='/' component={child1}/>
+                <Route exact path='/child2' component={child2}/>
+            </Switch>
+            </Router>
+        );
+    }
 }
+
+export default Routes;

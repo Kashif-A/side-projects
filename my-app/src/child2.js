@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import ChildOfChild from './ChildOfChild';
+// import ChildOfChild from './ChildOfChild';
+import './mockdata.json'
 
 export default class Child2 extends Component {
 	constructor(props) {
@@ -24,30 +25,30 @@ export default class Child2 extends Component {
 	}
 
 	// LIFECYCLE METHODS
-	// UNSAFE_componentWillMount() {
-	// 	console.log('Child2 - UNSAFE_componentWillMount');
-	// }
-	// componentDidMount() {
-	// 	console.log('Child2 - componentDidMount');
-	// }
-	// UNSAFE_componentWillReceiveProps() {
-	// 	console.log('Child2 - UNSAFE_componentWillReceiveProps');
-	// }
-	// shouldComponentUpdate(nextProps, nextState) {
-  //   console.log('Child2 - shouldComponentUpdate')
-  //   console.log(nextProps === this.props)
-	// 	console.log(nextState === this.state)
-	// 	return true
-	// }
-	// UNSAFE_componentWillUpdate() {
-	// 	console.log('Child2 - UNSAFE_componentWillUpdate');
-	// }
-	// componentDidUpdate() {
-	// 	console.log('Child2 - componentDidUpdate');
-	// }
-	// componentWillUnmount() {
-	// 	console.log('Child2 - componentWillUnmount');
-	// }
+	UNSAFE_componentWillMount() {
+		console.log('Child2 - UNSAFE_componentWillMount');
+	}
+	componentDidMount() {
+		console.log('Child2 - componentDidMount');
+	}
+	UNSAFE_componentWillReceiveProps() {
+		console.log('Child2 - UNSAFE_componentWillReceiveProps');
+	}
+	shouldComponentUpdate(nextProps, nextState) {
+    console.log('Child2 - shouldComponentUpdate')
+    console.log(nextProps === this.props)
+		console.log(nextState === this.state)
+		return true
+	}
+	UNSAFE_componentWillUpdate() {
+		console.log('Child2 - UNSAFE_componentWillUpdate');
+	}
+	componentDidUpdate() {
+		console.log('Child2 - componentDidUpdate');
+	}
+	componentWillUnmount() {
+		console.log('Child2 - componentWillUnmount');
+	}
 
 	handleClick(newValue) {
 		this.setState({

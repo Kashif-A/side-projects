@@ -29,11 +29,11 @@ namespace webapp
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddEntityFrameworkSqlServer()
-                .AddDbContext<Models.EmployeeContext>(options =>
+                .AddDbContext<EmployeeContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<Models.EmployeeContext>();
+                .AddEntityFrameworkStores<EmployeeContext>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

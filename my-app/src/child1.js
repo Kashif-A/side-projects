@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-// import ChildOfChild from './ChildOfChild';
+import {ChildOfChildFunc} from './ChildOfChildFunc';
 
 export default class Child1 extends Component {
 	constructor(props) {
@@ -10,15 +10,19 @@ export default class Child1 extends Component {
 		console.log('Child1 - constructor')
 		this.handleClick = this.handleClick.bind(this)
 	}
+
 	render() {
 		console.log('Child1 - render');
 		return (
 			<div id='child1'>
-				{/* <h1 style={{ color: 'white', paddingLeft: 20, paddingTop: 15 }}>Child1</h1> */}
-				<button style={{ width: 130 }} onClick={this.handleClick}>
-					PRESS ME
-				</button>
-				{/* <ChildOfChild /> */}
+				<div style={{ width: 130, height: 100, backgroundColor: '#0216b8' }}>
+					<h4 style={{ color: 'white', paddingLeft: 20, paddingTop: 15 }}>Child1</h4>
+					<button style={{ width: 130 }} onClick={this.handleClick}>
+						PRESS ME
+					</button>
+					<br /><br /><br /><br />
+					{/* <ChildOfChildFunc p={this.state.stateItem} /> */}
+				</div>
 			</div>
 		);
 	}
@@ -33,12 +37,15 @@ export default class Child1 extends Component {
 	UNSAFE_componentWillReceiveProps() {
 		console.log('Child1 - UNSAFE_componentWillReceiveProps');
 	}
-	shouldComponentUpdate(nextProps, nextState) {
-		console.log('Child1 - shouldComponentUpdate')
-		console.log(nextProps === this.props)
-		console.log(nextState === this.state)
-		return true
-	}
+	// shouldComponentUpdate(nextProps, nextState) {
+	// 	console.log('Child1 - shouldComponentUpdate')
+	// 	console.log(this.props)
+	// 	console.log(nextProps)
+	// 	console.log(this.state)
+	// 	console.log(nextState)
+	// 	console.log('nextProps === this.props : ' + nextProps === this.props)
+	// 	console.log('nextState === this.state ' + nextState === this.state)
+	// }
 	UNSAFE_componentWillUpdate() {
 		console.log('Child1 - UNSAFE_componentWillUpdate');
 	}
@@ -49,7 +56,7 @@ export default class Child1 extends Component {
 		console.log('Child1 - componentWillUnmount');
 	}
 
-	handleClick(newValue) {
+	handleClick() {
 		this.setState({
 			stateItem: this.state.stateItem + 1
 		});

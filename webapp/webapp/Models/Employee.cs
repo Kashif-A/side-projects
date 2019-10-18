@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace webapp.Models
 {
-    public class Employee
+    public class Employee : Microsoft.AspNetCore.Identity.EntityFrameworkCore.
+    // IdentityUser<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public string name { get; set; }
-        public Employee() { }
-        public Employee(int _id, string _name)
-        {
-            Id = _id;
-            name = _name;
-        }
     }
+
+    // public class CustomUserRole: IdentityUserRole<int> { }
+    // public class CustomUserLogin: IdentityUserLogin<int> { }
+    // public class CustomUserClaim: IdentityUserClaim<int> { }
 }

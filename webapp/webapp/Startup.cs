@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
@@ -31,9 +29,6 @@ namespace webapp
             services.AddEntityFrameworkSqlServer()
                 .AddDbContext<EmployeeContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<EmployeeContext>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

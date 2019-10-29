@@ -1,0 +1,10 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
+namespace asp.net.identity.deepDive.Models
+{
+    public class UserDbContext : IdentityDbContext<User>
+    {
+        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
+    }
+}

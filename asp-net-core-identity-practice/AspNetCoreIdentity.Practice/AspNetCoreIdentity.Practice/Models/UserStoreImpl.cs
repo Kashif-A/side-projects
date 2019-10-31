@@ -65,7 +65,7 @@ namespace AspNetCoreIdentity.Practice.Models
             using (var connection = GetOpenConnection())
             {
                 return await connection.QueryFirstOrDefaultAsync<User>(
-                    "select * from IdentityDemo where Id = @name",
+                    "select * from IdentityDemo where UserName = @name",
                     new { name = normalizedUserName });
             }
         }

@@ -26,10 +26,11 @@ namespace AspNetCoreIdentity.Practice
             services.AddMvc();
 
             services.AddIdentityCore<User>();
-            //.AddUserManager<UserManager<User>>();
             services.AddScoped<IUserStore<User>, UserStoreImpl>();
-            //services.AddScoped<UserManager<User>, UserManager<User>>();
 
+            services.AddAuthentication("memconnect")
+                .AddCookie("memconnect", options =>
+                options.LoginPath = "/Home/Login");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

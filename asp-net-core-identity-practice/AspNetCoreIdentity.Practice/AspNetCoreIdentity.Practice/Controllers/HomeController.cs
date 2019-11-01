@@ -12,8 +12,8 @@ namespace AspNetCoreIdentity.Practice.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        public HomeController(UserManager<User> userManager)
+        private readonly UserManager<IdentityUser> _userManager;
+        public HomeController(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
         }
@@ -26,8 +26,8 @@ namespace AspNetCoreIdentity.Practice.Controllers
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
-
-            return View();
+            
+            return View(new AboutViewModel(HttpContext.User.Claims.ToString()));
         }
 
         public IActionResult Contact()
@@ -57,12 +57,18 @@ namespace AspNetCoreIdentity.Practice.Controllers
                 var user = await _userManager.FindByNameAsync(model.UserName);
                 if (user == null)
                 {
-                    user = new User
+                    user = new IdentityUser
                     {
                         Id = Guid.NewGuid().ToString(),
                         UserName = model.UserName
                     };
                     var result = await _userManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var response = await AuthMessageSender.SendEmailAsync("","","");
+                        Console.WriteLine(response);
+                    }
                 }
 
                 return View("Success");
@@ -91,7 +97,7 @@ namespace AspNetCoreIdentity.Practice.Controllers
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
                     identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
 
-                    await HttpContext.SignInAsync("memconnect", new ClaimsPrincipal(identity));
+                    await HttpContext.SignInAsync("test", new ClaimsPrincipal(identity));
                     return RedirectToAction("Index");
                 }
 
@@ -99,6 +105,11 @@ namespace AspNetCoreIdentity.Practice.Controllers
             }
 
             return View();
+        }
+
+        public string ForgotPassword()
+        {
+            return "Forgot Password";
         }
     }
 }

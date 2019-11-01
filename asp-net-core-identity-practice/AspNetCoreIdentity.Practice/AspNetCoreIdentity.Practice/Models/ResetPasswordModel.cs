@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspNetCoreIdentity.Practice.Models
+namespace AspNetCoreIdentity.Practice.Controllers
 {
-    public class RegisterModel
+    internal class ResetPasswordModel
     {
-        public string UserName { get; set; }
+        public string Token { get; set; }
+        public string Email { get; set; }
+
         [DataType(DataType.Password)]
         public string Password { get; set; }
         [Compare("Password")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
-        public string Email { get; set;  }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace AspNetCoreIdentity.Practice.Controllers
 {
-    internal class ResetPasswordModel
+    public class ResetPasswordModel
     {
         public string Token { get; set; }
         public string Email { get; set; }

@@ -67,7 +67,6 @@ namespace AspNetCoreIdentity.Practice.Controllers
                     {
                         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         var response = await AuthMessageSender.SendEmailAsync("","","");
-                        Console.WriteLine(response);
                     }
                 }
 
@@ -107,9 +106,65 @@ namespace AspNetCoreIdentity.Practice.Controllers
             return View();
         }
 
-        public string ForgotPassword()
+        [HttpGet]
+        public IActionResult ForgotPassword()
         {
-            return "Forgot Password";
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var resetUrl = Url.Action("ResetPassword", "Home",
+                        new { token = token, email = user.Email }, Request.Scheme);
+
+                    System.IO.File.WriteAllText("resetLink.txt", resetUrl);
+                }
+                else
+                {
+                    // Email user and inform them that they do not have an account
+                }
+
+                return View("Success");
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            return View(new ResetPasswordModel { Token = token, Email = email });
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user != null)
+                {
+                    var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                        return View();
+                    }
+                    return View("Success");
+                }
+                ModelState.AddModelError("", "Invalid Request");
+            }
+            return View();
         }
     }
 }

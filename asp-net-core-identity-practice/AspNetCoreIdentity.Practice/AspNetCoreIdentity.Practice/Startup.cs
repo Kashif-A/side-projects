@@ -29,7 +29,9 @@ namespace AspNetCoreIdentity.Practice
 
             services.AddDbContext<IdentityDbContext<IdentityUser>>(options => options.UseSqlServer(connectionString));
 
-            services.AddIdentityCore<IdentityUser>(options => { })
+            services.AddIdentityCore<IdentityUser>(options => {
+                options.SignIn.RequireConfirmedEmail = true;
+            })
             .AddDefaultTokenProviders();
 
             services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser, IdentityDbContext<IdentityUser>>>();

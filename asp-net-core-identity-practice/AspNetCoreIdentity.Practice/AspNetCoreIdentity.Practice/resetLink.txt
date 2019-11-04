@@ -1,0 +1,1 @@
+http://localhost:55875/Home/ResetPassword?token=CfDJ8KO%2FVdzq%2BtlEkTGQITMujh3pO5TVguqaYMVkNrxn1dJeKhrYLrrg8LHjuAP6uiGiky%2B6nqK1Fh1NYhJNUqFCqMJugR%2Bnt8FqxfI0haQhAiHL80ndRjxEfy%2FeavziI%2Bb4aZQm3P73obPCTqY2Ugi29ZSbjj3uc5Bht%2BplFwgA%2BhHnl7jzqOjJQP%2BwuUEcsSSd9i1%2Fz5PTS1eqHCyoPOYCQDq8Exo8CEGu9rHZGp7%2FQTs9&email=kashif.ahmed@cantarus.com

@@ -10,6 +10,7 @@ namespace AspNetCoreIdentity.Practice.Models
         [Compare("Password")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set;  }
     }
 }

@@ -60,13 +60,16 @@ namespace AspNetCoreIdentity.Practice.Controllers
                     user = new IdentityUser
                     {
                         Id = Guid.NewGuid().ToString(),
-                        UserName = model.UserName
+                        UserName = model.UserName,
+                        Email = model.Email
                     };
                     var result = await _userManager.CreateAsync(user, model.Password);
                     if (result.Succeeded)
                     {
                         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         var response = await AuthMessageSender.SendEmailAsync("","","");
+                        var confirmationEmail = Url.Action("ConfirmEmailAddress", "Home",
+                            new { token = confirmationToken, email = user.Email }, Request.Scheme);
                     }
                 }
 
@@ -77,13 +80,30 @@ namespace AspNetCoreIdentity.Practice.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ConfirmEmailAddress(string token, string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user != null)
+            {
+                var result = await _userManager.ConfirmEmailAsync(user, token);
+
+                if (result.Succeeded)
+                {
+                    return View("Success");
+                }
+            }
+
+            return View("Error");
+        }
+
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {
             if (ModelState.IsValid)
@@ -92,6 +112,11 @@ namespace AspNetCoreIdentity.Practice.Controllers
 
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
+                    if (!await _userManager.IsEmailConfirmedAsync(user))
+                    {
+                        ModelState.AddModelError("", "Email is not confirmed");
+                        return View();
+                    }
                     var identity = new ClaimsIdentity("memconnect");
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
                     identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));

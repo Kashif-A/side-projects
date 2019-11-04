@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspNetCoreIdentity.Practice.Controllers
+namespace AspNetCoreIdentity.Practice.Models
 {
     public class ResetPasswordModel
     {

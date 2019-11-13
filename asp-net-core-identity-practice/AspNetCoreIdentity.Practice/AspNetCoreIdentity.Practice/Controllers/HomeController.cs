@@ -117,7 +117,7 @@ namespace AspNetCoreIdentity.Practice.Controllers
                         ModelState.AddModelError("", "Email is not confirmed");
                         return View();
                     }
-                    var identity = new ClaimsIdentity("memconnect");
+                    var identity = new ClaimsIdentity("test");
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
                     identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
 

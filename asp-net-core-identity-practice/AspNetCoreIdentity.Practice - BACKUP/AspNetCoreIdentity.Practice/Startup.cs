@@ -22,6 +22,7 @@ namespace AspNetCoreIdentity.Practice
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
 
             var connectionString = @"Data source=127.0.0.1,1433;user=memconnect;password=password;" +
                 "database=IdentityDemo;" +
@@ -29,22 +30,34 @@ namespace AspNetCoreIdentity.Practice
 
             services.AddDbContext<IdentityDbContext<IdentityUser>>(options => options.UseSqlServer(connectionString));
 
-            services.AddIdentityCore<IdentityUser>().AddDefaultTokenProviders();
+            services.AddIdentityCore<IdentityUser>(options => {
+                options.SignIn.RequireConfirmedEmail = true;
+            })
+            .AddDefaultTokenProviders();
 
             services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser, IdentityDbContext<IdentityUser>>>();
-            
+
+            /*services.AddAuthentication("memconnect")
+                .AddCookie("memconnect", options =>
+                options.LoginPath = "/Home/Login");*/
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = ".Memconnect";
+                options.DefaultScheme = "test";
             })
                 .AddCookie(
-                    ".Memconnect",
-                    options => options.Cookie.Name = ".Memconnect"
-                );
+                    "test",
+                    options =>
+                    {
+                        options.Cookie.Name = "Memconnect";
+                        options.LoginPath = new PathString("/Home/Login");
+                    });
 
             // services.AddDefaultIdentity<IdentityUser>();
 
-            services.AddMvc();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,20 +72,25 @@ namespace AspNetCoreIdentity.Practice
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseCors(policy =>
-            {
-                policy.AllowAnyHeader();
-                policy.AllowAnyMethod();
-                policy.AllowAnyOrigin();
-                policy.AllowCredentials();
-            });
-
             app.UseAuthentication();
             app.UseStaticFiles();
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
 
-            app.UseMvcWithDefaultRoute();
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             using (var scope =
   app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())

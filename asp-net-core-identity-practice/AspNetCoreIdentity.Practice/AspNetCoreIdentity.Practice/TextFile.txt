@@ -1,0 +1,9 @@
+﻿fetch('http://localhost:55875/api/auth/login', {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+	  credentials: 'same-origin',
+      body: JSON.stringify({
+        "Username": "test",
+		"Password": "Test@11"
+      })
+    }).then(res => window.location='http://localhost:55875/api/auth/test')

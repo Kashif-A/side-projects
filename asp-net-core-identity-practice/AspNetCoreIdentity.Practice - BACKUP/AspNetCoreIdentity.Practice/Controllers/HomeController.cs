@@ -1,4 +1,4 @@
-﻿/*using AspNetCoreIdentity.Practice.Models;
+﻿using AspNetCoreIdentity.Practice.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -67,6 +67,7 @@ namespace AspNetCoreIdentity.Practice.Controllers
                     if (result.Succeeded)
                     {
                         var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var response = await AuthMessageSender.SendEmailAsync("","","");
                         var confirmationEmail = Url.Action("ConfirmEmailAddress", "Home",
                             new { token = confirmationToken, email = user.Email }, Request.Scheme);
                     }
@@ -192,4 +193,3 @@ namespace AspNetCoreIdentity.Practice.Controllers
         }
     }
 }
-*/

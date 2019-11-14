@@ -18,13 +18,20 @@ namespace AspNetCoreIdentity.Practice.Controllers
         {
             _userManager = userManager;
         }
-        
-        //[Authorize]
+
         [HttpGet]
-        [Route("test")]
-        public IActionResult Test()
+        [Route("setCookieInBrowser")]
+        public IActionResult setCookieInBrowser()
         {
-            return Content("test", "text/text"); // TODO
+            return Content("Authenticated", "text/text"); // TODO
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("hiddenStuff")]
+        public IActionResult hiddenStuff()
+        {
+            return Content("Accessing content that requires authorization", "text/text"); // TODO
         }
 
         [HttpPost]

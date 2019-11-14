@@ -19,7 +19,7 @@ namespace AspNetCoreIdentity.Practice.Controllers
             _userManager = userManager;
         }
         
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         [Route("test")]
         public IActionResult Test()

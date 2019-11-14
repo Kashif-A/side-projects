@@ -43,6 +43,8 @@ namespace AspNetCoreIdentity.Practice
                     {
                         options.Cookie.Name = ".Memconnect";
                         options.Cookie.Domain = "localhost";
+                        options.Cookie.HttpOnly = true;
+                        options.Cookie.SameSite = SameSiteMode.None;
                     }
                 );
 

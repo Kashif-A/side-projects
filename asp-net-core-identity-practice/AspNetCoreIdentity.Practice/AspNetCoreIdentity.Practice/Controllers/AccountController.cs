@@ -24,7 +24,7 @@ namespace AspNetCoreIdentity.Practice.Controllers
         [Route("test")]
         public IActionResult Test()
         {
-            return Content("test", "text/text");
+            return Content("test", "text/text"); // TODO
         }
 
         [HttpPost]

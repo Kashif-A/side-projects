@@ -32,17 +32,27 @@ namespace AspNetCoreIdentity.Practice
             services.AddIdentityCore<IdentityUser>().AddDefaultTokenProviders();
 
             services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser, IdentityDbContext<IdentityUser>>>();
-            
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = ".Memconnect";
             })
                 .AddCookie(
                     ".Memconnect",
-                    options => options.Cookie.Name = ".Memconnect"
+                    options =>
+                    {
+                        options.Cookie.Name = ".Memconnect";
+                        options.Cookie.Domain = "localhost";
+                    }
                 );
 
-            // services.AddDefaultIdentity<IdentityUser>();
+            services.AddCors(options => options.AddPolicy(".MemconnectCORS", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowCredentials();
+            }));
 
             services.AddMvc();
         }
@@ -59,23 +69,13 @@ namespace AspNetCoreIdentity.Practice
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseCors(policy =>
-            {
-                policy.AllowAnyHeader();
-                policy.AllowAnyMethod();
-                policy.AllowAnyOrigin();
-                policy.AllowCredentials();
-            });
-
             app.UseAuthentication();
-            app.UseStaticFiles();
+
+            app.UseCors(".MemconnectCORS");
 
             app.UseMvc();
 
-            app.UseMvcWithDefaultRoute();
-
-            using (var scope =
-  app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             using (var context = scope.ServiceProvider.GetRequiredService<IdentityDbContext<IdentityUser>>())
                 context.Database.EnsureCreated();
         }

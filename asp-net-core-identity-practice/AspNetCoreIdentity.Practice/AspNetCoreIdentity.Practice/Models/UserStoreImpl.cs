@@ -12,7 +12,7 @@ namespace AspNetCoreIdentity.Practice.Models
         public static DbConnection GetOpenConnection()
         {
             var connection = new SqlConnection("" +
-                "Data source=127.0.0.1,1433;user=memconnect;password=password;" +
+                "Data source=127.0.0.1,1433;user=IdentityDemo;password=password;" +
                 "database=IdentityDemo;" +
                 "trusted_connection=yes;");
 

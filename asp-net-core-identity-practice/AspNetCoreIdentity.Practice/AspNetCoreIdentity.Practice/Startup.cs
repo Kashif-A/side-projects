@@ -23,7 +23,7 @@ namespace AspNetCoreIdentity.Practice
         {
             services.AddMvc();
 
-            var connectionString = @"Data source=127.0.0.1,1433;user=memconnect;password=password;" +
+            var connectionString = @"Data source=127.0.0.1,1433;user=IdentityPractice;password=password;" +
                 "database=IdentityDemo;" +
                 "trusted_connection=yes;";
 
@@ -36,8 +36,8 @@ namespace AspNetCoreIdentity.Practice
 
             services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser, IdentityDbContext<IdentityUser>>>();
 
-            /*services.AddAuthentication("memconnect")
-                .AddCookie("memconnect", options =>
+            /*services.AddAuthentication("test")
+                .AddCookie("test", options =>
                 options.LoginPath = "/Home/Login");*/
             services.AddAuthentication(options =>
             {
@@ -47,7 +47,7 @@ namespace AspNetCoreIdentity.Practice
                     "test",
                     options =>
                     {
-                        options.Cookie.Name = "Memconnect";
+                        options.Cookie.Name = "test";
                         options.LoginPath = new PathString("/Home/Login");
                     });
 

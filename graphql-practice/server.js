@@ -6,26 +6,13 @@ const fetch = require('node-fetch')
 var schema = buildSchema(`
   type Query {
     hello: String,
-    getUsers: Data
-  },
-  type Data {
-    Id: String,
-    UserName: String,
-    Email: String
+    getUsers: String
   }
 `)
 
 var root = { 
    hello: () => 'Hello world!',
-   getUsers: () => fetch('http://memconnect_samanageconnector/api/Service')
-      .then(r => {
-            console.log('there'),
-            r.json()
-         })
-      .then(d => {
-            console.log('here'),
-            console.log(d) 
-         } 
+   getUsers: () => fetch('https://memconnect_cloudauthconnector/api/User/GetAllUsers').then(a => a.json()).then(b => b).then(c => c)
 }
 
 var app = express()

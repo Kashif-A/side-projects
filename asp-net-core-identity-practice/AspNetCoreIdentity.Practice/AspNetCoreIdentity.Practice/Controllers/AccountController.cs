@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AspNetCoreIdentity.Practice.Controllers
 {
     [Route("api/auth")]
+    [ApiController]
     public class OK : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -81,7 +84,6 @@ namespace AspNetCoreIdentity.Practice.Controllers
                         var identity = new ClaimsIdentity(".Memconnect");
                         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
                         identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
-
                         await HttpContext.SignInAsync(".Memconnect", new ClaimsPrincipal(identity));
                         return Content("{\"resp\":\"Logged in Successfully\"}");
                     }
@@ -90,6 +92,46 @@ namespace AspNetCoreIdentity.Practice.Controllers
             }
 
             return Content("{\"resp\": \"Invalid Username or Password\"}");
+        }
+
+        [HttpGet]
+        [Route("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await HttpContext.SignOutAsync();
+                return Ok();
+            }
+            catch (Exception) { }
+
+            return StatusCode(500);
+        }
+
+        [HttpPost]
+        [Route("token")]
+        public IActionResult GetToken()
+        {
+            try
+            {
+                string secret = "${---------------------SECRET------------------------}";
+                SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+                SigningCredentials signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
+
+                JwtSecurityToken token = new JwtSecurityToken(
+                        issuer: "test",
+                        audience: "test",
+                        expires: DateTime.Now.AddHours(1),
+                        signingCredentials: signingCredentials
+                    );
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                string jwtSecurityToken = tokenHandler.WriteToken(token);
+
+                return Ok(jwtSecurityToken);
+            }
+            catch (Exception) { }
+
+            return StatusCode(500);
         }
     }
 }

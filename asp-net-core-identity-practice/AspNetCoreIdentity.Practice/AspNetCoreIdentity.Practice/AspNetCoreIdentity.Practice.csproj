@@ -25,7 +25,9 @@
   <ItemGroup>
   <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0-msbuild3-final" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" />
+	<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.6.0" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
+	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
 	<DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" version="2.0.1" />
   </ItemGroup>
 

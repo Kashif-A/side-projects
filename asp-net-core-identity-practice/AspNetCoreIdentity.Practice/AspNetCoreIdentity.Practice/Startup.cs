@@ -36,7 +36,13 @@ namespace AspNetCoreIdentity.Practice
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = ".Memconnect";
+                options.DefaultSignInScheme = ".MemconnectJWT";
             })
+                .AddJwtBearer(options =>
+                {
+                    options.Validate();
+
+                })
                 .AddCookie(
                     ".Memconnect",
                     options =>
@@ -44,8 +50,7 @@ namespace AspNetCoreIdentity.Practice
                         options.Cookie.Name = ".Memconnect";
                         //options.Cookie.Domain = "localhost";
                         options.Cookie.HttpOnly = true;
-                    }
-                );
+                    });
 
             services.AddCors(options => options.AddPolicy(".MemconnectCORS", builder =>
             {

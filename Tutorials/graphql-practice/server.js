@@ -12,7 +12,7 @@ var schema = buildSchema(`
 
 var root = { 
    hello: () => 'Hello world!',
-   getUsers: () => fetch('https://memconnect_cloudauthconnector/api/User/GetAllUsers').then(a => a.json()).then(b => b).then(c => c)
+   getUsers: () => fetch('URL').then(a => a.json()).then(b => b).then(c => c)
 }
 
 var app = express()

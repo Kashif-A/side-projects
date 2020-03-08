@@ -12,36 +12,53 @@
 
     <title>App</title>
   </head>
-  <body>
+  <body className="opening hide-UI view-2D zoom-large data-close controls-close">
     <div id='root'></div>
     
-    <script
-      src='https://code.jquery.com/jquery-3.4.1.min.js'
-      integrity='sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo='
-      crossorigin='anonymous'></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
 
       <script>
-        $(function() {
-  $('.click').on('click', () => {
-    const O = $('.orbit');
-    const cssValue = O.css('animation-play-state');
-    
-    if(cssValue === 'running') {
-      O.css('animation-play-state', 'paused');
-      O.css('animation-play-state', 'paused');
-      O.css('animation-play-state', 'paused');
-    } else {
-      O.css('animation-play-state', 'running');
-      O.css('animation-play-state', 'running');
-      O.css('animation-play-state', 'running');
-    }
-    
-  
-  })
+        $(window).load(function(){
 
-  $('.planet').on('click', () => {
-    console.log('clicked planet');
-  })
+var body = $("body"),
+    universe = $("#universe"),
+    solarsys = $("#solar-system");
+
+var init = function() {
+  body.removeClass('view-2D opening').addClass("view-3D").delay(2000).queue(function() {
+    $(this).removeClass('hide-UI').addClass("set-speed");
+    $(this).dequeue();
+  });
+};
+
+var setView = function(view) { universe.removeClass().addClass(view); };
+
+$("#toggle-data").click(function(e) {
+  body.toggleClass("data-open data-close");
+  e.preventDefault();
+});
+
+$("#toggle-controls").click(function(e) {
+  body.toggleClass("controls-open controls-close");
+  e.preventDefault();
+});
+
+$("#data a").click(function(e) {
+  var ref = $(this).attr("className");
+  solarsys.removeClass().addClass(ref);
+  $(this).parent().find('a').removeClass('active');
+  $(this).addClass('active');
+  e.preventDefault();
+});
+
+$(".set-view").click(function() { body.toggleClass("view-3D view-2D"); });
+$(".set-zoom").click(function() { body.toggleClass("zoom-large zoom-close"); });
+$(".set-speed").click(function() { setView("scale-stretched set-speed"); });
+$(".set-size").click(function() { setView("scale-s set-size"); });
+$(".set-distance").click(function() { setView("scale-d set-distance"); });
+
+init();
+
 });
       </script>
 

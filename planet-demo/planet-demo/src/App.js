@@ -1,4 +1,6 @@
 import React, {Fragment} from 'react';
+
+import Planet from './components/Planet';
 import './App.css';
 
 function App() {
@@ -6,12 +8,7 @@ function App() {
     <Fragment>
       <div className="view-3D scale-stretched">
         <div id="solar-system">
-          <div id="mercury" className="orbit">
-            <div className="pos">
-              <div className="planet">
-              </div>
-            </div>
-          </div>
+          <Planet />
         </div>
       </div>
       <div className="click" />

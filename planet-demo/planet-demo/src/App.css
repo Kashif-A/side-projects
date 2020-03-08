@@ -1,38 +1,105 @@
-.App {
-  text-align: center;
-}
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
+body {
+  font-size: 10px;
+  background-color: #08090A; }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+#solar-system {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.orbit {
+  position: absolute;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  left: 80%;
+  top: 50%;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  animation-name: orbit;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+
+.pos {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2em;
+  height: 2em;
+  margin-top: -1em;
+  margin-left: -1em;
+  transform-style: preserve-3d;
+  animation-name: invert;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+
+.planet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin-top: -0.5em;
+  margin-left: -0.5em; }
+
+
+/* --------------------------------------------------------------------------- animations */
+@keyframes orbit {
+  0% {
+    transform: rotateZ(0deg); }
+
+  100% {
+    transform: rotateZ(-360deg); } }
+
+@keyframes invert {
+  0% {
+    transform: rotateX(-90deg) rotateY(360deg)  }
+
+  100% {
+    transform: rotateX(-90deg) rotateY(0deg) } }
+/* --------------------------------------------------------------------------- 3D view */
+
+.view-3D #solar-system {
+  transform: rotateX(75deg); }
+
+/* --------------------------------------------------------------------------- speed */
+/* sideral years */
+#mercury .pos,
+#mercury .planet,
+#mercury.orbit {
+  animation-duration: 32.89016s; }
+
+/* --------------------------------------------------------------------------- stretched sizes */
+
+.scale-stretched #mercury .planet {
+  font-size: 2.6em; }
+
+/* --------------------------------------------------------------------------- stretched orbits */
+.scale-stretched #mercury.orbit {
+  width: 40em;
+  height: 40em;
+  margin-top: -50em;
+  margin-left: -50em; }
+
+/* --------------------------------------------------------------------------- planets starting position and lighting effect */
+/* --------------------------------------------------------------------------- mercury ; pos: Top */
+#mercury .pos {
+  left: 50%;
+  top: -1%; }
+
+/* --------------------------------------------------------------------------- images */
+
+#mercury .planet {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAMAAACelLz8AAAABGdBTUEAALGPC/xhBQAAAGBQTFRFsW89lWA2jVwzsm8+qGo72oVJrW08h1gxlWA15IpMrW09jlw0l2E2nGM3v3ZC3YdK3odKyHtE75BP8JFQ8JFQ8JFQ8JFQ8JFQw3hD8JFQ8JFQ8JFQ8JFQ8JFQ8JFQAAAAe3ooYQAAACB0Uk5Tk0+hrcTz6g7P5tkiYurz49bk79XR3vvm2PH26ezi2QCQ4vSgAAABm0lEQVQoz1VSWXaEMAzLLAw7ZHMSx0vvf8uaTtvX+icQYSRbch/vGrf7ftV0v43fV+59bNP+Oo6jtXAs0/YHWg1o4TxnqyG05bn+QOt0AUIRKWVV39qyvqF1f4VTFSqiZgWuerarz6D7KwyoqkI19k5UFYfjeUHbdJzEkLQS9cLCSELDsX24cVoCVYYMHXsphQk0Aw2v0W17OCv2CPwFIWnSBDAfmzOmSt0KmZhj1ZwERLU5N72GwsyIREwCKZtIsAe/uL3NpapW42ciMTWitXI8g9uDj/aCAEZoaqRHtf8ZmduPFAtW1kz2BWntXQRUo0FhTrVcKxLTZmNbi7Fd0NR8Vhsz5x6jZMHIrJrS3Nx98WAQ5lyJsXdGGxs0eeduS5Brs1+y2dZRe0EBajc3LuaHEKRks8qFIYrC0EZb79KM31qUbCO9l44mJWyXKY9mbMnkJzAeo0Ni/3hb+WynqDGkDJHNa/Okrd8BWJpPag1gHpdO5vL6G5tnC15rRBaI6sNj/Ru25Wjez3E+LTTbvxxaRB/PdtVj+4noJ91nOp3NTB6wAAAAAElFTkSuQmCC); 
+}
+  
+  .click {
+    width: 5em;
+    height: 5em;
+    background-color: red;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 12;
+    overflow: 'hidden';
   }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}

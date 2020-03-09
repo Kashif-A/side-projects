@@ -1,16 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Planets.Models
 {
     public class Planet
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
         [Required]
-        public string Url { get; set; }
+        public string Name { get; set; }
         [Required]
-        public double DistanceFromSun { get; set; }
+        public string ImageUrl { get; set; }
         [Required]
-        public double Mass { get; set; }
+        public long DistanceFromSun { get; set; }
         [Required]
-        public double Diameter { get; set; }
+        public string Mass { get; set; }
+        [Required]
+        public int Diameter { get; set; }
     }
 }

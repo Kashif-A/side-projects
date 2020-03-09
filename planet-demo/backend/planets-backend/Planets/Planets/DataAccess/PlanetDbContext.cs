@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Planets.Models;
 
-namespace Planets.Data
+namespace Planets.DataAccess
 {
     public class PlanetDbContext : DbContext
     {

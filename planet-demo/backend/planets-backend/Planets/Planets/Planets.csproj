@@ -11,4 +11,8 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Planets.Models\Planets.Models.csproj" />
+  </ItemGroup>
+
 </Project>

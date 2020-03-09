@@ -6,10 +6,6 @@ import './App.css';
 function App() {
   return (
     <Fragment>
-        <div id='navbar'>
-          <a id='toggle-data' href='#data'><i className='icon-data'></i>Data</a>
-          <a id='toggle-controls' href='#controls'><i className='icon-controls'></i>Controls</a>
-        </div>
         <div id='data'>
           <a className='sun' title='sun' href='#sunspeed'>Sun</a>
           <a className='mercury' title='mercury' href='#mercuryspeed'>Mercury</a>

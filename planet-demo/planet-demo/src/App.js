@@ -2,6 +2,7 @@ import React, {Fragment} from 'react';
 
 // import Planet from './components/Planet';
 import './App.css';
+import Planet from './components/Planet';
 
 function App() {
   return (
@@ -21,92 +22,14 @@ function App() {
         <div id='universe' className='scale-stretched'>
           <div id='galaxy'>
             <div id='solar-system' className='earth'>
-              <div id='mercury' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Mercury</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='venus' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Venus</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='earth' className='orbit'>
-                <div className='pos'>
-                  <div className='orbit'>
-                    <div className='pos'>
-                      <div className='moon'></div>
-                    </div>
-                  </div>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Earth</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='mars' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Mars</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='jupiter' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Jupiter</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='saturn' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <div className='ring'></div>
-                    <dl className='infos'>
-                      <dt>Saturn</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='uranus' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Uranus</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div id='neptune' className='orbit'>
-                <div className='pos'>
-                  <div className='planet'>
-                    <dl className='infos'>
-                      <dt>Neptune</dt>
-                      <dd><span></span></dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
+              <Planet planet={'mercury'} />
+              <Planet planet={'venus'} />
+              <Planet planet={'earth'} />
+              <Planet planet={'mars'} />
+              <Planet planet={'jupiter'} />
+              <Planet planet={'saturn'} />
+              <Planet planet={'uranus'} />
+              <Planet planet={'neptune'} />
               <div id='sun'>
                 <dl className='infos'>
                   <dt>Sun</dt>

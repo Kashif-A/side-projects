@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import App from './App'
+import Moment from 'react-moment'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+(() => setInterval(() => { ReactDOM.render(<Moment date={new Date().getTime()}/>, document.getElementById('root')) }))()

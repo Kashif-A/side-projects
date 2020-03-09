@@ -21,21 +21,7 @@ function App() {
           <a className='uranus' title='uranus' href='#uranusspeed'>Uranus</a>
           <a className='neptune' title='neptune' href='#neptunespeed'>Neptune</a>
         </div>
-        <div id='controls'>
-          <label className='set-view' />
-            <input type='checkbox' />
-          <label className='set-zoom' />
-            <input type='checkbox' />
-          <label />
-            <input type='radio' className='set-speed' name='scale' checked />
-            <span>Speed</span>
-          <label />
-            <input type='radio' className='set-size' name='scale' />
-            <span>Size</span>
-          <label />
-            <input type='radio' className='set-distance' name='scale' />
-            <span>Distance</span>
-        </div>
+
         <div id='universe' className='scale-stretched'>
           <div id='galaxy'>
             <div id='solar-system' className='earth'>

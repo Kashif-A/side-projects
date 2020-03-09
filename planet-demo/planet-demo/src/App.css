@@ -513,103 +513,6 @@ body {
   margin-top: -0.5em;
   margin-left: -0.5em; }
 
-/* --------------------------------------------------------------------------- text infos data */
-/* --------------------------------------------------------------------------- speed */
-.set-speed dl.infos dd span:after {
-  content: 'Orbit Velocity'; }
-
-.set-speed #sun dl.infos dd:after {
-  content: '0 km/h'; }
-
-.set-speed #mercury dl.infos dd:after {
-  content: '170,503 km/h'; }
-
-.set-speed #venus dl.infos dd:after {
-  content: '126,074 km/h'; }
-
-.set-speed #earth dl.infos dd:after {
-  content: '107,218 km/h'; }
-
-.set-speed #mars dl.infos dd:after {
-  content: '86,677 km/h'; }
-
-.set-speed #jupiter dl.infos dd:after {
-  content: '47,002 km/h'; }
-
-.set-speed #saturn dl.infos dd:after {
-  content: '34,701 km/h'; }
-
-.set-speed #uranus dl.infos dd:after {
-  content: '24,477 km/h'; }
-
-.set-speed #neptune dl.infos dd:after {
-  content: '19,566 km/h'; }
-
-/* --------------------------------------------------------------------------- size */
-.set-size dl.infos dd span:after {
-  content: 'Equatorial Circumference'; }
-
-.set-size #sun dl.infos dd:after {
-  content: '4,370,005 km'; }
-
-.set-size #mercury dl.infos dd:after {
-  content: '15,329 km'; }
-
-.set-size #venus dl.infos dd:after {
-  content: '38,024 km'; }
-
-.set-size #earth dl.infos dd:after {
-  content: '40,030 km'; }
-
-.set-size #mars dl.infos dd:after {
-  content: '21,296 km'; }
-
-.set-size #jupiter dl.infos dd:after {
-  content: '439,263 km'; }
-
-.set-size #saturn dl.infos dd:after {
-  content: '365,882 km'; }
-
-.set-size #uranus dl.infos dd:after {
-  content: '159,354 km'; }
-
-.set-size #neptune dl.infos dd:after {
-  content: '154,704 km'; }
-
-/* --------------------------------------------------------------------------- distance */
-.set-distance dl.infos dd span:after {
-  content: 'From Sun'; }
-
-.set-distance #sun dl.infos dd span:after {
-  content: 'From Earth'; }
-
-.set-distance #sun dl.infos dd:after {
-  content: '149,598,262 km'; }
-
-.set-distance #mercury dl.infos dd:after {
-  content: '57,909,227 km'; }
-
-.set-distance #venus dl.infos dd:after {
-  content: '108,209,475 km'; }
-
-.set-distance #earth dl.infos dd:after {
-  content: '149,598,262 km'; }
-
-.set-distance #mars dl.infos dd:after {
-  content: '227,943,824 km'; }
-
-.set-distance #jupiter dl.infos dd:after {
-  content: '778,340,821 km'; }
-
-.set-distance #saturn dl.infos dd:after {
-  content: '1,426,666,422 km'; }
-
-.set-distance #uranus dl.infos dd:after {
-  content: '2,870,658,186 km'; }
-
-.set-distance #neptune dl.infos dd:after {
-  content: '4,498,396,441 km'; }
-
 /* --------------------------------------------------------------------------- planets starting position and lighting effect */
 /* --------------------------------------------------------------------------- mercury ; pos: Top */
 #mercury .pos {
@@ -1039,7 +942,7 @@ h1 span, #navbar h1 a {
   color: rgba(255, 255, 255, 0.5); 
 }
 
-#navbar, #controls, #data {
+#navbar, #data {
   background: rgba(0, 0, 0, 0.4); }
 
 #navbar {
@@ -1051,13 +954,13 @@ h1 span, #navbar h1 a {
   width: 100%;
   height: 48px; }
 
-#navbar a, #data a, #controls label {
+#navbar a, #data a {
   color: rgba(255, 255, 255, 0.6);
   display: block;
   position: relative;
   text-decoration: none; }
 
-#navbar a:hover, #data a:hover, #controls label:hover {
+#navbar a:hover, #data a:hover {
   color: #FFF; }
 
 #data a.active {
@@ -1076,7 +979,7 @@ h1 span, #navbar h1 a {
 #toggle-controls {
   right: 0; }
 
-#data, #controls {
+#data {
   z-index: 99;
   position: fixed;
   opacity: 1;
@@ -1089,103 +992,10 @@ h1 span, #navbar h1 a {
 .data-open #data {
   left: 0px; }
 
-.controls-close #controls {
-  right: -100%; }
-
-.controls-open #controls {
-  right: 0px; }
-
 #data a {
   margin-bottom: 1px;
   padding: 6px 10px;
   font-size: 18px; }
-
-#controls label {
-  opacity: .6;
-  height: 24px;
-  margin-bottom: 28px; }
-
-#controls label:hover {
-  opacity: 1; }
-
-#controls label:before {
-  position: absolute;
-  display: block;
-  width: 20px;
-  height: 20px;
-  margin-top: 3px;
-  text-align: center;
-  color: #FFF;
-  z-index: 99; }
-
-#controls label span {
-  display: block;
-  margin-left: 36px;
-  padding-top: 4px;
-  font-size: 18px;
-  color: #FFF; }
-
-#controls input {
-  display: block;
-  appearance: none; }
-
-#controls input[type='radio']:before {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border: 2px solid #FFF;
-  border-radius: 16px; }
-
-#controls input:checked[type='radio']:after {
-  content: '';
-  display: block;
-  top: 3px;
-  margin-left: 3px;
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  background: #FFF;
-  z-index: 99; }
-
-#controls input[type='checkbox']:before {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 100px;
-  height: 22px;
-  border: 2px solid #FFF;
-  border-radius: 16px; }
-
-#controls input[type='checkbox']:after {
-  content: '';
-  display: block;
-  top: 3px;
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  background: #FFF;
-  z-index: 99; }
-
-#controls label.set-view:before {
-  font: bold small-caps 11px/20px sans-serif; }
-
-.view-3D #controls label.set-view:before {
-  content: '2D';
-  margin-left: 82px; }
-
-.view-2D #controls label.set-view:before {
-  content: '3D';
-  margin-left: 7px; }
-
-.view-3D #controls .set-view input:after {
-  margin-left: 3px; }
-
-.view-2D #controls .set-view input:after {
-  margin-left: 81px; }
 
 /* --------------------------------------------------------------------------- transitions */
 .pos {
@@ -1222,7 +1032,7 @@ h1 span, #navbar h1 a {
 .pos {
   transition-delay: 1s; }
 
-h1, #data, #controls {
+h1, #data {
   transition-property: opacity, margin;
   transition-duration: .8s;
   transition-timing-function: ease-in-out; }
@@ -1232,9 +1042,6 @@ h1 {
 
 #data {
   transition-delay: .7s; }
-
-#controls {
-  transition-delay: 1s; }
 
 /* --------------------------------------------------------------------------- images */
 body {
@@ -1291,9 +1098,9 @@ body {
     font-size: 58%; } }
 @media screen and (min-width: 1000px) {
   #universe {
-    font-size: 73%; }
+    font-size: 73%; } }
 
-  #navbar, #controls, #data {
+  #navbar, #data {
     background: transparent; }
 
   #navbar a {
@@ -1302,10 +1109,6 @@ body {
   h1 {
     font-size: 22px;
     margin-top: 8px; }
-
-  #controls {
-    padding-right: 32px;
-    top: 12px; }
 
   #data {
     position: fixed;
@@ -1323,8 +1126,6 @@ body {
   .data-open #data, .data-close #data {
     left: 0px; }
 
-  .controls-open #controls, .controls-close #controls {
-    right: 0px; } }
 @media screen and (min-width: 1300px) {
   #universe {
     font-size: 100%; } }

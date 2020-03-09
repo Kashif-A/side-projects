@@ -12,7 +12,7 @@
 
     <title>App</title>
   </head>
-  <body className='view-2D zoom-large data-close controls-close'>
+  <body className='view-3D set-speed data-close controls-close'>
     <div id='root'></div>
     
     <script src='//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js'></script>
@@ -24,7 +24,7 @@ var body = $('body'),
     universe = $('#universe'),
     solarsys = $('#solar-system');
 
-var init = function() {
+    var init = function() {
   body.removeClass('view-2D opening').addClass('view-3D').delay(2000).queue(function() {
     $(this).removeClass('hide-UI').addClass('set-speed');
     $(this).dequeue();
@@ -52,7 +52,6 @@ $('#data a').click(function(e) {
 });
 
 $('.set-view').click(function() { body.toggleClass('view-3D view-2D'); });
-$('.set-zoom').click(function() { body.toggleClass('zoom-large zoom-close'); });
 $('.set-speed').click(function() { setView('scale-stretched set-speed'); });
 $('.set-size').click(function() { setView('scale-s set-size'); });
 $('.set-distance').click(function() { setView('scale-d set-distance'); });

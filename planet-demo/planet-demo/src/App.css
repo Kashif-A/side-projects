@@ -183,27 +183,7 @@ body {
   100% {
     transform: rotateX(-90deg) rotateY(0deg) rotateZ(0deg); } }
 
-/* --------------------------------------------------------------------------- 2D view */
-.view-2D.zoom-large #sun {
-  transform-style: flat; }
-
-.view-2D.zoom-large .orbit {
-  transform-style: flat; }
-
-.view-2D #sun,
-.view-2D .ring {
-  transform: rotateX(0deg); }
-
-.view-2D .planet,
-.view-2D .moon {
-  transform: rotateX(90deg); }
-
 /* --------------------------------------------------------------------------- 3D view */
-.view-3D.zoom-large #sun {
-  transform-style: preserve-3d; }
-
-.view-3D.zoom-large .orbit {
-  transform-style: preserve-3d; }
 
 .view-3D #solar-system {
   transform: rotateX(75deg); }
@@ -217,77 +197,6 @@ body {
 .view-3D .planet,
 .view-3D .moon {
   transform: rotateX(0deg); }
-
-/* --------------------------------------------------------------------------- large zoom */
-.zoom-large #solar-system {
-  width: 100%; }
-
-.zoom-large.view-2D .scale-stretched #solar-system {
-  font-size: 26%; }
-
-.zoom-large.view-3D .scale-stretched #solar-system {
-  font-size: 62%; }
-
-.zoom-large.view-2D .scale-d #solar-system {
-  font-size: 22%; }
-
-.zoom-large.view-3D .scale-d #solar-system {
-  font-size: 48%; }
-
-.zoom-large.view-2D .scale-s #solar-system {
-  font-size: 7%; }
-
-.zoom-large.view-3D .scale-s #solar-system {
-  font-size: 14%; }
-
-/* --------------------------------------------------------------------------- close zoom */
-.zoom-close #solar-system {
-  width: 200%;
-  font-size: 100%; }
-
-.zoom-close .scale-stretched #solar-system {
-  margin-left: -100%; }
-
-.zoom-close .scale-d #solar-system {
-  margin-left: -106%; }
-
-.zoom-close.view-2D .scale-d #solar-system {
-  font-size: 84%; }
-
-.zoom-close.view-3D .scale-d #solar-system {
-  font-size: 84%; }
-
-.zoom-close .scale-s #solar-system {
-  margin-left: -145%; }
-
-.zoom-close.view-2D .scale-s #solar-system {
-  font-size: 40%; }
-
-.zoom-close.view-3D .scale-s #solar-system {
-  font-size: 40%; }
-
-.zoom-close .orbit,
-.zoom-close .pos,
-.zoom-close .planet,
-.zoom-close .satelite,
-.zoom-close .ring {
-  animation-play-state: paused!important;
-  animation-duration: 0s!important;
-  animation: none!important; }
-
-.zoom-close.view-2D .planet,
-.zoom-close.view-2D .moon {
-  transform: rotateX(0deg); }
-
-.zoom-close.view-3D .planet {
-  transform: rotateX(-90deg); }
-
-.zoom-close.view-3D .moon {
-  transform: rotateX(90deg); }
-
-.zoom-close .pos {
-  left: 100%!important;
-  top: 50%!important; }
 
 /* --------------------------------------------------------------------------- data */
 /* --------------------------------------------------------------------------- speed */
@@ -1278,23 +1187,6 @@ h1 span, #navbar h1 a {
 .view-2D #controls .set-view input:after {
   margin-left: 81px; }
 
-#controls label.set-zoom:before {
-  font: normal small-caps 18px/14px sans-serif; }
-
-.zoom-large #controls label.set-zoom:before {
-  content: '+';
-  margin-left: 82px; }
-
-.zoom-close #controls label.set-zoom:before {
-  content: '-';
-  margin-left: 7px; }
-
-.zoom-large #controls .set-zoom input:after {
-  margin-left: 3px; }
-
-.zoom-close #controls .set-zoom input:after {
-  margin-left: 81px; }
-
 /* --------------------------------------------------------------------------- transitions */
 .pos {
   transition-property: top, left; }
@@ -1436,9 +1328,6 @@ body {
 @media screen and (min-width: 1300px) {
   #universe {
     font-size: 100%; } }
-@media screen and (min-width: 1600px) {
-  .zoom-close .scale-d #solar-system {
-    margin-left: -120%; } }
 
 
 .click {

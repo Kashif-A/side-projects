@@ -2,10 +2,6 @@ import React from 'react'
 
 const Controls = () =>
 	<>
-		<div id='navbar'>
-			<a id='toggle-data' href='#data'><i className='icon-data'></i>Data</a>
-			<a id='toggle-controls' href='#controls'><i className='icon-controls'></i>Controls</a>
-		</div>
 		<div id='data'>
 			<a className='sun' title='sun' href='#sunspeed'>Sun</a>
 			<a className='mercury' title='mercury' href='#mercuryspeed'>Mercury</a>
@@ -19,7 +15,7 @@ const Controls = () =>
 		</div>
 		<div id='controls'>
 			<label>
-				<input type='radio' className='set-speed' name='scale' checked />
+				<input type='radio' className='set-speed' name='scale' defaultChecked />
 				<span>Show Speed</span>
 			</label>
 			<label>

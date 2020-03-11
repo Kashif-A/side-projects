@@ -13,7 +13,7 @@ function App() {
       {renderUniverse()}
     </Fragment>
   )
-}
+}   
 
 export default App
 

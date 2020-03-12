@@ -7,11 +7,11 @@ const Planet = props => {
 			<div className='pos'>
                 
 				{planet === 'earth' &&
-                    <div className='orbit'>
-                    	<div className='pos'>
-                    		<div className='moon'></div>
-                    	</div>
-                    </div>}
+					<div className='orbit'>
+						<div className='pos'>
+							<div className='moon'></div>
+						</div>
+					</div>}
 
 				<div className='planet'>
                     

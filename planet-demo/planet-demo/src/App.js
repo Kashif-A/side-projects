@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useState } from 'react'
 
 import './App.css'
 
@@ -7,9 +7,11 @@ import Sun from './components/Sun'
 import Controls from './components/Controls'
 
 function App() {
+	const [selectedPlanet, setSelectedPlanet] = useState(null)
+	console.log(selectedPlanet)
 	return (
 		<Fragment>
-			<Controls />
+			<Controls setSelectedPlanet={setSelectedPlanet} />
 			{renderUniverse()}
 		</Fragment>
 	)

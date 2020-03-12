@@ -22,31 +22,31 @@
 
       var body = $('body'),
           universe = $('#universe'),
-          solarsys = $('#solar-system');
+          solarsys = $('#solar-system')
 
       var init = function() {
         body.removeClass('opening').addClass('view-3D').delay(2000).queue(function() {
-          $(this).removeClass('hide-UI').addClass('set-speed');
-          $(this).dequeue();
-        });
-      };
+          $(this).removeClass('hide-UI').addClass('set-speed')
+          $(this).dequeue()
+        })
+      }
 
-      var setView = function(view) { universe.removeClass().addClass(view); };
+      var setView = function(view) { universe.removeClass().addClass(view) }
 
       $('#data a').click(function(e) {
-        var ref = $(this).attr('class');
-        solarsys.removeClass().addClass(ref);
-        $(this).parent().find('a').removeClass('active');
-        $(this).addClass('active');
-        e.preventDefault();
-      });
+        var ref = $(this).attr('class')
+        solarsys.removeClass().addClass(ref)
+        $(this).parent().find('a').removeClass('active')
+        $(this).addClass('active')
+        e.preventDefault()
+      })
 
-      $('.set-speed').click(function() { setView('scale-stretched set-speed'); });
-      $('.set-distance').click(function() { setView('scale-d set-distance'); });
+      $('.set-speed').click(function() { setView('scale-stretched set-speed') })
+      $('.set-distance').click(function() { setView('scale-d set-distance') })
 
-      init();
+      init()
 
-      });
+      })
     </script>
 </body>
 </html>

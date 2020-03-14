@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-const PlanetDetail = (props) => {
+const PlanetDetails = (props) => {
 	const { selectedPlanet, setSelectedPlanet } = props
 
 	const [planetDetails, setPlanetDetails] = useState(null)
@@ -19,7 +19,7 @@ const PlanetDetail = (props) => {
 	console.log(planetDetails)
 
 	return (
-		<div className='planetDetail'>
+		<div className='planetDetails'>
 
 			{renderCloseButton(setSelectedPlanet)}
 			
@@ -34,7 +34,7 @@ const PlanetDetail = (props) => {
 	)
 }
 
-export default PlanetDetail
+export default PlanetDetails
 
 const renderDetail = (planetDetails) => {
 	const { name, distanceFromSun, mass, diameter, imageUrl } = planetDetails

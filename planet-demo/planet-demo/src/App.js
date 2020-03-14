@@ -3,7 +3,7 @@ import React, { Fragment, useState } from 'react'
 import './App.css'
 import Controls from './components/Controls'
 import Universe from './components/Universe'
-import PlanetDetail from './components/PlanetDetail'
+import PlanetDetails from './components/PlanetDetails'
 
 function App() {
 	const [selectedPlanet, setSelectedPlanet] = useState(null)
@@ -16,7 +16,7 @@ function App() {
 			<Universe />
 
 			{selectedPlanet && 
-				<PlanetDetail 
+				<PlanetDetails 
 					selectedPlanet={selectedPlanet} 
 					setSelectedPlanet={setSelectedPlanet} />}
 

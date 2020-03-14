@@ -44,16 +44,16 @@ const renderDetail = (planetDetails) => {
 
 			<h2 className='planetDetailName'>{name}</h2>
 
-			<div style={{marginLeft: '50px', float: 'left', marginTop: '35px', backgroundColor: 'red'}}>
-				<img src={imageUrl} height='230' />
+			<div>
+				<img src={imageUrl} height='230' style={{textAlign: 'right'}} />
 			</div>
 
-			<div style={{marginLeft: '330px'}}>
+			<div>
 				<form className='form'>
 					<ul>
 
 						<li>
-							<label htmlFor='distance from sun'>Distance from Sun</label>
+							<label htmlFor='distance from sun'>Distance from Sun (KM)</label>
 							<input 
 								type='text' 
 								name='distance from sun' 
@@ -62,7 +62,7 @@ const renderDetail = (planetDetails) => {
 						</li>
 
 						<li>
-							<label htmlFor='mass'>Mass</label>
+							<label htmlFor='mass'>Mass (KG)</label>
 							<input 
 								type='text' 
 								name='mass' 
@@ -71,7 +71,7 @@ const renderDetail = (planetDetails) => {
 						</li>
 
 						<li>
-							<label htmlFor='diameter'>Diameter</label>
+							<label htmlFor='diameter'>Diameter (KM)</label>
 							<input 
 								type='text' 
 								name='diameter' 

@@ -21,7 +21,7 @@ export default Controls
 
 const renderPlanetControls = (setSelectedPlanet) => 
 	<>
-		<a className='sun' title='sun' href='#sunspeed' onClick={() => setSelectedPlanet('sun')}>Sun</a>
+		<a className='sun' title='sun' href='#sunspeed' onClick={() => setSelectedPlanet(null)}>Sun</a>
 		<a className='mercury' title='mercury' href='#mercuryspeed' onClick={() => setSelectedPlanet('mercury')}>Mercury</a>
 		<a className='venus' title='venus' href='#venusspeed' onClick={() => setSelectedPlanet('venus')}>Venus</a>
 		<a className='earth active' title='earth' href='#earthspeed' onClick={() => setSelectedPlanet('earth')}>Earth</a>

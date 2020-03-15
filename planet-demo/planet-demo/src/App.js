@@ -4,24 +4,35 @@ import './App.css'
 import Controls from './components/Controls'
 import Universe from './components/Universe'
 import PlanetDetails from './components/PlanetDetails'
+import Auth from './components/auth/Auth'
 
 function App() {
 	const [selectedPlanet, setSelectedPlanet] = useState(null)
-	console.log(selectedPlanet)
+	const [authenticated, setAuthenticated] = useState(null)
+
 	return (
-		<Fragment>
-			
-			<Controls setSelectedPlanet={setSelectedPlanet} />
-			
-			<Universe />
+		authenticated 
 
-			{selectedPlanet && 
-				<PlanetDetails 
-					selectedPlanet={selectedPlanet} 
-					setSelectedPlanet={setSelectedPlanet} />}
+			? renderMainApp(
+				selectedPlanet, 
+				setSelectedPlanet) 
 
-		</Fragment>
+			: <Auth 
+				authenticated={authenticated}
+				setAuthenticated={setAuthenticated} />
 	)
 }
 
 export default App
+
+const renderMainApp = (selectedPlanet, setSelectedPlanet) =>
+	<Fragment>
+		<Controls setSelectedPlanet={selectedPlanet} />
+
+		<Universe />
+
+		{selectedPlanet &&
+			<PlanetDetails
+				selectedPlanet={selectedPlanet}
+				setSelectedPlanet={setSelectedPlanet} />}
+	</Fragment>

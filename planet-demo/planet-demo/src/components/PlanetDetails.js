@@ -4,6 +4,7 @@ const PlanetDetails = (props) => {
 	const { selectedPlanet, setSelectedPlanet } = props
 
 	const [planetDetails, setPlanetDetails] = useState(null)
+	const [enableUpdate, setEnableUpdate] = useState(false)
 
 	useEffect(() => {
 		selectedPlanet &&
@@ -26,7 +27,7 @@ const PlanetDetails = (props) => {
 			<div style={{ marginTop: '-10px' }}>
 
 				{planetDetails
-					? renderDetail(planetDetails)
+					? renderDetail(planetDetails, setPlanetDetails, enableUpdate, setEnableUpdate)
 					: <p style={{padding: '20px', backgroundColor: 'white'}}>LOADING...</p>}
 				
 			</div>
@@ -36,7 +37,7 @@ const PlanetDetails = (props) => {
 
 export default PlanetDetails
 
-const renderDetail = (planetDetails) => {
+const renderDetail = (planetDetails, setPlanetDetails, enableUpdate, setEnableUpdate) => {
 	const { name, distanceFromSun, mass, diameter, imageUrl } = planetDetails
 
 	return (
@@ -45,20 +46,26 @@ const renderDetail = (planetDetails) => {
 			<h2 className='planetDetailName'>{name}</h2>
 
 			<div>
-				<img src={imageUrl} height='230' style={{textAlign: 'right'}} />
+				<img src={imageUrl} height='170' style={{textAlign: 'right'}} />
 			</div>
 
 			<div>
+				<p style={{paddingTop: '20px', color: '#fff', fontSize: '15px'}}>Please change any of the following details to enable update functionality...</p>
 				<form className='form'>
 					<ul>
 
 						<li>
 							<label htmlFor='distance from sun'>Distance from Sun (KM)</label>
 							<input 
-								type='text' 
+								type='number' 
 								name='distance from sun' 
 								maxLength='100'
-								value={distanceFromSun} />
+								value={distanceFromSun}
+								onChange={(e) => {
+									const distanceFromSun = parseInt(e.target.value)
+									setPlanetDetails({ ...planetDetails, distanceFromSun })
+									setEnableUpdate(true)
+								}} />
 						</li>
 
 						<li>
@@ -67,20 +74,34 @@ const renderDetail = (planetDetails) => {
 								type='text' 
 								name='mass' 
 								maxLength='100'
-								value={mass} />
+								value={mass}
+								onChange={(e) => {
+									const mass = e.target.value
+									setPlanetDetails({ ...planetDetails, mass })
+									setEnableUpdate(true)
+								}} />
 						</li>
 
 						<li>
 							<label htmlFor='diameter'>Diameter (KM)</label>
 							<input 
-								type='text' 
+								type='number' 
 								name='diameter' 
 								maxLength='100'
-								value={diameter} />
+								value={diameter}
+								onChange={(e) => {
+									const diameter = parseInt(e.target.value)
+									setPlanetDetails({ ...planetDetails, diameter })
+									setEnableUpdate(true)
+								}} />
 						</li>
 
 						<li>
-							<input type='submit' value='Update' />
+							{true &&
+								<input 
+									type='submit' 
+									value='Update'
+									style={enableUpdate ? {backgroundColor: 'grey'} : {}} />}
 						</li>
 
 					</ul>
@@ -94,24 +115,3 @@ const renderCloseButton = (setSelectedPlanet) =>
 	<div style={{ paddingRight: '20px', paddingTop: '10px' }}>
 		<p className='closePlanetDetail' onClick={() => setSelectedPlanet(null)}>x</p>
 	</div>
-	
-const getWidth = (planetName) => {
-	switch (planetName) {
-	case 'mercury':
-		return 500
-	case 'venus':
-		return 500
-	case 'earth':
-		return 500
-	case 'mars':
-		return 500
-	case 'jupiter':
-		return 500
-	case 'saturn':
-		return 500
-	case 'uranus':
-		return 500
-	case 'Neptune':
-		return 500
-	}
-}

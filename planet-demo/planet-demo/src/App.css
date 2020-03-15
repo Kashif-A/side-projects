@@ -1232,7 +1232,9 @@ body {
   font-weight: bold;
   letter-spacing: 2px;
 }
-.form input[type="text"]
+.form input[type="text"],
+form input[type="number"],
+form input[type="password"]
 {
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -1246,7 +1248,12 @@ body {
 	font-size: 16px;
   padding: 10px;
   margin-top: 1px;
+  -moz-appearance: 'textfield';
 }
+input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
 .form textarea{
 	resize:none;
 }
@@ -1257,12 +1264,10 @@ body {
 	padding: 10px 30px 10px 30px;
   border-radius: 3px;
   font-size: 20px;
-  color: white;
 }
 .form input[type="submit"]:hover,
 .form input[type="button"]:hover{
 	background: #6B9FFF;
-  color:#fff;
   cursor: pointer;
 }
 .planetDetails {
@@ -1275,7 +1280,7 @@ body {
 }
 .planetDetailName {
   color: white;
-  font-size: 27px;
+  font-size: 25px;
   font-weight: lighter;
   margin-top: 5%;
   margin-bottom: '20px';

@@ -21,6 +21,12 @@ namespace Planets.DataAccess
            return planets;
         }
 
+        public async Task<Planet> GetPlanetByName(string name)
+        {
+            Planet planet = await _dbContext.Planets.Where(p => p.Name.Equals(name)).FirstOrDefaultAsync();
+            return planet;
+        }
+
         public async Task UpdatePlanet(Planet planet)
         {
             Planet planetToUpdate = 

@@ -7,6 +7,7 @@ namespace Planets.DataAccess
     public interface IPlanetDataAccess
     {
         Task<ReadOnlyList<Planet>> GetAllPlanets();
+        Task<Planet> GetPlanetByName(string name);
         Task UpdatePlanet(Planet planet);
     }
 }

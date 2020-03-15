@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Planets.Models;
@@ -6,8 +7,10 @@ using Planets.Service;
 
 namespace Planets.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces(MediaTypeNames.Application.Json)]
+
     public class PlanetsController : ControllerBase
     {
         private readonly IPlanetService _planetService;
@@ -22,6 +25,13 @@ namespace Planets.Controllers
         {
             IEnumerable<Planet> planets = await _planetService.GetAllPlanets();
             return Ok(planets);
+        }
+
+        [HttpGet("{name}", Name = "GetPlanetByName")]
+        public async Task<IActionResult> GetPlanetByName([FromRoute] string name)
+        {
+            Planet planet = await _planetService.GetPlanetByName(name);
+            return Ok(planet);
         }
 
         [HttpPut]

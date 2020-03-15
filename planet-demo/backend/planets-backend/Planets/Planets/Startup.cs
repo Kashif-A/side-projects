@@ -37,7 +37,22 @@ namespace Planets
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
-            
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins()
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .Build();
+                    });
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -50,13 +65,31 @@ namespace Planets
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "MemConnect_CloudAuthConnector v1");
                 c.RoutePrefix = string.Empty;
             });
+
+            app.ApplyMigrations<PlanetDbContext>();
             
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors();
             app.UseMvc();
+        }
+    }
+    
+    public static class DatabaseStartup
+    {
+        public static void ApplyMigrations<T>(this IApplicationBuilder app) where T : DbContext
+        {
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+
+            using (var scope = scopeFactory.CreateScope())
+            {
+                DbContext dbContext = scope.ServiceProvider.GetRequiredService<T>();
+
+                dbContext.Database.Migrate();
+            }
         }
     }
 }

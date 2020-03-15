@@ -19,6 +19,11 @@ namespace Planets.Service
             return await _planetDataAccess.GetAllPlanets();
         }
 
+        public async Task<Planet> GetPlanetByName(string name)
+        {
+            return await _planetDataAccess.GetPlanetByName(name);
+        }
+
         public async Task UpdatePlanet(Planet planet)
         {
             await _planetDataAccess.UpdatePlanet(planet);

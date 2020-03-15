@@ -1,13 +1,10 @@
-﻿using System;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using DootrixDemo.Auth.Models.Dto;
+using DootrixDemo.Auth.Dto;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace DootrixChallenge.Auth.Controllers
 {

@@ -31,9 +31,5 @@
 	  <Version>3.0.0</Version>
 	</PackageReference>
   </ItemGroup>
-	
-  <ItemGroup>
-    <ProjectReference Include="..\DootrixChallenge.Auth.Models\DootrixChallenge.Auth.Models.csproj" />
-  </ItemGroup>
 
 </Project>

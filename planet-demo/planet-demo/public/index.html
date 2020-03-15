@@ -1,47 +1,52 @@
 <!DOCTYPE html>
 <html lang='en'>
+
   <head>
     <meta charset='utf-8' />
     <link rel='icon' href='' />
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <meta name='theme-color' content='#000000' />
-    <meta
-      name=''
-      content=''
-    />
+    <meta name='' content='' />
 
-    <title>App</title>
+    <title>Dootrix Demo</title>
+
   </head>
-  <body className='set-speed data-close controls-close'>
+
+  <body className='opening hide-UI view-3D zoom-large'>
     <div id='root'></div>
-    
+
     <script src='//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js'></script>
 
-      <script>
-        $(window).load(function(){
+    <script>
+      $(window).load(function(){
 
-var body = $('body'),
-    universe = $('#universe'),
-    solarsys = $('#solar-system')
+      var body = $('body'),
+          universe = $('#universe'),
+          solarsys = $('#solar-system')
 
-    var init = function() {
-    body.addClass('view-3D').delay(2000).queue(function() {
-      $(this).dequeue()
-    })
-  }
+      var init = function() {
+        body.removeClass('opening').addClass('view-3D').delay(2000).queue(function() {
+          $(this).removeClass('hide-UI').addClass('set-speed')
+          $(this).dequeue()
+        })
+      }
 
-  $('#data a').click(function(e) {
-    var ref = $(this).attr('className')
-    solarsys.removeClass().addClass(ref)
-    $(this).parent().find('a').removeClass('active')
-    $(this).addClass('active')
-    e.preventDefault()
-  })
+      var setView = function(view) { universe.removeClass().addClass(view) }
 
-  init()
+      $('#data a').click(function(e) {
+        var ref = $(this).attr('class')
+        solarsys.removeClass().addClass(ref)
+        $(this).parent().find('a').removeClass('active')
+        $(this).addClass('active')
+        e.preventDefault()
+      })
 
-  })
-      </script>
+      $('.set-speed').click(function() { setView('scale-stretched set-speed') })
+      $('.set-distance').click(function() { setView('scale-d set-distance') })
 
-  </body>
+      init()
+
+      })
+    </script>
+</body>
 </html>

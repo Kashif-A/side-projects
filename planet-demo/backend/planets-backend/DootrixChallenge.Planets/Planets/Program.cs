@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
+using Planets.DataAccess;
 
 namespace Planets
 {
@@ -10,6 +12,18 @@ namespace Planets
     {
         public static void Main(string[] args)
         {
+            var host = CreateWebHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<PlanetDbContext>();
+
+                DataGenerator.Initialize(services);
+            }
+
+            //Continue to run the application
+            host.Run();
             var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
 
             try

@@ -36,8 +36,6 @@ namespace Planets.DataAccess
             
             if (planetToUpdate != null)
             {
-                planetToUpdate.Name = planet.Name;
-                planetToUpdate.ImageUrl = planet.ImageUrl;
                 planetToUpdate.DistanceFromSun = planet.DistanceFromSun;
                 planetToUpdate.Mass = planet.Mass;
                 planetToUpdate.Diameter = planet.Diameter;

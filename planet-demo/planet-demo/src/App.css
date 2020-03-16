@@ -318,7 +318,6 @@ body {
 .scale-stretched #neptune .planet {
   font-size: 4.9em; }
 
-/*$distanceScaleRatio:   0.000075em;*/
 /* --------------------------------------------------------------------------- planets distance scale sizes */
 .scale-d #sun {
   font-size: 41.73048em; }
@@ -461,72 +460,6 @@ body {
   height: 1em;
   margin-top: -0.5em;
   margin-left: -0.5em; }
-
-/* --------------------------------------------------------------------------- text infos data */
-/* --------------------------------------------------------------------------- speed */
-.set-speed dl.infos dd span:after {
-  content: 'Orbit Velocity'; }
-
-.set-speed #sun dl.infos dd:after {
-  content: '0 km/h'; }
-
-.set-speed #mercury dl.infos dd:after {
-  content: '170,503 km/h'; }
-
-.set-speed #venus dl.infos dd:after {
-  content: '126,074 km/h'; }
-
-.set-speed #earth dl.infos dd:after {
-  content: '107,218 km/h'; }
-
-.set-speed #mars dl.infos dd:after {
-  content: '86,677 km/h'; }
-
-.set-speed #jupiter dl.infos dd:after {
-  content: '47,002 km/h'; }
-
-.set-speed #saturn dl.infos dd:after {
-  content: '34,701 km/h'; }
-
-.set-speed #uranus dl.infos dd:after {
-  content: '24,477 km/h'; }
-
-.set-speed #neptune dl.infos dd:after {
-  content: '19,566 km/h'; }
-
-/* --------------------------------------------------------------------------- distance */
-.set-distance dl.infos dd span:after {
-  content: 'From Sun'; }
-
-.set-distance #sun dl.infos dd span:after {
-  content: 'From Earth'; }
-
-.set-distance #sun dl.infos dd:after {
-  content: '149,598,262 km'; }
-
-.set-distance #mercury dl.infos dd:after {
-  content: '57,909,227 km'; }
-
-.set-distance #venus dl.infos dd:after {
-  content: '108,209,475 km'; }
-
-.set-distance #earth dl.infos dd:after {
-  content: '149,598,262 km'; }
-
-.set-distance #mars dl.infos dd:after {
-  content: '227,943,824 km'; }
-
-.set-distance #jupiter dl.infos dd:after {
-  content: '778,340,821 km'; }
-
-.set-distance #saturn dl.infos dd:after {
-  content: '1,426,666,422 km'; }
-
-.set-distance #uranus dl.infos dd:after {
-  content: '2,870,658,186 km'; }
-
-.set-distance #neptune dl.infos dd:after {
-  content: '4,498,396,441 km'; }
 
 /* --------------------------------------------------------------------------- planets starting position and lighting effect */
 /* --------------------------------------------------------------------------- mercury ; pos: Top */
@@ -957,9 +890,6 @@ h1 span {
 #data a:hover, #controls label:hover {
   color: #FFF; }
 
-#data a.active {
-  color: #0CF; }
-
 #data, #controls {
   z-index: 99;
   position: fixed;
@@ -1295,4 +1225,44 @@ input::-webkit-outer-spin-button,
   margin-right: 2em;
   margin-top: 1em;
   cursor: pointer;
+}
+.logout {
+  font-weight: 900;
+  background-color: #000;
+  padding: 25px;
+  text-align: center;
+  color: #fff;
+  font-size: 28px;
+  position: absolute;
+  left: 0;
+  z-index: 100;
+  bottom: 0;
+  cursor: pointer;
+}
+.logout:hover {
+  background-color: rgb(79, 68, 143);
+  color: rgb(155, 214, 224);
+  cursor: pointer;
+}
+.loading {
+  color: #fbae17;
+  display: inline-block;
+  font-size: large;
+  position: absolute;
+  width: 20%;
+  left: 40%;
+  top: 45%;
+  text-align: center;
+  margin: 0 auto;
+}
+.error {
+  color: #fb1750;
+  display: inline-block;
+  font-size: large;
+  position: absolute;
+  width: 20%;
+  left: 40%;
+  top: 45%;
+  text-align: center;
+  margin: 0 auto;
 }

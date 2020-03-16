@@ -33,17 +33,6 @@
 
       var setView = function(view) { universe.removeClass().addClass(view) }
 
-      $('#data a').click(function(e) {
-        var ref = $(this).attr('class')
-        solarsys.removeClass().addClass(ref)
-        $(this).parent().find('a').removeClass('active')
-        $(this).addClass('active')
-        e.preventDefault()
-      })
-
-      $('.set-speed').click(function() { setView('scale-stretched set-speed') })
-      $('.set-distance').click(function() { setView('scale-d set-distance') })
-
       init()
 
       })

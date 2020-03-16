@@ -1,9 +1,18 @@
 import React, { Fragment, useState } from 'react'
 
 import './Auth.css'
+import { sendAuthRequest } from '../../util/auth'
+
+import PropTypes from 'prop-types'
 
 const Auth = (props) =>{
 	const { authenticated, setAuthenticated } = props
+
+	Auth.propTypes = {
+		authenticated: PropTypes.bool,
+		setAuthenticated: PropTypes.func
+	}
+
 	const [username, setUsername] = useState(null)
 	const [password, setPassword] = useState(null)
 
@@ -17,13 +26,7 @@ const Auth = (props) =>{
 					{authenticated === null && <p className='loginHeader'>Enter details to login...</p>}
 					{authenticated === false && <p className='loginHeader'>Incorrect credentials. Please try again or contact the administrator...</p>}
 
-					<form className='form' onSubmit={(e) => 
-						sendAuthRequest(
-							e, 
-							username, 
-							password, 
-							setAuthenticated
-						)}>
+					<form className='form'>
 
 						<ul>
 
@@ -34,7 +37,10 @@ const Auth = (props) =>{
 									name='username' 
 									value={username}
 									placeholder={'Enter username...'}
-									onChange={(e) => setUsername(e.target.value)} />
+									onChange={(e) => {
+										setUsername(e.target.value)
+										setAuthenticated(null)
+									}} />
 							</li>
 
 							<li>
@@ -44,14 +50,27 @@ const Auth = (props) =>{
 									name='password' 
 									value={password}
 									placeholder={'Enter password...'}
-									onChange={(e) => setPassword(e.target.value)} />
+									onChange={(e) => {
+										setPassword(e.target.value)
+										setAuthenticated(null)
+									}} />
 							</li>
 
 							<li>
-								{true &&
-                  <input 
+								<input 
                   	type='submit' 
-                  	value='Login'/>}
+                  	value={(username || password) ? 'Login' : 'Skip Auth'}
+									onClick={(e) => {
+										e.preventDefault()
+										if (username || password) {
+											sendAuthRequest(
+												username, 
+												password, 
+												setAuthenticated
+											)
+										}
+										setAuthenticated(true)
+									}} />
 							</li>
 
 						</ul>
@@ -60,24 +79,6 @@ const Auth = (props) =>{
 			</div>
 		</Fragment>
 	)
-}
-
-const sendAuthRequest = (e, userName, password, setAuthenticated) =>{
-	e.preventDefault()
-	fetch('http://dootrixauth/api/Authentication/Login', {
-		method: 'POST',
-		body: JSON.stringify({
-			userName,
-			password 
-		}),
-		headers: {'Content-Type': 'application/json'}
-	}).then(resp => {
-		if (resp.status === 200) {
-			setAuthenticated(true)
-		} else {
-			setAuthenticated(false)
-		}
-	})
 }
 
 export default Auth

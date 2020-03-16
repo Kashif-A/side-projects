@@ -15,7 +15,8 @@ function App() {
 
 			? renderMainApp(
 				selectedPlanet, 
-				setSelectedPlanet) 
+				setSelectedPlanet,
+				setAuthenticated) 
 
 			: <Auth 
 				authenticated={authenticated}
@@ -25,9 +26,11 @@ function App() {
 
 export default App
 
-const renderMainApp = (selectedPlanet, setSelectedPlanet) =>
+const renderMainApp = (selectedPlanet, setSelectedPlanet, setAuthenticated) =>
 	<Fragment>
-		<Controls setSelectedPlanet={selectedPlanet} />
+		<Controls 
+			setSelectedPlanet={setSelectedPlanet}
+			setAuthenticated={setAuthenticated} />
 
 		<Universe />
 

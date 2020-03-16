@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Planets.DataAccess;
 using Planets.Service;
@@ -14,10 +16,25 @@ namespace Planets
 {
     public class Startup
     {
+        private readonly string _connectionString;
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
+
+        private IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<PlanetDbContext>(options => options.UseInMemoryDatabase(databaseName: "DootrixDemo.Planets"));
+            if (_connectionString.Length > 1)
+            {
+                services.AddDbContext<PlanetDbContext>(options => options.UseSqlServer(_connectionString));
+            } else
+            {
+                services.AddDbContext<PlanetDbContext>(options => options.UseInMemoryDatabase(databaseName: "DootrixDemo.Planets"));
+            }
 
             services.AddScoped<IPlanetDataAccess, PlanetDataAccess>();
             services.AddScoped<IPlanetService, PlanetService>();
@@ -62,6 +79,11 @@ namespace Planets
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            if (_connectionString.Length > 1)
+            {
+                app.ApplyMigrations<PlanetDbContext>();
             }
 
             app.UseCors();

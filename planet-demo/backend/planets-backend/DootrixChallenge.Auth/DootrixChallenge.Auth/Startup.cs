@@ -39,9 +39,6 @@ namespace DootrixChallenge.Auth
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = true;
-                options.User.RequireUniqueEmail = true;
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             })
                 .AddDefaultTokenProviders();
 
@@ -54,8 +51,6 @@ namespace DootrixChallenge.Auth
 
             services.AddScoped<UserManager<IdentityUser<string>>>();
             services.AddScoped<IUserStore<IdentityUser<string>>, UserStore<IdentityUser<string>, IdentityRole, AuthDbContext>>();
-
-            services.AddHttpClient();
 
             services.AddAuthentication(
                 options =>
@@ -73,7 +68,6 @@ namespace DootrixChallenge.Auth
                     options.Cookie.Domain = ".eu-west-2.compute.amazonaws.com";
                     options.LoginPath = "/";
                     options.Cookie.MaxAge = TimeSpan.FromHours(1);
-                    options.SlidingExpiration = true;
                     options.Cookie.SecurePolicy = CookieSecurePolicy.None;
 
                 });

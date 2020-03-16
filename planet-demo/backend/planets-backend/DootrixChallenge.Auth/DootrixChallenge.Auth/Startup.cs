@@ -68,10 +68,10 @@ namespace DootrixChallenge.Auth
                 })
                 .AddCookie(".DootrixAuth", options =>
                 {
-                    options.Cookie.Name = Configuration["AUTH_COOKIE_NAME"];
+                    options.Cookie.Name = "DootrixAuth";
                     options.Cookie.HttpOnly = true;
-                    //options.Cookie.Domain = Configuration["AUTH_COOKIE_DOMAIN"];
-                    options.LoginPath = Configuration["AUTH_COOKIE_PATH"];
+                    options.Cookie.Domain = ".eu-west-2.compute.amazonaws.com";
+                    options.LoginPath = "/";
                     options.Cookie.MaxAge = TimeSpan.FromHours(1);
                     options.SlidingExpiration = true;
                     options.Cookie.SecurePolicy = CookieSecurePolicy.None;
@@ -117,7 +117,10 @@ namespace DootrixChallenge.Auth
 
             app.UseAuthentication();
 
-            app.ApplyMigrations<AuthDbContext>();
+            if (_connectionString.Length > 1)
+            {
+                app.ApplyMigrations<AuthDbContext>();
+            }           
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

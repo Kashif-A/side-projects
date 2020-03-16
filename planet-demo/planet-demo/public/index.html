@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+  <head>
+    <meta charset='utf-8' />
+    <link rel='icon' href='' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <meta name='theme-color' content='#000000' />
+    <meta name='' content='' />
+
+    <title>Dootrix Demo</title>
+
+  </head>
+
+  <body className='opening hide-UI view-3D zoom-large'>
+    <div id='root'></div>
+
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js'></script>
+
+    <script>
+      $(window).load(function(){
+
+      var body = $('body'),
+          universe = $('#universe'),
+          solarsys = $('#solar-system')
+
+      var init = function() {
+        body.removeClass('opening').addClass('view-3D').delay(2000).queue(function() {
+          $(this).removeClass('hide-UI').addClass('set-speed')
+          $(this).dequeue()
+        })
+      }
+
+      var setView = function(view) { universe.removeClass().addClass(view) }
+
+      init()
+
+      })
+    </script>
+</body>
+</html>

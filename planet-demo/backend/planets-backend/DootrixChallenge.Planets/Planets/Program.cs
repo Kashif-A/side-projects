@@ -19,7 +19,10 @@ namespace Planets
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<PlanetDbContext>();
 
-                DataGenerator.Initialize(services);
+                if (context.Database.CanConnect())
+                {
+                    DataGenerator.Initialize(services);
+                }
             }
 
             //Continue to run the application

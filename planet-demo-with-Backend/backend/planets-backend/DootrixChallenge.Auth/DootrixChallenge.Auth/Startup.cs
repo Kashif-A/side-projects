@@ -29,14 +29,7 @@ namespace DootrixChallenge.Auth
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            if (_connectionString.Length > 1)
-            {
-                services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(_connectionString));
-            }
-            else
-            {
-                services.AddDbContext<AuthDbContext>(options => options.UseInMemoryDatabase(databaseName: "DootrixDemo.Auth"));
-            }
+            services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(_connectionString));
 
             services.AddIdentityCore<IdentityUser<string>>(options =>
             {
@@ -121,7 +114,7 @@ namespace DootrixChallenge.Auth
             if (_connectionString.Length > 1)
             {
                 app.ApplyMigrations<AuthDbContext>();
-            }    
+            }           
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

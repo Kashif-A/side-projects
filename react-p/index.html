@@ -1,4 +1,19 @@
-<div id="app"></div>
-<script src="node_modules/react/umd/react.development.js"></script>
-<script src="node_modules/react-dom/umd/react-dom.development.js"></script>
-<script type="text/jsx" src="./prac.jsx"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>React App</title>
+    <script src="node_modules/react/umd/react.development.js"></script>
+    <script src="node_modules/react-dom/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="app"></div> 
+    <script type="text/babel" >
+      ReactDOM.render(
+          <h1>Hi! My react App</h1>,
+          document.getElementById('app')
+      )
+    </script>
+  </body>
+</html>

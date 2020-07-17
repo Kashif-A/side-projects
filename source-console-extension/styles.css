@@ -1,0 +1,18 @@
+/* If drawer has been expanded at least once AND it's still expanded */
+#-webkit-web-inspector #main[style*="bottom"]:not([style*="bottom: 0"]) {
+	width: 50%;
+	bottom: 0 !important;
+}
+
+#-webkit-web-inspector #drawer[style*="height"]:not([style*="height: 0"]) {
+	/* The position of the drawer */
+	left: 50% !important;
+	/* styles to position the #drawer correctly */
+	top: 26px !important;
+	height: auto !important;
+	z-index: 1;
+	border-left: 1px solid rgb(64%, 64%, 64%);
+}
+#-webkit-web-inspector.show-toolbar-icons #drawer[style*="height"]:not([style*="height: 0"]) {
+	top: 56px !important;
+}

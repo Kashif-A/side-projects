@@ -1,0 +1,7 @@
+{
+  "name": "Show source and console in same window",
+  "version": "1.1",
+  "description": "",
+  "devtools_page": "devtools.html",
+  "manifest_version": 2
+}

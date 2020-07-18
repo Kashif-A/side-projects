@@ -3,5 +3,12 @@
   "version": "1.0",
   "description": "Helper extensions",
   "devtools_page": "devtools.html",
-  "manifest_version": 2
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "css": ["styles.css"],
+      "js": ["contentScript.js"]
+    }
+  ]
 }

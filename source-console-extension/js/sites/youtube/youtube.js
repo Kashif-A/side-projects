@@ -13,7 +13,6 @@ const secondaryCleanUp = (d) => {
   mainContentBody.forEach(i => i && i.tagName !== 'DIV' && i.remove())
 }
 
-
 const init = (d) => {
   cleanupTags(d)
 }

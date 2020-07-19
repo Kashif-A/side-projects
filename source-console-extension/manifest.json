@@ -2,7 +2,7 @@
   "name": "MyExtensions",
   "version": "1.0",
   "description": "Helper extensions",
-  "devtools_page": "devtools.html",
+  "devtools_page": "./devtools/devtools.html",
   "manifest_version": 2,
   "content_scripts": [
     {

@@ -7,8 +7,13 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "css": ["styles.css"],
-      "js": ["contentScript.js"]
+      "css": ["./js/sites/youtube/styles.css"],
+      "js": ["./js/sites/youtube/youtube.js"]
     }
+  ],
+  "permissions": [
+    "tabs",
+    "http://*/*",
+    "https://*/*"
   ]
 }

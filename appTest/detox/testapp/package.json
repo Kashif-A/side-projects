@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "jest-circus": "^26.3.0",
     "react": "16.13.1",
     "react-native": "0.63.2"
   },
@@ -18,6 +19,7 @@
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",
     "babel-jest": "^25.1.0",
+    "detox": "^17.3.4",
     "eslint": "^6.5.1",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.59.0",
@@ -25,5 +27,22 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "detox": {
+    "configurations": {
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "name": "Pixel_2_API_27"
+      },
+      "android.emu.release": {
+        "binaryPath": "android/app/build/outputs/apk/release/app-release.apk",
+        "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
+        "type": "android.emulator",
+        "name": "Pixel_2_API_27"
+      }
+    },
+    "test-runner": "jest"
   }
 }

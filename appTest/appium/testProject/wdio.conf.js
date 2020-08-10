@@ -55,9 +55,8 @@ exports.config = {
         acceptInsecureCerts: true,
         maxInstances: 1,
         browserName: '',
-        appiumVersion: '1.13.0',
+        appiumVersion: '1.18.0',
         platformName: 'Android',
-        platformVersion: driver.getCapabilities().getCapability("platformName").toString(),
         deviceName: 'Pixel_2_API_27',
         app: '/Users/kashif.ahmed/Documents/random/side-projects/appTest/appium/testapp/android/app/build/outputs/apk/debug',
         automationName: 'UiAutomator2'
@@ -108,7 +107,7 @@ exports.config = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    baseUrl: 'http://localhost',
+    baseUrl: 'http://localhost/',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,

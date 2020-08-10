@@ -54,7 +54,7 @@ exports.config = {
       acceptInsecureCerts: true,
       appiumVersion: '1.13.0',
       platformName: 'Android',
-      deviceName: 'PIXEL_2_API_27',
+      deviceName: 'emulator-5554',
       app:
         '/Users/kashif.ahmed/Documents/random/side-projects/appTest/appium/testapp/android/app/build/outputs/apk/debug/app-debug.apk',
       automationName: 'UiAutomator2',

@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@wdio/appium-service": "^6.4.0",
     "@wdio/cli": "^6.4.0",
+    "appium": "^1.18.0",
     "webdriverio": "^6.4.0"
   },
   "devDependencies": {

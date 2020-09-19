@@ -1,14 +1,35 @@
-describe('My Login application', () => {
-    it('should login with valid credentials', () => {
-        browser.url(`https://the-internet.herokuapp.com/login`);
+var expect = require('chai').expect;
 
-        $('#username').setValue(username);
-        $('#password').setValue(password);
-        $('button[type="submit"]').click(); 
+describe('Simple App testing', () => {
+  // Adding time out to make sure the app is load prior to test is run
+  beforeEach(() => {
+    $('~app-root').waitForDisplayed(11000, false);
+  });
 
-        expect($('#flash')).toBeExisting();
-        expect($('#flash')).toHaveTextContaining(
-            'You logged into a secure area!');
-    });
+  it('Valid Login Test', (async) => {
+    $('~username').setValue('shamique');
+    $('~password').setValue('123456');
+
+    $('~login').click();
+
+    $('~loginstatus').waitForDisplayed(11000);
+    const status = $('~loginstatus').getText();
+    expect(status).to.equal('success');
+  });
+
+  it('Invalid Login Test', (async) => {
+    $('~username').setValue('shamique');
+    $('~password').setValue('12345');
+
+    $('~login').click();
+
+    $('~loginstatus').waitForDisplayed(11000);
+    const status = $('~loginstatus').getText();
+    expect(status).to.equal('fail');
+  });
+
+  it('TEST', (async) => {
+    let el5 = $('~username');
+    el5.setValue('Test');
+  });
 });
-

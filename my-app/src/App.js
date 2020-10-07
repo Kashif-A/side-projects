@@ -1,26 +1,20 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// import React from 'react'
+// import Child1 from './components/Child1'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () => {
+
+  // console.log('App called')
+
+  // React.useEffect(() => {
+  //   console.log('App mount')
+  // }, [])
+
+  // React.useEffect(() => {
+  //   console.log('App re-render in effect')
+  // })
+
+  return 'TEW'
+
 }
 
 export default App;

@@ -1,8 +1,6 @@
-import React from 'react'
+console.log(this)
 
-const Child1 = () => 
+const Child = () => 
   <div>
-    <h3>Child 1</h3>
+    <h3>Child</h3>
   </div>
-
-export default Child1

@@ -1,4 +1,0 @@
-#Mon Aug 10 15:55:01 BST 2020
-base.0=/Users/kashif.ahmed/Documents/random/side-projects/appTest/detox/testapp/android/app/build/intermediates/dex/debugAndroidTest/mergeDexDebugAndroidTest/out/classes.dex
-renamed.0=classes.dex
-path.0=classes.dex

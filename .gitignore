@@ -1,4 +1,5 @@
 appTest
-*/node_modules/*
+node_modules
+!react-p/node_modules/react-dom/
 !react-p/node_modules/react/
 obj

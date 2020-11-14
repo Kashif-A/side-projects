@@ -1,5 +1,4 @@
 appTest
 node_modules
-!react-p/node_modules/react-dom/
-!react-p/node_modules/react/
+!react-p/node_modules/react-dom/umd
 obj

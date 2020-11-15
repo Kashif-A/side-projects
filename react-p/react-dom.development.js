@@ -3,7 +3,9 @@
 'use strict';
 
 (function (global, factory) {
+	// eslint-disable-next-line no-undef
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('react')) :
+	// eslint-disable-next-line no-undef
 	typeof define === 'function' && define.amd ? define(['react'], factory) :
 	(global.ReactDOM = factory(global.React));
 }(this, (function (React) { 'use strict';
@@ -505,7 +507,8 @@ var warningWithoutStack = function () {};
         return args[argIndex++];
       });
       throw new Error(message);
-    } catch (x) {}
+    // eslint-disable-next-line no-empty
+    } catch {}
   };
 }
 
@@ -888,7 +891,7 @@ if (!ReactSharedInternals.hasOwnProperty('ReactCurrentBatchConfig')) {
   };
 }
 
-var BEFORE_SLASH_RE = /^(.*)[\\\/]/;
+var BEFORE_SLASH_RE = /^(.*)[\\/]/;
 var describeComponentFrame = function (name, source, ownerName) {
   var sourceInfo = '';
 
@@ -932,8 +935,6 @@ var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
 var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for('react.provider') : 0xeacd;
 var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for('react.context') : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
 // (unstable) APIs that have been removed. Can we remove the symbols?
-
-
 var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
 var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
 var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
@@ -975,8 +976,7 @@ var warning = warningWithoutStack$1;
     }
 
     var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
-    var stack = ReactDebugCurrentFrame.getStackAddendum(); // eslint-disable-next-line react-internal/warning-and-invariant-args
-
+    var stack = ReactDebugCurrentFrame.getStackAddendum();
     for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
       args[_key - 2] = arguments[_key];
     }
@@ -1162,8 +1162,6 @@ function getCurrentFiberStackInDev() {
 
     return getStackByFiberInDevAndProd(current);
   }
-
-  return '';
 }
 function resetCurrentFiber() {
   {
@@ -1663,6 +1661,7 @@ function validateEventValue(eventValue) {
 
 
     Object.defineProperty(eventValue, 'nativeEvent', {
+      // eslint-disable-next-line getter-return
       get: function () {
         {
           showWarning('nativeEvent');
@@ -2162,7 +2161,7 @@ var properties = {}; // These props are reserved by React. They shouldn't be wri
   null, // attributeNamespace
   false);
 });
-var CAMELIZE = /[\-\:]([a-z])/g;
+var CAMELIZE = /[-:]([a-z])/g;
 
 var capitalize = function (token) {
   return token[1].toUpperCase();
@@ -2228,7 +2227,8 @@ var ReactDebugCurrentFrame$1 = null;
 /* eslint-disable max-len */
 
 
-var isJavaScriptProtocol = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+// eslint-disable-next-line no-control-regex
+var isJavaScriptProtocol = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*:/i;
 var didWarn = false;
 
 function sanitizeURL(url) {
@@ -2507,6 +2507,7 @@ var printWarning = function() {};
       // This error was thrown as a convenience so that you can use this stack
       // to find the callsite that caused this warning to fire.
       throw new Error(message);
+    // eslint-disable-next-line no-empty
     } catch (x) {}
   };
 }
@@ -2601,14 +2602,14 @@ var ReactControlledValuePropTypes = {
     submit: true
   };
   var propTypes = {
-    value: function (props, propName, componentName) {
+    value: function (props, propName) {
       if (hasReadOnlyValue[props.type] || props.onChange || props.readOnly || props.disabled || props[propName] == null || enableFlareAPI && props.listeners) {
         return null;
       }
 
       return new Error('You provided a `value` prop to a form field without an ' + '`onChange` handler. This will render a read-only field. If ' + 'the field should be mutable use `defaultValue`. Otherwise, ' + 'set either `onChange` or `readOnly`.');
     },
-    checked: function (props, propName, componentName) {
+    checked: function (props, propName) {
       if (props.onChange || props.readOnly || props.disabled || props[propName] == null || enableFlareAPI && props.listeners) {
         return null;
       }
@@ -3427,7 +3428,7 @@ function updateWrapper$1(element, props) {
     node.defaultValue = toString(defaultValue);
   }
 }
-function postMountWrapper$3(element, props) {
+function postMountWrapper$3(element) {
   var node = element; // This is in postMount because we need access to the DOM node, which is not
   // available until after the component has mounted.
 
@@ -4145,11 +4146,7 @@ function findCurrentHostFiber(parent) {
 
     node.sibling.return = node.return;
     node = node.sibling;
-  } // Flow needs the return null here, but ESLint complains about it.
-  // eslint-disable-next-line no-unreachable
-
-
-  return null;
+  }
 }
 function findCurrentHostFiberWithNoPortals(parent) {
   var currentParent = findCurrentFiberUsingSlowPath(parent);
@@ -4157,7 +4154,6 @@ function findCurrentHostFiberWithNoPortals(parent) {
   if (!currentParent) {
     return null;
   } // Next we'll drill down this component to find the first HostComponent/Text.
-
 
   var node = currentParent;
 
@@ -4184,11 +4180,7 @@ function findCurrentHostFiberWithNoPortals(parent) {
 
     node.sibling.return = node.return;
     node = node.sibling;
-  } // Flow needs the return null here, but ESLint complains about it.
-  // eslint-disable-next-line no-unreachable
-
-
-  return null;
+  }
 }
 
 var attemptSynchronousHydration;
@@ -5396,7 +5388,7 @@ function modifierStateGetter(keyArg) {
   return keyProp ? !!nativeEvent[keyProp] : false;
 }
 
-function getEventModifierState(nativeEvent) {
+function getEventModifierState() {
   return modifierStateGetter;
 }
 
@@ -5645,7 +5637,7 @@ var SimpleEventPlugin = {
     var config = topLevelEventsToDispatchConfig[topLevelType];
     return config !== undefined ? config.eventPriority : ContinuousEvent;
   },
-  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget, eventSystemFlags) {
+  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
     var dispatchConfig = topLevelEventsToDispatchConfig[topLevelType];
 
     if (!dispatchConfig) {
@@ -5778,6 +5770,7 @@ if (enableFlareAPI && canUseDOM) {
     var options = {}; // $FlowFixMe: Ignore Flow complaining about needing a value
 
     Object.defineProperty(options, 'passive', {
+      // eslint-disable-next-line getter-return
       get: function () {
         passiveBrowserEventsSupported = true;
       }
@@ -6522,7 +6515,7 @@ var warnValidStyle = function () {};
     warning$1(false, "Style property values shouldn't contain a semicolon. " + 'Try "%s: %s" instead.', name, value.replace(badStyleValueWithSemicolonPattern, ''));
   };
 
-  var warnStyleValueIsNaN = function (name, value) {
+  var warnStyleValueIsNaN = function (name) {
     if (warnedForNaNValue) {
       return;
     }
@@ -6531,7 +6524,7 @@ var warnValidStyle = function () {};
     warning$1(false, '`NaN` is an invalid value for the `%s` css style property.', name);
   };
 
-  var warnStyleValueIsInfinity = function (name, value) {
+  var warnStyleValueIsInfinity = function (name) {
     if (warnedForInfinityValue) {
       return;
     }
@@ -7680,6 +7673,7 @@ var normalizeHTML;
   // We will still patch up in this case but not fire the warning.
 
   var NORMALIZE_NEWLINES_REGEX = /\r\n?/g;
+  // eslint-disable-next-line no-control-regex
   var NORMALIZE_NULL_AND_REPLACEMENT_REGEX = /\u0000|\uFFFD/g;
 
   normalizeMarkupForTextOrAttribute = function (markup) {
@@ -8300,8 +8294,6 @@ function getPossibleStandardName(propName) {
 
     return possibleStandardNames[lowerCasedName] || null;
   }
-
-  return null;
 }
 
 function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, rootContainerElement) {
@@ -8617,7 +8609,7 @@ function warnForDeletedHydratableText(parentNode, child) {
     warningWithoutStack$1(false, 'Did not expect server HTML to contain the text node "%s" in <%s>.', child.nodeValue, parentNode.nodeName.toLowerCase());
   }
 }
-function warnForInsertedHydratedElement(parentNode, tag, props) {
+function warnForInsertedHydratedElement(parentNode, tag) {
   {
     if (didWarnInvalidHydration) {
       return;
@@ -9041,7 +9033,7 @@ function restoreSelection(priorSelectionInformation) {
     var ancestors = [];
     var ancestor = priorFocusedElem;
 
-    while (ancestor = ancestor.parentNode) {
+    while (ancestor == ancestor.parentNode) {
       if (ancestor.nodeType === ELEMENT_NODE) {
         ancestors.push({
           element: ancestor,
@@ -9506,10 +9498,8 @@ function getRootHostContext(rootContainerInstance) {
       ancestorInfo: ancestorInfo
     };
   }
-
-  return namespace;
 }
-function getChildHostContext(parentHostContext, type, rootContainerInstance) {
+function getChildHostContext(parentHostContext, type) {
   {
     var parentHostContextDev = parentHostContext;
     var namespace = getChildNamespace(parentHostContextDev.namespace, type);
@@ -9519,19 +9509,16 @@ function getChildHostContext(parentHostContext, type, rootContainerInstance) {
       ancestorInfo: ancestorInfo
     };
   }
-
-  var parentNamespace = parentHostContext;
-  return getChildNamespace(parentNamespace, type);
 }
 function getPublicInstance(instance) {
   return instance;
 }
-function prepareForCommit(containerInfo) {
+function prepareForCommit() {
   eventsEnabled = isEnabled();
   selectionInformation = getSelectionInformation();
   setEnabled(false);
 }
-function resetAfterCommit(containerInfo) {
+function resetAfterCommit() {
   restoreSelection(selectionInformation);
   selectionInformation = null;
   setEnabled(eventsEnabled);
@@ -9562,7 +9549,7 @@ function createInstance(type, props, rootContainerInstance, hostContext, interna
 function appendInitialChild(parentInstance, child) {
   parentInstance.appendChild(child);
 }
-function finalizeInitialChildren(domElement, type, props, rootContainerInstance, hostContext) {
+function finalizeInitialChildren(domElement, type, props, rootContainerInstance) {
   setInitialProperties(domElement, type, props, rootContainerInstance);
   return shouldAutoFocusHostComponent(type, props);
 }
@@ -9607,7 +9594,7 @@ var noTimeout = -1; // -------------------
 // -------------------
 
 var supportsMutation = true;
-function commitMount(domElement, type, newProps, internalInstanceHandle) {
+function commitMount(domElement, type, newProps) {
   // Despite the naming that might imply otherwise, this method only
   // fires if there is an `Update` effect scheduled during mounting.
   // This happens if `finalizeInitialChildren` returns `true` (which it
@@ -9618,7 +9605,7 @@ function commitMount(domElement, type, newProps, internalInstanceHandle) {
     domElement.focus();
   }
 }
-function commitUpdate(domElement, updatePayload, type, oldProps, newProps, internalInstanceHandle) {
+function commitUpdate(domElement, updatePayload, type, oldProps, newProps) {
   // Update the props handle so that we know which props are the ones with
   // with current event handlers.
   updateFiberProps(domElement, newProps); // Apply the diff to the DOM node.
@@ -9737,6 +9724,7 @@ function clearSuspenseBoundaryFromContainer(container, suspenseInstance) {
     clearSuspenseBoundary(container.parentNode, suspenseInstance);
   } else if (container.nodeType === ELEMENT_NODE) {
     clearSuspenseBoundary(container, suspenseInstance);
+  // eslint-disable-next-line no-empty
   } else {} // Document nodes should never contain suspense boundaries.
   // Retry if any event replaying was blocked on this.
 
@@ -9744,9 +9732,6 @@ function clearSuspenseBoundaryFromContainer(container, suspenseInstance) {
   retryIfBlockedOn(container);
 }
 function hideInstance(instance) {
-  // TODO: Does this work for all element types? What about MathML? Should we
-  // pass host context to this method?
-  instance = instance;
   var style = instance.style;
 
   if (typeof style.setProperty === 'function') {
@@ -9759,7 +9744,6 @@ function hideTextInstance(textInstance) {
   textInstance.nodeValue = '';
 }
 function unhideInstance(instance, props) {
-  instance = instance;
   var styleProp = props[STYLE];
   var display = styleProp !== undefined && styleProp !== null && styleProp.hasOwnProperty('display') ? styleProp.display : null;
   instance.style.display = dangerousStyleValue('display', display);
@@ -9771,7 +9755,7 @@ function unhideTextInstance(textInstance, text) {
 // -------------------
 
 var supportsHydration = true;
-function canHydrateInstance(instance, type, props) {
+function canHydrateInstance(instance, type) {
   if (instance.nodeType !== ELEMENT_NODE || type.toLowerCase() !== instance.nodeName.toLowerCase()) {
     return null;
   } // This has now been refined to an element node.

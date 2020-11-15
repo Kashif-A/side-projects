@@ -854,11 +854,8 @@
   var FunctionComponent = 0;
   var ClassComponent = 1;
   var IndeterminateComponent = 2; // Before we know whether it is function or class
-
   var HostRoot = 3; // Root of a host tree. Could be nested inside another node.
-
   var HostPortal = 4; // A subtree. Could be an entry point to a different renderer.
-
   var HostComponent = 5;
   var HostText = 6;
   var Fragment = 7;

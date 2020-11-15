@@ -1450,18 +1450,14 @@ var unstable_now = _ReactInternals$Sched.unstable_now;
 var unstable_scheduleCallback = _ReactInternals$Sched.unstable_scheduleCallback;
 var unstable_shouldYield = _ReactInternals$Sched.unstable_shouldYield;
 var unstable_requestPaint = _ReactInternals$Sched.unstable_requestPaint;
-var unstable_getFirstCallbackNode = _ReactInternals$Sched.unstable_getFirstCallbackNode;
 var unstable_runWithPriority = _ReactInternals$Sched.unstable_runWithPriority;
 var unstable_next = _ReactInternals$Sched.unstable_next;
-var unstable_continueExecution = _ReactInternals$Sched.unstable_continueExecution;
-var unstable_pauseExecution = _ReactInternals$Sched.unstable_pauseExecution;
 var unstable_getCurrentPriorityLevel = _ReactInternals$Sched.unstable_getCurrentPriorityLevel;
 var unstable_ImmediatePriority = _ReactInternals$Sched.unstable_ImmediatePriority;
 var unstable_UserBlockingPriority = _ReactInternals$Sched.unstable_UserBlockingPriority;
 var unstable_NormalPriority = _ReactInternals$Sched.unstable_NormalPriority;
 var unstable_LowPriority = _ReactInternals$Sched.unstable_LowPriority;
 var unstable_IdlePriority = _ReactInternals$Sched.unstable_IdlePriority;
-var unstable_forceFrameRate = _ReactInternals$Sched.unstable_forceFrameRate;
 var unstable_flushAllWithoutAsserting = _ReactInternals$Sched.unstable_flushAllWithoutAsserting;
 
 // CommonJS interop named imports.
@@ -2014,7 +2010,6 @@ function shouldRemoveAttributeWithWarning(name, value, propertyInfo, isCustomCom
 
   switch (typeof value) {
     case 'function': // $FlowIssue symbol is perfectly valid here
-
     case 'symbol':
       // eslint-disable-line
       return true;
@@ -2279,19 +2274,6 @@ function getToStringValue(value) {
  * If application uses Trusted Types we don't stringify trusted values, but preserve them as objects.
  */
 var toStringOrTrustedType = toString;
-
-if (enableTrustedTypesIntegration && typeof trustedTypes !== 'undefined') {
-  toStringOrTrustedType = function (value) {
-    if (typeof value === 'object' && (trustedTypes.isHTML(value) || trustedTypes.isScript(value) || trustedTypes.isScriptURL(value) ||
-    /* TrustedURLs are deprecated and will be removed soon: https://github.com/WICG/trusted-types/pull/204 */
-    trustedTypes.isURL && trustedTypes.isURL(value))) {
-      // Pass Trusted Types through.
-      return value;
-    }
-
-    return toString(value);
-  };
-}
 
 /**
  * Set attribute for a node. The attribute value can be either string or

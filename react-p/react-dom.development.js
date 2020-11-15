@@ -930,7 +930,6 @@
   // nor polyfill, then a plain number is used for performance.
   var hasSymbol = typeof Symbol === 'function' && Symbol.for;
   var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for('react.element') : 0xeac7;
-  var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for('react.portal') : 0xeaca;
   var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for('react.fragment') : 0xeacb;
   var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for('react.strict_mode') : 0xeacc;
   var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
@@ -1052,9 +1051,6 @@
     switch (type) {
       case REACT_FRAGMENT_TYPE:
         return 'Fragment';
-
-      case REACT_PORTAL_TYPE:
-        return 'Portal';
 
       case REACT_PROFILER_TYPE:
         return "Profiler";
@@ -4309,30 +4305,6 @@
     }
 
     queuedTarget.blockedOn = null;
-  }
-
-  function queueExplicitHydrationTarget(target) {
-    if (enableSelectiveHydration) {
-      var priority = unstable_getCurrentPriorityLevel();
-      var queuedTarget = {
-        blockedOn: null,
-        target: target,
-        priority: priority
-      };
-      var i = 0;
-
-      for (; i < queuedExplicitHydrationTargets.length; i++) {
-        if (priority <= queuedExplicitHydrationTargets[i].priority) {
-          break;
-        }
-      }
-
-      queuedExplicitHydrationTargets.splice(i, 0, queuedTarget);
-
-      if (i === 0) {
-        attemptExplicitHydrationTarget(queuedTarget);
-      }
-    }
   }
 
   function attemptReplayContinuousQueuedEvent(queuedEvent) {
@@ -13829,20 +13801,6 @@
       }
     }
 
-    function updatePortal(returnFiber, current$$1, portal, expirationTime) {
-      if (current$$1 === null || current$$1.tag !== HostPortal || current$$1.stateNode.containerInfo !== portal.containerInfo || current$$1.stateNode.implementation !== portal.implementation) {
-        // Insert
-        var created = createFiberFromPortal(portal, returnFiber.mode, expirationTime);
-        created.return = returnFiber;
-        return created;
-      } else {
-        // Update
-        var existing = useFiber(current$$1, portal.children || [], expirationTime);
-        existing.return = returnFiber;
-        return existing;
-      }
-    }
-
     function updateFragment(returnFiber, current$$1, fragment, expirationTime, key) {
       if (current$$1 === null || current$$1.tag !== Fragment) {
         // Insert
@@ -13876,14 +13834,6 @@
               _created.ref = coerceRef(returnFiber, null, newChild);
               _created.return = returnFiber;
               return _created;
-            }
-
-          case REACT_PORTAL_TYPE:
-            {
-              var _created2 = createFiberFromPortal(newChild, returnFiber.mode, expirationTime);
-
-              _created2.return = returnFiber;
-              return _created2;
             }
         }
 
@@ -13935,15 +13885,6 @@
                 return null;
               }
             }
-
-          case REACT_PORTAL_TYPE:
-            {
-              if (newChild.key === key) {
-                return updatePortal(returnFiber, oldFiber, newChild, expirationTime);
-              } else {
-                return null;
-              }
-            }
         }
 
         if (isArray(newChild) || getIteratorFn(newChild)) {
@@ -13986,13 +13927,6 @@
 
               return updateElement(returnFiber, _matchedFiber, newChild, expirationTime);
             }
-
-          case REACT_PORTAL_TYPE:
-            {
-              var _matchedFiber2 = existingChildren.get(newChild.key === null ? newIdx : newChild.key) || null;
-
-              return updatePortal(returnFiber, _matchedFiber2, newChild, expirationTime);
-            }
         }
 
         if (isArray(newChild) || getIteratorFn(newChild)) {
@@ -14025,7 +13959,6 @@
 
         switch (child.$$typeof) {
           case REACT_ELEMENT_TYPE:
-          case REACT_PORTAL_TYPE:
             warnForMissingKey(child);
             var key = child.key;
 
@@ -14447,38 +14380,6 @@
       }
     }
 
-    function reconcileSinglePortal(returnFiber, currentFirstChild, portal, expirationTime) {
-      var key = portal.key;
-      var child = currentFirstChild;
-
-      while (child !== null) {
-        // TODO: If key === null and child.key === null, then this only applies to
-        // the first item in the list.
-        if (child.key === key) {
-          if (child.tag === HostPortal && child.stateNode.containerInfo === portal.containerInfo && child.stateNode.implementation === portal.implementation) {
-            deleteRemainingChildren(returnFiber, child.sibling);
-            var existing = useFiber(child, portal.children || [], expirationTime);
-            existing.return = returnFiber;
-            return existing;
-          } else {
-            deleteRemainingChildren(returnFiber, child);
-            break;
-          }
-        } else {
-          deleteChild(returnFiber, child);
-        }
-
-        child = child.sibling;
-      }
-
-      var created = createFiberFromPortal(portal, returnFiber.mode, expirationTime);
-      created.return = returnFiber;
-      return created;
-    } // This API will tag the children with the side-effect of the reconciliation
-    // itself. They will be added to the side-effect list as we pass through the
-    // children and the parent.
-
-
     function reconcileChildFibers(returnFiber, currentFirstChild, newChild, expirationTime) {
       // This function is not recursive.
       // If the top level item is an array, we treat it as a set of children,
@@ -14500,9 +14401,6 @@
         switch (newChild.$$typeof) {
           case REACT_ELEMENT_TYPE:
             return placeSingleChild(reconcileSingleElement(returnFiber, currentFirstChild, newChild, expirationTime));
-
-          case REACT_PORTAL_TYPE:
-            return placeSingleChild(reconcileSinglePortal(returnFiber, currentFirstChild, newChild, expirationTime));
         }
       }
 
@@ -25251,21 +25149,6 @@
     }
   }
 
-  function createPortal$1(children, containerInfo, // TODO: figure out the API for cross-renderer implementation.
-    implementation) {
-    var key = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    return {
-      // This tag allow us to uniquely identify this as a React Portal
-      $$typeof: REACT_PORTAL_TYPE,
-      key: key == null ? null : '' + key,
-      children: children,
-      containerInfo: containerInfo,
-      implementation: implementation
-    };
-  }
-
-  var didWarnAboutUnstableCreatePortal = false;
-
   {
     if (typeof Map !== 'function' || // $FlowIssue Flow incorrectly thinks Map has no prototype
       Map.prototype == null || typeof Map.prototype.forEach !== 'function' || typeof Set !== 'function' || // $FlowIssue Flow incorrectly thinks Set has no prototype
@@ -25277,37 +25160,12 @@
   setRestoreImplementation(restoreControlledState$$1);
   setBatchingImplementation(batchedUpdates$1, discreteUpdates$1, flushDiscreteUpdates, batchedEventUpdates$1);
 
-  function createPortal$$1(children, container) {
-    var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-    if (!isValidContainer(container)) {
-      {
-        throw Error("Target container is not a DOM element.");
-      }
-    } // TODO: pass ReactDOM portal implementation as third argument
-
-
-    return createPortal$1(children, container, null, key);
-  }
-
   var ReactDOM = {
-    createPortal: createPortal$$1,
-    // Legacy
     findDOMNode: findDOMNode,
     hydrate: hydrate,
     render: render,
     unstable_renderSubtreeIntoContainer: unstable_renderSubtreeIntoContainer,
     unmountComponentAtNode: unmountComponentAtNode,
-    // Temporary alias since we already shipped React 16 RC with it.
-    // TODO: remove in React 17.
-    unstable_createPortal: function () {
-      if (!didWarnAboutUnstableCreatePortal) {
-        didWarnAboutUnstableCreatePortal = true;
-        lowPriorityWarningWithoutStack$1(false, 'The ReactDOM.unstable_createPortal() alias has been deprecated, ' + 'and will be removed in React 17+. Update your code to use ' + 'ReactDOM.createPortal() instead. It has the exact same API, ' + 'but without the "unstable_" prefix.');
-      }
-
-      return createPortal$$1.apply(void 0, arguments);
-    },
     unstable_batchedUpdates: batchedUpdates$1,
     flushSync: flushSync,
     __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: {
@@ -25323,12 +25181,6 @@
     ReactDOM.unstable_discreteUpdates = discreteUpdates$1;
     ReactDOM.unstable_flushDiscreteUpdates = flushDiscreteUpdates;
     ReactDOM.unstable_flushControlled = flushControlled;
-
-    ReactDOM.unstable_scheduleHydration = function (target) {
-      if (target) {
-        queueExplicitHydrationTarget(target);
-      }
-    };
   }
 
   var ReactDOM$2 = Object.freeze({

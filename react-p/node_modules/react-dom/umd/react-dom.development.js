@@ -26410,7 +26410,7 @@ function resolveLazyComponentTag(Component) {
   return IndeterminateComponent;
 } // This is used to create an alternate fiber to do work on.
 
-function createWorkInProgress(current, pendingProps, expirationTime) {
+function createWorkInProgress(current, pendingProps) {
   var workInProgress = current.alternate;
 
   if (workInProgress === null) {
@@ -27094,8 +27094,6 @@ function findHostInstanceWithWarning(component, methodName) {
 
     return hostFiber.stateNode;
   }
-
-  return findHostInstance(component);
 }
 
 function createContainer(containerInfo, tag, hydrate, hydrationCallbacks) {
@@ -27272,78 +27270,12 @@ function findHostInstanceWithNoPortals(fiber) {
   return hostFiber.stateNode;
 }
 
-var shouldSuspendImpl = function (fiber) {
+var shouldSuspendImpl = function () {
   return false;
 };
 
 function shouldSuspend(fiber) {
   return shouldSuspendImpl(fiber);
-}
-var overrideHookState = null;
-var overrideProps = null;
-var scheduleUpdate = null;
-var setSuspenseHandler = null;
-
-{
-  var copyWithSetImpl = function (obj, path, idx, value) {
-    if (idx >= path.length) {
-      return value;
-    }
-
-    var key = path[idx];
-    var updated = Array.isArray(obj) ? obj.slice() : _assign({}, obj); // $FlowFixMe number or string is fine here
-
-    updated[key] = copyWithSetImpl(obj[key], path, idx + 1, value);
-    return updated;
-  };
-
-  var copyWithSet = function (obj, path, value) {
-    return copyWithSetImpl(obj, path, 0, value);
-  }; // Support DevTools editable values for useState and useReducer.
-
-
-  overrideHookState = function (fiber, id, path, value) {
-    // For now, the "id" of stateful hooks is just the stateful hook index.
-    // This may change in the future with e.g. nested hooks.
-    var currentHook = fiber.memoizedState;
-
-    while (currentHook !== null && id > 0) {
-      currentHook = currentHook.next;
-      id--;
-    }
-
-    if (currentHook !== null) {
-      var newState = copyWithSet(currentHook.memoizedState, path, value);
-      currentHook.memoizedState = newState;
-      currentHook.baseState = newState; // We aren't actually adding an update to the queue,
-      // because there is no update we can add for useReducer hooks that won't trigger an error.
-      // (There's no appropriate action type for DevTools overrides.)
-      // As a result though, React will see the scheduled update as a noop and bailout.
-      // Shallow cloning props works as a workaround for now to bypass the bailout check.
-
-      fiber.memoizedProps = _assign({}, fiber.memoizedProps);
-      scheduleWork(fiber, Sync);
-    }
-  }; // Support DevTools props for function components, forwardRef, memo, host components, etc.
-
-
-  overrideProps = function (fiber, path, value) {
-    fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
-
-    if (fiber.alternate) {
-      fiber.alternate.pendingProps = fiber.pendingProps;
-    }
-
-    scheduleWork(fiber, Sync);
-  };
-
-  scheduleUpdate = function (fiber) {
-    scheduleWork(fiber, Sync);
-  };
-
-  setSuspenseHandler = function (newShouldSuspendImpl) {
-    shouldSuspendImpl = newShouldSuspendImpl;
-  };
 }
 
 // This file intentionally does *not* have the Flow annotation.

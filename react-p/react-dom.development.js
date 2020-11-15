@@ -2293,100 +2293,6 @@ function setAttributeNS(node, attributeNamespace, attributeName, attributeValue)
 }
 
 /**
- * Get the value for a property on a node. Only used in DEV for SSR validation.
- * The "expected" argument is used as a hint of what the expected value is.
- * Some properties have multiple equivalent values.
- */
-function getValueForProperty(node, name, expected, propertyInfo) {
-  {
-    if (propertyInfo.mustUseProperty) {
-      var propertyName = propertyInfo.propertyName;
-      return node[propertyName];
-    } else {
-      if (!disableJavaScriptURLs && propertyInfo.sanitizeURL) {
-        // If we haven't fully disabled javascript: URLs, and if
-        // the hydration is successful of a javascript: URL, we
-        // still want to warn on the client.
-        sanitizeURL('' + expected);
-      }
-
-      var attributeName = propertyInfo.attributeName;
-      var stringValue = null;
-
-      if (propertyInfo.type === OVERLOADED_BOOLEAN) {
-        if (node.hasAttribute(attributeName)) {
-          var value = node.getAttribute(attributeName);
-
-          if (value === '') {
-            return true;
-          }
-
-          if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
-            return value;
-          }
-
-          if (value === '' + expected) {
-            return expected;
-          }
-
-          return value;
-        }
-      } else if (node.hasAttribute(attributeName)) {
-        if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
-          // We had an attribute but shouldn't have had one, so read it
-          // for the error message.
-          return node.getAttribute(attributeName);
-        }
-
-        if (propertyInfo.type === BOOLEAN) {
-          // If this was a boolean, it doesn't matter what the value is
-          // the fact that we have it is the same as the expected.
-          return expected;
-        } // Even if this property uses a namespace we use getAttribute
-        // because we assume its namespaced name is the same as our config.
-        // To use getAttributeNS we need the local name which we don't have
-        // in our config atm.
-
-
-        stringValue = node.getAttribute(attributeName);
-      }
-
-      if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
-        return stringValue === null ? expected : stringValue;
-      } else if (stringValue === '' + expected) {
-        return expected;
-      } else {
-        return stringValue;
-      }
-    }
-  }
-}
-/**
- * Get the value for a attribute on a node. Only used in DEV for SSR validation.
- * The third argument is used as a hint of what the expected value is. Some
- * attributes have multiple equivalent values.
- */
-
-function getValueForAttribute(node, name, expected) {
-  {
-    if (!isAttributeNameSafe(name)) {
-      return;
-    }
-
-    if (!node.hasAttribute(name)) {
-      return expected === undefined ? undefined : null;
-    }
-
-    var value = node.getAttribute(name);
-
-    if (value === '' + expected) {
-      return expected;
-    }
-
-    return value;
-  }
-}
-/**
  * Sets the value for a property on a node.
  *
  * @param {DOMElement} node
@@ -7610,29 +7516,17 @@ function validateProperties$2(type, props, canUseEventSystem) {
   warnUnknownProperties(type, props, canUseEventSystem);
 }
 
-// TODO: direct imports like some-package/src/* are bad. Fix me.
-var didWarnInvalidHydration = false;
 var didWarnShadyDOM = false;
 var didWarnScriptTags = false;
 var DANGEROUSLY_SET_INNER_HTML = 'dangerouslySetInnerHTML';
-var SUPPRESS_CONTENT_EDITABLE_WARNING = 'suppressContentEditableWarning';
-var SUPPRESS_HYDRATION_WARNING$1 = 'suppressHydrationWarning';
 var AUTOFOCUS = 'autoFocus';
 var CHILDREN = 'children';
 var STYLE$1 = 'style';
 var HTML = '__html';
-var LISTENERS = 'listeners';
 var HTML_NAMESPACE = Namespaces.html;
 var warnedUnknownTags;
-var suppressHydrationWarning;
 var validatePropertiesInDevelopment;
-var warnForTextDifference;
-var warnForPropDifference;
-var warnForExtraAttributes;
 var warnForInvalidEventListener;
-var canDiffStyleForHydrationWarning;
-var normalizeMarkupForTextOrAttribute;
-var normalizeHTML;
 
 {
   warnedUnknownTags = {
@@ -7657,74 +7551,6 @@ var normalizeHTML;
     validateProperties$2(type, props,
     /* canUseEventSystem */
     true);
-  }; // IE 11 parses & normalizes the style attribute as opposed to other
-  // browsers. It adds spaces and sorts the properties in some
-  // non-alphabetical order. Handling that would require sorting CSS
-  // properties in the client & server versions or applying
-  // `expectedStyle` to a temporary DOM node to read its `style` attribute
-  // normalized. Since it only affects IE, we're skipping style warnings
-  // in that browser completely in favor of doing all that work.
-  // See https://github.com/facebook/react/issues/11807
-
-
-  canDiffStyleForHydrationWarning = canUseDOM && !document.documentMode; // HTML parsing normalizes CR and CRLF to LF.
-  // It also can turn \u0000 into \uFFFD inside attributes.
-  // https://www.w3.org/TR/html5/single-page.html#preprocessing-the-input-stream
-  // If we have a mismatch, it might be caused by that.
-  // We will still patch up in this case but not fire the warning.
-
-  var NORMALIZE_NEWLINES_REGEX = /\r\n?/g;
-  // eslint-disable-next-line no-control-regex
-  var NORMALIZE_NULL_AND_REPLACEMENT_REGEX = /\u0000|\uFFFD/g;
-
-  normalizeMarkupForTextOrAttribute = function (markup) {
-    var markupString = typeof markup === 'string' ? markup : '' + markup;
-    return markupString.replace(NORMALIZE_NEWLINES_REGEX, '\n').replace(NORMALIZE_NULL_AND_REPLACEMENT_REGEX, '');
-  };
-
-  warnForTextDifference = function (serverText, clientText) {
-    if (didWarnInvalidHydration) {
-      return;
-    }
-
-    var normalizedClientText = normalizeMarkupForTextOrAttribute(clientText);
-    var normalizedServerText = normalizeMarkupForTextOrAttribute(serverText);
-
-    if (normalizedServerText === normalizedClientText) {
-      return;
-    }
-
-    didWarnInvalidHydration = true;
-    warningWithoutStack$1(false, 'Text content did not match. Server: "%s" Client: "%s"', normalizedServerText, normalizedClientText);
-  };
-
-  warnForPropDifference = function (propName, serverValue, clientValue) {
-    if (didWarnInvalidHydration) {
-      return;
-    }
-
-    var normalizedClientValue = normalizeMarkupForTextOrAttribute(clientValue);
-    var normalizedServerValue = normalizeMarkupForTextOrAttribute(serverValue);
-
-    if (normalizedServerValue === normalizedClientValue) {
-      return;
-    }
-
-    didWarnInvalidHydration = true;
-    warningWithoutStack$1(false, 'Prop `%s` did not match. Server: %s Client: %s', propName, JSON.stringify(normalizedServerValue), JSON.stringify(normalizedClientValue));
-  };
-
-  warnForExtraAttributes = function (attributeNames) {
-    if (didWarnInvalidHydration) {
-      return;
-    }
-
-    didWarnInvalidHydration = true;
-    var names = [];
-    attributeNames.forEach(function (name) {
-      names.push(name);
-    });
-    warningWithoutStack$1(false, 'Extra attributes from the server: %s', names);
   };
 
   warnForInvalidEventListener = function (registrationName, listener) {
@@ -7733,19 +7559,7 @@ var normalizeHTML;
     } else {
       warning$1(false, 'Expected `%s` listener to be a function, instead got a value of `%s` type.', registrationName, typeof listener);
     }
-  }; // Parse the HTML and read it back to normalize the HTML string so that it
-  // can be used for comparison.
-
-
-  normalizeHTML = function (parent, html) {
-    // We could have created a separate document here to avoid
-    // re-initializing custom elements if they exist. But this breaks
-    // how <noscript> is being handled. So we use the same document.
-    // See the discussion in https://github.com/facebook/react/pull/11157.
-    var testElement = parent.namespaceURI === HTML_NAMESPACE ? parent.ownerDocument.createElement(parent.tagName) : parent.ownerDocument.createElementNS(parent.namespaceURI, parent.tagName);
-    testElement.innerHTML = html;
-    return testElement.innerHTML;
-  };
+  }; 
 }
 
 function ensureListeningTo(rootContainerElement, registrationName) {
@@ -7812,7 +7626,6 @@ function setInitialDOMProperties(tag, domElement, rootContainerElement, nextProp
       } else if (typeof nextProp === 'number') {
         setTextContent(domElement, '' + nextProp);
       }
-    } else if (enableFlareAPI && propKey === LISTENERS || propKey === SUPPRESS_CONTENT_EDITABLE_WARNING || propKey === SUPPRESS_HYDRATION_WARNING$1) {// Noop
     } else if (propKey === AUTOFOCUS) {// We polyfill it separately on the client during commit.
       // We could have excluded it in the property list instead of
       // adding a special case here, but then it wouldn't be emitted
@@ -8134,7 +7947,6 @@ function diffProperties(domElement, tag, lastRawProps, nextRawProps, rootContain
         }
       }
     } else if (propKey === DANGEROUSLY_SET_INNER_HTML || propKey === CHILDREN) {// Noop. This is handled by the clear text mechanism.
-    } else if (enableFlareAPI && propKey === LISTENERS || propKey === SUPPRESS_CONTENT_EDITABLE_WARNING || propKey === SUPPRESS_HYDRATION_WARNING$1) {// Noop
     } else if (propKey === AUTOFOCUS) {// Noop. It doesn't work on updates anyway.
     } else if (registrationNameModules.hasOwnProperty(propKey)) {
       // This is a special case. If any listener updates we need to ensure
@@ -8216,7 +8028,6 @@ function diffProperties(domElement, tag, lastRawProps, nextRawProps, rootContain
       if (lastProp !== nextProp && (typeof nextProp === 'string' || typeof nextProp === 'number')) {
         (updatePayload = updatePayload || []).push(propKey, '' + nextProp);
       }
-    } else if (enableFlareAPI && propKey === LISTENERS || propKey === SUPPRESS_CONTENT_EDITABLE_WARNING || propKey === SUPPRESS_HYDRATION_WARNING$1) {// Noop
     } else if (registrationNameModules.hasOwnProperty(propKey)) {
       if (nextProp != null) {
         // We eagerly listen to this even though we haven't committed yet.
@@ -9087,12 +8898,6 @@ var replaceContainerChildren = shim;
 var cloneHiddenInstance = shim;
 var cloneHiddenTextInstance = shim;
 
-var SUPPRESS_HYDRATION_WARNING;
-
-{
-  SUPPRESS_HYDRATION_WARNING = 'suppressHydrationWarning';
-}
-
 var SUSPENSE_START_DATA = '$';
 var SUSPENSE_END_DATA = '/$';
 var SUSPENSE_PENDING_START_DATA = '$?';
@@ -9547,56 +9352,6 @@ function getClosestInstanceFromNode(targetNode) {
     // node and the first child. It isn't surrounding the container node.
     // If it's not a container, we check if it's an instance.
     targetInst = parentNode[internalContainerInstanceKey] || parentNode[internalInstanceKey];
-
-    if (targetInst) {
-      // Since this wasn't the direct target of the event, we might have
-      // stepped past dehydrated DOM nodes to get here. However they could
-      // also have been non-React nodes. We need to answer which one.
-      // If we the instance doesn't have any children, then there can't be
-      // a nested suspense boundary within it. So we can use this as a fast
-      // bailout. Most of the time, when people add non-React children to
-      // the tree, it is using a ref to a child-less DOM node.
-      // Normally we'd only need to check one of the fibers because if it
-      // has ever gone from having children to deleting them or vice versa
-      // it would have deleted the dehydrated boundary nested inside already.
-      // However, since the HostRoot starts out with an alternate it might
-      // have one on the alternate so we need to check in case this was a
-      // root.
-      var alternate = targetInst.alternate;
-
-      if (targetInst.child !== null || alternate !== null && alternate.child !== null) {
-        // Next we need to figure out if the node that skipped past is
-        // nested within a dehydrated boundary and if so, which one.
-        var suspenseInstance = getParentSuspenseInstance(targetNode);
-
-        while (suspenseInstance !== null) {
-          // We found a suspense instance. That means that we haven't
-          // hydrated it yet. Even though we leave the comments in the
-          // DOM after hydrating, and there are boundaries in the DOM
-          // that could already be hydrated, we wouldn't have found them
-          // through this pass since if the target is hydrated it would
-          // have had an internalInstanceKey on it.
-          // Let's get the fiber associated with the SuspenseComponent
-          // as the deepest instance.
-          var targetSuspenseInst = suspenseInstance[internalInstanceKey];
-
-          if (targetSuspenseInst) {
-            return targetSuspenseInst;
-          } // If we don't find a Fiber on the comment, it might be because
-          // we haven't gotten to hydrate it yet. There might still be a
-          // parent boundary that hasn't above this one so we need to find
-          // the outer most that is known.
-
-
-          suspenseInstance = getParentSuspenseInstance(suspenseInstance); // If we don't find one, then that should mean that the parent
-          // host component also hasn't hydrated yet. We can return it
-          // below since it will bail out on the isMounted check later.
-        }
-      }
-
-      return targetInst;
-    }
-
     targetNode = parentNode;
     parentNode = targetNode.parentNode;
   }
@@ -12291,206 +12046,6 @@ function markFailedErrorBoundaryForHotReloading(fiber) {
     }
 
     failedBoundaries.add(fiber);
-  }
-}
-
-function scheduleFibersWithFamiliesRecursively(fiber, updatedFamilies, staleFamilies) {
-  {
-    var alternate = fiber.alternate,
-        child = fiber.child,
-        sibling = fiber.sibling,
-        tag = fiber.tag,
-        type = fiber.type;
-    var candidateType = null;
-
-    switch (tag) {
-      case FunctionComponent:
-      case SimpleMemoComponent:
-      case ClassComponent:
-        candidateType = type;
-        break;
-
-      case ForwardRef:
-        candidateType = type.render;
-        break;
-
-      default:
-        break;
-    }
-
-    if (resolveFamily === null) {
-      throw new Error('Expected resolveFamily to be set during hot reload.');
-    }
-
-    var needsRender = false;
-    var needsRemount = false;
-
-    if (candidateType !== null) {
-      var family = resolveFamily(candidateType);
-
-      if (family !== undefined) {
-        if (staleFamilies.has(family)) {
-          needsRemount = true;
-        } else if (updatedFamilies.has(family)) {
-          if (tag === ClassComponent) {
-            needsRemount = true;
-          } else {
-            needsRender = true;
-          }
-        }
-      }
-    }
-
-    if (failedBoundaries !== null) {
-      if (failedBoundaries.has(fiber) || alternate !== null && failedBoundaries.has(alternate)) {
-        needsRemount = true;
-      }
-    }
-
-    if (needsRemount) {
-      fiber._debugNeedsRemount = true;
-    }
-
-    if (needsRemount || needsRender) {
-      scheduleWork(fiber, Sync);
-    }
-
-    if (child !== null && !needsRemount) {
-      scheduleFibersWithFamiliesRecursively(child, updatedFamilies, staleFamilies);
-    }
-
-    if (sibling !== null) {
-      scheduleFibersWithFamiliesRecursively(sibling, updatedFamilies, staleFamilies);
-    }
-  }
-}
-
-var findHostInstancesForRefresh = function (root, families) {
-  {
-    var hostInstances = new Set();
-    var types = new Set(families.map(function (family) {
-      return family.current;
-    }));
-    findHostInstancesForMatchingFibersRecursively(root.current, types, hostInstances);
-    return hostInstances;
-  }
-};
-
-function findHostInstancesForMatchingFibersRecursively(fiber, types, hostInstances) {
-  {
-    var child = fiber.child,
-        sibling = fiber.sibling,
-        tag = fiber.tag,
-        type = fiber.type;
-    var candidateType = null;
-
-    switch (tag) {
-      case FunctionComponent:
-      case SimpleMemoComponent:
-      case ClassComponent:
-        candidateType = type;
-        break;
-
-      case ForwardRef:
-        candidateType = type.render;
-        break;
-
-      default:
-        break;
-    }
-
-    var didMatch = false;
-
-    if (candidateType !== null) {
-      if (types.has(candidateType)) {
-        didMatch = true;
-      }
-    }
-
-    if (didMatch) {
-      // We have a match. This only drills down to the closest host components.
-      // There's no need to search deeper because for the purpose of giving
-      // visual feedback, "flashing" outermost parent rectangles is sufficient.
-      findHostInstancesForFiberShallowly(fiber, hostInstances);
-    } else {
-      // If there's no match, maybe there will be one further down in the child tree.
-      if (child !== null) {
-        findHostInstancesForMatchingFibersRecursively(child, types, hostInstances);
-      }
-    }
-
-    if (sibling !== null) {
-      findHostInstancesForMatchingFibersRecursively(sibling, types, hostInstances);
-    }
-  }
-}
-
-function findHostInstancesForFiberShallowly(fiber, hostInstances) {
-  {
-    var foundHostInstances = findChildHostInstancesForFiberShallowly(fiber, hostInstances);
-
-    if (foundHostInstances) {
-      return;
-    } // If we didn't find any host children, fallback to closest host parent.
-
-
-    var node = fiber;
-
-    while (true) {
-      switch (node.tag) {
-        case HostComponent:
-          hostInstances.add(node.stateNode);
-          return;
-
-        case HostPortal:
-          hostInstances.add(node.stateNode.containerInfo);
-          return;
-
-        case HostRoot:
-          hostInstances.add(node.stateNode.containerInfo);
-          return;
-      }
-
-      if (node.return === null) {
-        throw new Error('Expected to reach root first.');
-      }
-
-      node = node.return;
-    }
-  }
-}
-
-function findChildHostInstancesForFiberShallowly(fiber, hostInstances) {
-  {
-    var node = fiber;
-    var foundHostInstances = false;
-
-    while (true) {
-      if (node.tag === HostComponent) {
-        // We got a match.
-        foundHostInstances = true;
-        hostInstances.add(node.stateNode); // There may still be more, so keep searching.
-      } else if (node.child !== null) {
-        node.child.return = node;
-        node = node.child;
-        continue;
-      }
-
-      if (node === fiber) {
-        return foundHostInstances;
-      }
-
-      while (node.sibling === null) {
-        if (node.return === null || node.return === fiber) {
-          return foundHostInstances;
-        }
-
-        node = node.return;
-      }
-
-      node.sibling.return = node.return;
-      node = node.sibling;
-    }
   }
 }
 
@@ -18447,26 +18002,6 @@ function mountDehydratedSuspenseComponent(workInProgress, suspenseInstance) {
     }
 
     workInProgress.expirationTime = Sync;
-  } else if (isSuspenseInstanceFallback(suspenseInstance)) {
-    // This is a client-only boundary. Since we won't get any content from the server
-    // for this, we need to schedule that at a higher priority based on when it would
-    // have timed out. In theory we could render it in this pass but it would have the
-    // wrong priority associated with it and will prevent hydration of parent path.
-    // Instead, we'll leave work left on it to render it in a separate commit.
-    // TODO This time should be the time at which the server rendered response that is
-    // a parent to this boundary was displayed. However, since we currently don't have
-    // a protocol to transfer that time, we'll just estimate it by using the current
-    // time. This will mean that Suspense timeouts are slightly shifted to later than
-    // they should be.
-    var serverDisplayTime = requestCurrentTimeForUpdate(); // Schedule a normal pri update to render this content.
-
-    var newExpirationTime = computeAsyncExpiration(serverDisplayTime);
-
-    if (enableSchedulerTracing) {
-      markSpawnedWork(newExpirationTime);
-    }
-
-    workInProgress.expirationTime = newExpirationTime;
   } else {
     // We'll continue hydrating the rest at offscreen priority since we'll already
     // be showing the right content coming from the server, it is no rush.
@@ -18488,15 +18023,6 @@ function updateDehydratedSuspenseComponent(current$$1, workInProgress, suspenseI
   if ((workInProgress.mode & BlockingMode) === NoMode) {
     return retrySuspenseComponentWithoutHydrating(current$$1, workInProgress, renderExpirationTime);
   }
-
-  if (isSuspenseInstanceFallback(suspenseInstance)) {
-    // This boundary is in a permanent fallback state. In this case, we'll never
-    // get an update and we'll never be able to hydrate the final content. Let's just try the
-    // client side render instead.
-    return retrySuspenseComponentWithoutHydrating(current$$1, workInProgress, renderExpirationTime);
-  } // We use childExpirationTime to indicate that a child might depend on context, so if
-  // any context has changed, we need to treat is as if the input might have changed.
-
 
   var hasContextChanged$$1 = current$$1.childExpirationTime >= renderExpirationTime;
 
@@ -20233,20 +19759,9 @@ function completeWork(current, workInProgress, renderExpirationTime) {
             } // This can happen when we abort work.
 
           }
-
           var _rootContainerInstance = getRootHostContainer();
-
           var _currentHostContext = getHostContext();
-
-          var _wasHydrated2 = popHydrationState(workInProgress);
-
-          if (_wasHydrated2) {
-            if (prepareToHydrateHostTextInstance(workInProgress)) {
-              markUpdate(workInProgress);
-            }
-          } else {
             workInProgress.stateNode = createTextInstance(newText, _rootContainerInstance, _currentHostContext, workInProgress);
-          }
         }
 
         break;
@@ -24636,17 +24151,6 @@ function retryTimedOutBoundary(boundaryFiber, retryTime) {
     ensureRootIsScheduled(root);
     schedulePendingInteractions(root, retryTime);
   }
-}
-
-function retryDehydratedSuspenseBoundary(boundaryFiber) {
-  var suspenseState = boundaryFiber.memoizedState;
-  var retryTime = NoWork;
-
-  if (suspenseState !== null) {
-    retryTime = suspenseState.retryTime;
-  }
-
-  retryTimedOutBoundary(boundaryFiber, retryTime);
 }
 function resolveRetryThenable(boundaryFiber, thenable) {
   var retryTime = NoWork; // Default

@@ -16904,20 +16904,7 @@
     var node = firstChild;
 
     while (node !== null) {
-      if (node.tag === SuspenseComponent) {
-        var state = node.memoizedState;
-
-        if (state !== null) {
-          scheduleWorkOnFiber(node, renderExpirationTime);
-        }
-      } else if (node.tag === SuspenseListComponent) {
-        // If the tail is hidden there might not be an Suspense boundaries
-        // to schedule work on. In this case we have to schedule it on the
-        // list itself.
-        // We don't have to traverse to the children of the list since
-        // the list will propagate the change when it rerenders.
-        scheduleWorkOnFiber(node, renderExpirationTime);
-      } else if (node.child !== null) {
+      if (node.child !== null) {
         node.child.return = node;
         node = node.child;
         continue;
@@ -17469,86 +17456,6 @@
             }
 
             break;
-
-          case SuspenseComponent:
-            {
-              var state = workInProgress.memoizedState;
-
-              if (state !== null) {
-                if (enableSuspenseServerRenderer) {
-                  if (state.dehydrated !== null) {
-                    pushSuspenseContext(workInProgress, setDefaultShallowSuspenseContext(suspenseStackCursor.current)); // We know that this component will suspend again because if it has
-                    // been unsuspended it has committed as a resolved Suspense component.
-                    // If it needs to be retried, it should have work scheduled on it.
-
-                    workInProgress.effectTag |= DidCapture;
-                    break;
-                  }
-                }
-                pushSuspenseContext(workInProgress, setDefaultShallowSuspenseContext(suspenseStackCursor.current)); // The primary children do not have pending work with sufficient
-                // priority. Bailout.
-
-                var child = bailoutOnAlreadyFinishedWork(current$$1, workInProgress, renderExpirationTime);
-
-                if (child !== null) {
-                  // The fallback children have pending work. Skip over the
-                  // primary children and work on the fallback.
-                  return child.sibling;
-                } else {
-                  return null;
-                }
-              } else {
-                pushSuspenseContext(workInProgress, setDefaultShallowSuspenseContext(suspenseStackCursor.current));
-              }
-
-              break;
-            }
-
-          case SuspenseListComponent:
-            {
-              var didSuspendBefore = (current$$1.effectTag & DidCapture) !== NoEffect;
-
-              var _hasChildWork = workInProgress.childExpirationTime >= renderExpirationTime;
-
-              if (didSuspendBefore) {
-                if (_hasChildWork) {
-                  // If something was in fallback state last time, and we have all the
-                  // same children then we're still in progressive loading state.
-                  // Something might get unblocked by state updates or retries in the
-                  // tree which will affect the tail. So we need to use the normal
-                  // path to compute the correct tail.
-                  return updateSuspenseListComponent(current$$1, workInProgress, renderExpirationTime);
-                } // If none of the children had any work, that means that none of
-                // them got retried so they'll still be blocked in the same way
-                // as before. We can fast bail out.
-
-
-                workInProgress.effectTag |= DidCapture;
-              } // If nothing suspended before and we're rendering the same children,
-              // then the tail doesn't matter. Anything new that suspends will work
-              // in the "together" mode, so we can continue from the state we had.
-
-
-              var renderState = workInProgress.memoizedState;
-
-              if (renderState !== null) {
-                // Reset to the "together" mode in case we've started a different
-                // update in the past but didn't complete it.
-                renderState.rendering = null;
-                renderState.tail = null;
-              }
-
-              pushSuspenseContext(workInProgress, suspenseStackCursor.current);
-
-              if (_hasChildWork) {
-                break;
-              } else {
-                // If none of the children had any work, that means that none of
-                // them got retried so they'll still be blocked in the same way
-                // as before. We can fast bail out.
-                return null;
-              }
-            }
         }
 
         return bailoutOnAlreadyFinishedWork(current$$1, workInProgress, renderExpirationTime);
@@ -17708,15 +17615,6 @@
       state: state
     };
   }
-
-  function isFiberSuspenseAndTimedOut(fiber) {
-    return fiber.tag === SuspenseComponent && fiber.memoizedState !== null;
-  }
-
-  function getSuspenseFallbackChild(fiber) {
-    return fiber.child.sibling.child;
-  }
-
   var emptyObject$1 = {};
 
   function collectScopedNodes(node, fn, scopedNodes) {
@@ -18045,38 +17943,7 @@
           }
 
           appendInitialChild(parent, _instance2);
-        } else if (node.tag === SuspenseComponent) {
-          if ((node.effectTag & Update) !== NoEffect) {
-            // Need to toggle the visibility of the primary children.
-            var newIsHidden = node.memoizedState !== null;
-
-            if (newIsHidden) {
-              var primaryChildParent = node.child;
-
-              if (primaryChildParent !== null) {
-                if (primaryChildParent.child !== null) {
-                  primaryChildParent.child.return = primaryChildParent;
-                  appendAllChildren(parent, primaryChildParent, true, newIsHidden);
-                }
-
-                var fallbackChildParent = primaryChildParent.sibling;
-
-                if (fallbackChildParent !== null) {
-                  fallbackChildParent.return = node;
-                  node = fallbackChildParent;
-                  continue;
-                }
-              }
-            }
-          }
-
-          if (node.child !== null) {
-            // Continue traversing like normal
-            node.child.return = node;
-            node = node.child;
-            continue;
-          }
-        } else if (node.child !== null) {
+        } if (node.child !== null) {
           node.child.return = node;
           node = node.child;
           continue;

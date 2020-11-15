@@ -864,13 +864,11 @@
   var ContextProvider = 10;
   var ForwardRef = 11;
   var Profiler = 12;
-  var SuspenseComponent = 13;
   var MemoComponent = 14;
   var SimpleMemoComponent = 15;
   var LazyComponent = 16;
   var IncompleteClassComponent = 17;
   var DehydratedFragment = 18;
-  var SuspenseListComponent = 19;
   var FundamentalComponent = 20;
   var ScopeComponent = 21;
 
@@ -881,12 +879,6 @@
   if (!ReactSharedInternals.hasOwnProperty('ReactCurrentDispatcher')) {
     ReactSharedInternals.ReactCurrentDispatcher = {
       current: null
-    };
-  }
-
-  if (!ReactSharedInternals.hasOwnProperty('ReactCurrentBatchConfig')) {
-    ReactSharedInternals.ReactCurrentBatchConfig = {
-      suspense: null
     };
   }
 
@@ -935,8 +927,6 @@
   // (unstable) APIs that have been removed. Can we remove the symbols?
   var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
   var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
-  var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
-  var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for('react.suspense_list') : 0xead8;
   var REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
   var REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
   var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for('react.fundamental') : 0xead5;
@@ -1054,12 +1044,6 @@
 
       case REACT_STRICT_MODE_TYPE:
         return 'StrictMode';
-
-      case REACT_SUSPENSE_TYPE:
-        return 'Suspense';
-
-      case REACT_SUSPENSE_LIST_TYPE:
-        return 'SuspenseList';
     }
 
     if (typeof type === 'object') {
@@ -1255,60 +1239,39 @@
 
   var enableUserTimingAPI = true; // Helps identify side effects in render-phase lifecycle hooks and setState
   // reducers by double invoking them in Strict Mode.
-
   var debugRenderPhaseSideEffectsForStrictMode = true; // To preserve the "Pause on caught exceptions" behavior of the debugger, we
   // replay the begin phase of a failed component inside invokeGuardedCallback.
-
   var replayFailedUnitOfWorkWithInvokeGuardedCallback = true; // Warn about deprecated, async-unsafe lifecycles; relates to RFC #6:
-
   var warnAboutDeprecatedLifecycles = true; // Gather advanced timing metrics for Profiler subtrees.
-
   var enableProfilerTimer = true; // Trace which interactions trigger each commit.
-
   var enableSchedulerTracing = true; // SSR experiments
-
-  var enableSuspenseServerRenderer = false;
   var enableSelectiveHydration = false; // Only used in www builds.
-
   // Only used in www builds.
-
   // Disable javascript: URL strings in href for XSS protection.
-
   var disableJavaScriptURLs = false; // React Fire: prevent the value and checked attributes from syncing
   // with their related DOM properties
-
   var disableInputAttributeSyncing = false; // These APIs will no longer be "unstable" in the upcoming 16.7 release,
   // Control this behavior with a flag to support 16.6 minor releases in the meanwhile.
-
   var exposeConcurrentModeAPIs = false;
   var warnAboutShorthandPropertyCollision = false; // Experimental React Flare event system and event components support.
-
   var enableFlareAPI = false; // Experimental Host Component support.
-
   var enableFundamentalAPI = false; // Experimental Scope support.
-
   var enableScopeAPI = false; // New API for JSX transforms to target - https://github.com/reactjs/rfcs/pull/107
-
   // We will enforce mocking scheduler with scheduler/unstable_mock at some point. (v17?)
   // Till then, we warn about the missing mock, but still fallback to a legacy mode compatible version
-
   var warnAboutUnmockedScheduler = false; // For tests, we flush suspense fallbacks in an act scope;
   // *except* in some of our own tests, where we test incremental loading states.
-
   var flushSuspenseFallbacksInTests = true; // Add a callback property to suspense to notify which promises are currently
   // in the update queue. This allows reporting and tracing of what is causing
   // the user to see a loading state.
-
   var enableSuspenseCallback = false; // Part of the simplification of React.createElement so we can eventually move
   // from React.createElement to React.jsx
   // https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-
   var warnAboutDefaultPropsOnFunctionComponents = false;
   var warnAboutStringRefs = false;
   var disableLegacyContext = false;
   var disableSchedulerTimeoutBasedOnReactExpirationTime = false;
   var enableTrustedTypesIntegration = false; // Flag to turn event.target and event.currentTarget in ReactNative from a reactTag to a component instance
-
   // the renderer. Such as when we're dispatching events or if third party
   // libraries need to call batchedUpdates. Eventually, this API will go away when
   // everything is batched by default. We'll then have a similar API to opt-out of
@@ -9040,7 +9003,7 @@
     var inst = node[internalInstanceKey] || node[internalContainerInstanceKey];
 
     if (inst) {
-      if (inst.tag === HostComponent || inst.tag === HostText || inst.tag === SuspenseComponent || inst.tag === HostRoot) {
+      if (inst.tag === HostComponent || inst.tag === HostText || inst.tag === HostRoot) {
         return inst;
       } else {
         return null;
@@ -10461,8 +10424,7 @@
       }
 
       fiber._debugIsCurrentlyTiming = false;
-      var warning = fiber.tag === SuspenseComponent ? 'Rendering was suspended' : 'An error was thrown inside this error boundary';
-      endFiberMark(fiber, null, warning);
+      endFiberMark(fiber, null, 'warning');
     }
   }
   function startPhaseTimer(fiber, phase) {
@@ -11220,10 +11182,7 @@
   function computeAsyncExpiration(currentTime) {
     return computeExpirationBucket(currentTime, LOW_PRIORITY_EXPIRATION, LOW_PRIORITY_BATCH_SIZE);
   }
-  function computeSuspenseExpiration(currentTime, timeoutMs) {
-    // TODO: Should we warn if timeoutMs is lower than the normal pri expiration time?
-    return computeExpirationBucket(currentTime, timeoutMs, LOW_PRIORITY_BATCH_SIZE);
-  } // We intentionally set a higher expiration time for interactive updates in
+  // We intentionally set a higher expiration time for interactive updates in
   // dev than in production.
   //
   // If the main thread is being blocked so long that you hit the expiration,
@@ -12136,10 +12095,9 @@
     return queue;
   }
 
-  function createUpdate(expirationTime, suspenseConfig) {
+  function createUpdate(expirationTime) {
     var update = {
       expirationTime: expirationTime,
-      suspenseConfig: suspenseConfig,
       tag: UpdateState,
       payload: null,
       callback: null,
@@ -12389,7 +12347,7 @@
         // TODO: We should skip this update if it was already committed but currently
         // we have no way of detecting the difference between a committed and suspended
         // update here.
-        markRenderEventTimeAndConfig(updateExpirationTime, update.suspenseConfig); // Process it and compute a new result.
+        markRenderEventTimeAndConfig(updateExpirationTime); // Process it and compute a new result.
 
         resultState = getStateFromUpdate(workInProgress, queue, update, resultState, props, instance);
         var callback = update.callback;
@@ -12547,11 +12505,6 @@
     }
   }
 
-  var ReactCurrentBatchConfig = ReactSharedInternals.ReactCurrentBatchConfig;
-  function requestCurrentSuspenseConfig() {
-    return ReactCurrentBatchConfig.suspense;
-  }
-
   var fakeInternalInstance = {};
   var isArray$1 = Array.isArray; // React.Component uses a shared frozen object by default.
   // We'll use it to determine whether we need to initialize legacy refs.
@@ -12653,9 +12606,8 @@
     enqueueSetState: function (inst, payload, callback) {
       var fiber = get(inst);
       var currentTime = requestCurrentTimeForUpdate();
-      var suspenseConfig = requestCurrentSuspenseConfig();
-      var expirationTime = computeExpirationForFiber(currentTime, fiber, suspenseConfig);
-      var update = createUpdate(expirationTime, suspenseConfig);
+      var expirationTime = computeExpirationForFiber(currentTime, fiber);
+      var update = createUpdate(expirationTime);
       update.payload = payload;
 
       if (callback !== undefined && callback !== null) {
@@ -12672,9 +12624,8 @@
     enqueueReplaceState: function (inst, payload, callback) {
       var fiber = get(inst);
       var currentTime = requestCurrentTimeForUpdate();
-      var suspenseConfig = requestCurrentSuspenseConfig();
-      var expirationTime = computeExpirationForFiber(currentTime, fiber, suspenseConfig);
-      var update = createUpdate(expirationTime, suspenseConfig);
+      var expirationTime = computeExpirationForFiber(currentTime, fiber);
+      var update = createUpdate(expirationTime);
       update.tag = ReplaceState;
       update.payload = payload;
 
@@ -12692,9 +12643,8 @@
     enqueueForceUpdate: function (inst, callback) {
       var fiber = get(inst);
       var currentTime = requestCurrentTimeForUpdate();
-      var suspenseConfig = requestCurrentSuspenseConfig();
-      var expirationTime = computeExpirationForFiber(currentTime, fiber, suspenseConfig);
-      var update = createUpdate(expirationTime, suspenseConfig);
+      var expirationTime = computeExpirationForFiber(currentTime, fiber);
+      var update = createUpdate(expirationTime);
       update.tag = ForceUpdate;
 
       if (callback !== undefined && callback !== null) {
@@ -14357,41 +14307,6 @@
     pop(contextFiberStackCursor, fiber);
   }
 
-  var DefaultSuspenseContext = 0; // The Suspense Context is split into two parts. The lower bits is
-  // inherited deeply down the subtree. The upper bits only affect
-  // this immediate suspense boundary and gets reset each new
-  // boundary or suspense list.
-
-  var SubtreeSuspenseContextMask = 1; // Subtree Flags:
-  // InvisibleParentSuspenseContext indicates that one of our parent Suspense
-  // boundaries is not currently showing visible main content.
-  // Either because it is already showing a fallback or is not mounted at all.
-  // We can use this to determine if it is desirable to trigger a fallback at
-  // the parent. If not, then we might need to trigger undesirable boundaries
-  // and/or suspend the commit to avoid hiding the parent content.
-
-  var InvisibleParentSuspenseContext = 1; // Shallow Flags:
-  // ForceSuspenseFallback can be used by SuspenseList to force newly added
-  // items into their fallback state during one of the render passes.
-
-  var ForceSuspenseFallback = 2;
-  var suspenseStackCursor = createCursor(DefaultSuspenseContext);
-  function hasSuspenseContext(parentContext, flag) {
-    return (parentContext & flag) !== 0;
-  }
-  function setDefaultShallowSuspenseContext(parentContext) {
-    return parentContext & SubtreeSuspenseContextMask;
-  }
-  function setShallowSuspenseContext(parentContext, shallowContext) {
-    return parentContext & SubtreeSuspenseContextMask | shallowContext;
-  }
-  function pushSuspenseContext(fiber, newContext) {
-    push(suspenseStackCursor, newContext, fiber);
-  }
-  function popSuspenseContext(fiber) {
-    pop(suspenseStackCursor, fiber);
-  }
-
   var emptyObject = {};
   var isArray$2 = Array.isArray;
   function createResponderInstance(responder, responderProps, responderState, fiber) {
@@ -15089,7 +15004,7 @@
           // TODO: We should skip this update if it was already committed but currently
           // we have no way of detecting the difference between a committed and suspended
           // update here.
-          markRenderEventTimeAndConfig(updateExpirationTime, _update.suspenseConfig); // Process this update.
+          markRenderEventTimeAndConfig(updateExpirationTime); // Process this update.
 
           if (_update.eagerReducer === reducer) {
             // If this update was processed eagerly, and its reducer matches the
@@ -15358,90 +15273,6 @@
     return nextValue;
   }
 
-  function mountDeferredValue(value, config) {
-    var _mountState = mountState(value),
-      prevValue = _mountState[0],
-      setValue = _mountState[1];
-
-    mountEffect(function () {
-      unstable_next(function () {
-        var previousConfig = ReactCurrentBatchConfig$1.suspense;
-        ReactCurrentBatchConfig$1.suspense = config === undefined ? null : config;
-
-        try {
-          setValue(value);
-        } finally {
-          ReactCurrentBatchConfig$1.suspense = previousConfig;
-        }
-      });
-    }, [value, config]);
-    return prevValue;
-  }
-
-  function updateDeferredValue(value, config) {
-    var _updateState = updateState(value),
-      prevValue = _updateState[0],
-      setValue = _updateState[1];
-
-    updateEffect(function () {
-      unstable_next(function () {
-        var previousConfig = ReactCurrentBatchConfig$1.suspense;
-        ReactCurrentBatchConfig$1.suspense = config === undefined ? null : config;
-
-        try {
-          setValue(value);
-        } finally {
-          ReactCurrentBatchConfig$1.suspense = previousConfig;
-        }
-      });
-    }, [value, config]);
-    return prevValue;
-  }
-
-  function mountTransition(config) {
-    var _mountState2 = mountState(false),
-      isPending = _mountState2[0],
-      setPending = _mountState2[1];
-
-    var startTransition = mountCallback(function (callback) {
-      setPending(true);
-      unstable_next(function () {
-        var previousConfig = ReactCurrentBatchConfig$1.suspense;
-        ReactCurrentBatchConfig$1.suspense = config === undefined ? null : config;
-
-        try {
-          setPending(false);
-          callback();
-        } finally {
-          ReactCurrentBatchConfig$1.suspense = previousConfig;
-        }
-      });
-    }, [config, isPending]);
-    return [startTransition, isPending];
-  }
-
-  function updateTransition(config) {
-    var _updateState2 = updateState(false),
-      isPending = _updateState2[0],
-      setPending = _updateState2[1];
-
-    var startTransition = updateCallback(function (callback) {
-      setPending(true);
-      unstable_next(function () {
-        var previousConfig = ReactCurrentBatchConfig$1.suspense;
-        ReactCurrentBatchConfig$1.suspense = config === undefined ? null : config;
-
-        try {
-          setPending(false);
-          callback();
-        } finally {
-          ReactCurrentBatchConfig$1.suspense = previousConfig;
-        }
-      });
-    }, [config, isPending]);
-    return [startTransition, isPending];
-  }
-
   function dispatchAction(fiber, queue, action) {
     if (!(numberOfReRenders < RE_RENDER_LIMIT)) {
       {
@@ -15462,7 +15293,6 @@
       didScheduleRenderPhaseUpdate = true;
       var update = {
         expirationTime: renderExpirationTime$1,
-        suspenseConfig: null,
         action: action,
         eagerReducer: null,
         eagerState: null,
@@ -23262,10 +23092,6 @@
       this.memoizedInteractions = new Set();
       this.pendingInteractionMap = new Map();
     }
-
-    if (enableSuspenseCallback) {
-      this.hydrationCallbacks = null;
-    }
   }
 
   function createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks) {
@@ -23462,8 +23288,7 @@
       }
     }
 
-    var suspenseConfig = requestCurrentSuspenseConfig();
-    var expirationTime = computeExpirationForFiber(currentTime, current$$1, suspenseConfig);
+    var expirationTime = computeExpirationForFiber(currentTime, current$$1);
 
     {
       if (ReactFiberInstrumentation_1.debugTool) {
@@ -23492,7 +23317,7 @@
       }
     }
 
-    var update = createUpdate(expirationTime, suspenseConfig); // Caution: React DevTools currently depends on this property
+    var update = createUpdate(expirationTime); // Caution: React DevTools currently depends on this property
     // being called "element".
 
     update.payload = {

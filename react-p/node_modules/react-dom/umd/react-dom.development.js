@@ -24633,7 +24633,7 @@
     return createLegacyRoot(container, undefined);
   }
 
-  function legacyRenderSubtreeIntoContainer(parentComponent, children, container, forceHydrate, callback) {
+  function legacyRenderSubtreeIntoContainer(parentComponent, children, container, callback) {
     {
       topLevelUpdateWarnings(container);
       warnOnInvalidCallback(callback === undefined ? null : callback, 'render');
@@ -24705,24 +24705,6 @@
       return findHostInstanceWithWarning(componentOrElement, 'findDOMNode');
     }
   }
-  function hydrate(element, container, callback) {
-    if (!isValidContainer(container)) {
-      {
-        throw Error("Target container is not a DOM element.");
-      }
-    }
-
-    {
-      var isModernRoot = isContainerMarkedAsRoot(container) && container._reactRootContainer === undefined;
-
-      if (isModernRoot) {
-        warningWithoutStack$1(false, 'You are calling ReactDOM.hydrate() on a container that was previously ' + 'passed to ReactDOM.createRoot(). This is not supported. ' + 'Did you mean to call createRoot(container, {hydrate: true}).render(element)?');
-      }
-    } // TODO: throw or warn if we couldn't hydrate?
-
-
-    return legacyRenderSubtreeIntoContainer(null, element, container, true, callback);
-  }
   function render(element, container, callback) {
     if (!isValidContainer(container)) {
       {
@@ -24738,7 +24720,7 @@
       }
     }
 
-    return legacyRenderSubtreeIntoContainer(null, element, container, false, callback);
+    return legacyRenderSubtreeIntoContainer(null, element, container, callback);
   }
   function unstable_renderSubtreeIntoContainer(parentComponent, element, containerNode, callback) {
     if (!isValidContainer(containerNode)) {
@@ -24753,7 +24735,7 @@
       }
     }
 
-    return legacyRenderSubtreeIntoContainer(parentComponent, element, containerNode, false, callback);
+    return legacyRenderSubtreeIntoContainer(parentComponent, element, containerNode, callback);
   }
   function unmountComponentAtNode(container) {
     if (!isValidContainer(container)) {
@@ -24779,7 +24761,7 @@
 
 
       unbatchedUpdates(function () {
-        legacyRenderSubtreeIntoContainer(null, null, container, false, function () {
+        legacyRenderSubtreeIntoContainer(null, null, container, function () {
           container._reactRootContainer = null;
           unmarkContainerAsRoot(container);
         });
@@ -24814,7 +24796,6 @@
 
   var ReactDOM = {
     findDOMNode: findDOMNode,
-    hydrate: hydrate,
     render: render,
     unstable_renderSubtreeIntoContainer: unstable_renderSubtreeIntoContainer,
     unmountComponentAtNode: unmountComponentAtNode,

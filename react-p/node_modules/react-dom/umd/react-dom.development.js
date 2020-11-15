@@ -3733,10 +3733,6 @@
     /*    */
     1028; // Passive & Update & Callback & Ref & Snapshot
 
-  var LifecycleEffectMask =
-    /*   */
-    932; // Union of all host effects
-
   var HostEffectMask =
     /*        */
     2047;
@@ -3784,9 +3780,6 @@
 
 
     return null;
-  }
-  function getContainerFromFiber(fiber) {
-    return fiber.tag === HostRoot ? fiber.stateNode.containerInfo : null;
   }
   function isFiberMounted(fiber) {
     return getNearestMountedFiber(fiber) === fiber;
@@ -5759,14 +5752,6 @@
         var tag = nearestMounted.tag;
 
         if (tag === HostRoot) {
-          var root = nearestMounted.stateNode;
-
-          if (root.hydrate) {
-            // If this happens during a replay something went wrong and it might block
-            // the whole system.
-            return getContainerFromFiber(nearestMounted);
-          }
-
           targetInst = null;
         } else if (nearestMounted !== targetInst) {
           // If we get an event (ex: img onload) before committing that
@@ -14296,15 +14281,6 @@
     newChild.sibling = null;
   } // Reset a workInProgress child set to prepare it for a second pass.
 
-  function resetChildFibers(workInProgress, renderExpirationTime) {
-    var child = workInProgress.child;
-
-    while (child !== null) {
-      resetWorkInProgress(child, renderExpirationTime);
-      child = child.sibling;
-    }
-  }
-
   var NO_CONTEXT = {};
   var contextStackCursor$1 = createCursor(NO_CONTEXT);
   var contextFiberStackCursor = createCursor(NO_CONTEXT);
@@ -14414,87 +14390,6 @@
   }
   function popSuspenseContext(fiber) {
     pop(suspenseStackCursor, fiber);
-  }
-
-  function shouldCaptureSuspense(workInProgress, hasInvisibleParent) {
-    // If it was the primary children that just suspended, capture and render the
-    // fallback. Otherwise, don't capture and bubble to the next boundary.
-    var nextState = workInProgress.memoizedState;
-
-    if (nextState !== null) {
-      if (nextState.dehydrated !== null) {
-        // A dehydrated boundary always captures.
-        return true;
-      }
-
-      return false;
-    }
-
-    var props = workInProgress.memoizedProps; // In order to capture, the Suspense component must have a fallback prop.
-
-    if (props.fallback === undefined) {
-      return false;
-    } // Regular boundaries always capture.
-
-
-    if (props.unstable_avoidThisFallback !== true) {
-      return true;
-    } // If it's a boundary we should avoid, then we prefer to bubble up to the
-    // parent boundary if it is currently invisible.
-
-
-    if (hasInvisibleParent) {
-      return false;
-    } // If the parent is not able to handle it, we must handle it.
-
-
-    return true;
-  }
-  function findFirstSuspended(row) {
-    var node = row;
-
-    while (node !== null) {
-      if (node.tag === SuspenseComponent) {
-        var state = node.memoizedState;
-
-        if (state !== null) {
-          var dehydrated = state.dehydrated;
-
-          if (dehydrated === null) {
-            return node;
-          }
-        }
-      } else if (node.tag === SuspenseListComponent && // revealOrder undefined can't be trusted because it don't
-        // keep track of whether it suspended or not.
-        node.memoizedProps.revealOrder !== undefined) {
-        var didSuspend = (node.effectTag & DidCapture) !== NoEffect;
-
-        if (didSuspend) {
-          return node;
-        }
-      } else if (node.child !== null) {
-        node.child.return = node;
-        node = node.child;
-        continue;
-      }
-
-      if (node === row) {
-        return null;
-      }
-
-      while (node.sibling === null) {
-        if (node.return === null || node.return === row) {
-          return null;
-        }
-
-        node = node.return;
-      }
-
-      node.sibling.return = node.return;
-      node = node.sibling;
-    }
-
-    return null;
   }
 
   var emptyObject = {};
@@ -17227,12 +17122,6 @@
     var lastContentRow = null;
 
     while (row !== null) {
-      var currentRow = row.alternate; // New rows can't be content rows.
-
-      if (currentRow !== null && findFirstSuspended(currentRow) === null) {
-        lastContentRow = row;
-      }
-
       row = row.sibling;
     }
 
@@ -17437,14 +17326,6 @@
             workInProgress.child = null;
 
             while (row !== null) {
-              var currentRow = row.alternate; // New rows can't be content rows.
-
-              if (currentRow !== null && findFirstSuspended(currentRow) === null) {
-                // This is the beginning of the main content.
-                workInProgress.child = row;
-                break;
-              }
-
               var nextRow = row.sibling;
               row.sibling = _tail;
               _tail = row;
@@ -18567,80 +18448,6 @@
     updateHostText$1 = function () { };
   }
 
-  function cutOffTailIfNeeded(renderState, hasRenderedATailFallback) {
-    switch (renderState.tailMode) {
-      case 'hidden':
-        {
-          // Any insertions at the end of the tail list after this point
-          // should be invisible. If there are already mounted boundaries
-          // anything before them are not considered for collapsing.
-          // Therefore we need to go through the whole tail to find if
-          // there are any.
-          var tailNode = renderState.tail;
-          var lastTailNode = null;
-
-          while (tailNode !== null) {
-            if (tailNode.alternate !== null) {
-              lastTailNode = tailNode;
-            }
-
-            tailNode = tailNode.sibling;
-          } // Next we're simply going to delete all insertions after the
-          // last rendered item.
-
-
-          if (lastTailNode === null) {
-            // All remaining items in the tail are insertions.
-            renderState.tail = null;
-          } else {
-            // Detach the insertion after the last node that was already
-            // inserted.
-            lastTailNode.sibling = null;
-          }
-
-          break;
-        }
-
-      case 'collapsed':
-        {
-          // Any insertions at the end of the tail list after this point
-          // should be invisible. If there are already mounted boundaries
-          // anything before them are not considered for collapsing.
-          // Therefore we need to go through the whole tail to find if
-          // there are any.
-          var _tailNode = renderState.tail;
-          var _lastTailNode = null;
-
-          while (_tailNode !== null) {
-            if (_tailNode.alternate !== null) {
-              _lastTailNode = _tailNode;
-            }
-
-            _tailNode = _tailNode.sibling;
-          } // Next we're simply going to delete all insertions after the
-          // last rendered item.
-
-
-          if (_lastTailNode === null) {
-            // All remaining items in the tail are insertions.
-            if (!hasRenderedATailFallback && renderState.tail !== null) {
-              // We suspended during the head. We want to show at least one
-              // row at the tail. So we'll keep on and cut off the rest.
-              renderState.tail.sibling = null;
-            } else {
-              renderState.tail = null;
-            }
-          } else {
-            // Detach the insertion after the last node that was already
-            // inserted.
-            _lastTailNode.sibling = null;
-          }
-
-          break;
-        }
-    }
-  }
-
   function completeWork(current, workInProgress, renderExpirationTime) {
     var newProps = workInProgress.pendingProps;
 
@@ -18975,194 +18782,6 @@
 
           if (isContextProvider(_Component)) {
             popContext(workInProgress);
-          }
-
-          break;
-        }
-
-      case SuspenseListComponent:
-        {
-          popSuspenseContext(workInProgress);
-          var renderState = workInProgress.memoizedState;
-
-          if (renderState === null) {
-            // We're running in the default, "independent" mode. We don't do anything
-            // in this mode.
-            break;
-          }
-
-          var didSuspendAlready = (workInProgress.effectTag & DidCapture) !== NoEffect;
-          var renderedTail = renderState.rendering;
-
-          if (renderedTail === null) {
-            // We just rendered the head.
-            if (!didSuspendAlready) {
-              // This is the first pass. We need to figure out if anything is still
-              // suspended in the rendered set.
-              // If new content unsuspended, but there's still some content that
-              // didn't. Then we need to do a second pass that forces everything
-              // to keep showing their fallbacks.
-              // We might be suspended if something in this render pass suspended, or
-              // something in the previous committed pass suspended. Otherwise,
-              // there's no chance so we can skip the expensive call to
-              // findFirstSuspended.
-              var cannotBeSuspended = renderHasNotSuspendedYet() && (current === null || (current.effectTag & DidCapture) === NoEffect);
-
-              if (!cannotBeSuspended) {
-                var row = workInProgress.child;
-
-                while (row !== null) {
-                  var suspended = findFirstSuspended(row);
-
-                  if (suspended !== null) {
-                    didSuspendAlready = true;
-                    workInProgress.effectTag |= DidCapture;
-                    cutOffTailIfNeeded(renderState, false); // If this is a newly suspended tree, it might not get committed as
-                    // part of the second pass. In that case nothing will subscribe to
-                    // its thennables. Instead, we'll transfer its thennables to the
-                    // SuspenseList so that it can retry if they resolve.
-                    // There might be multiple of these in the list but since we're
-                    // going to wait for all of them anyway, it doesn't really matter
-                    // which ones gets to ping. In theory we could get clever and keep
-                    // track of how many dependencies remain but it gets tricky because
-                    // in the meantime, we can add/remove/change items and dependencies.
-                    // We might bail out of the loop before finding any but that
-                    // doesn't matter since that means that the other boundaries that
-                    // we did find already has their listeners attached.
-
-                    var newThennables = suspended.updateQueue;
-
-                    if (newThennables !== null) {
-                      workInProgress.updateQueue = newThennables;
-                      workInProgress.effectTag |= Update;
-                    } // Rerender the whole list, but this time, we'll force fallbacks
-                    // to stay in place.
-                    // Reset the effect list before doing the second pass since that's now invalid.
-
-
-                    if (renderState.lastEffect === null) {
-                      workInProgress.firstEffect = null;
-                    }
-
-                    workInProgress.lastEffect = renderState.lastEffect; // Reset the child fibers to their original state.
-
-                    resetChildFibers(workInProgress, renderExpirationTime); // Set up the Suspense Context to force suspense and immediately
-                    // rerender the children.
-
-                    pushSuspenseContext(workInProgress, setShallowSuspenseContext(suspenseStackCursor.current, ForceSuspenseFallback));
-                    return workInProgress.child;
-                  }
-
-                  row = row.sibling;
-                }
-              }
-            } else {
-              cutOffTailIfNeeded(renderState, false);
-            } // Next we're going to render the tail.
-
-          } else {
-            // Append the rendered row to the child list.
-            if (!didSuspendAlready) {
-              var _suspended = findFirstSuspended(renderedTail);
-
-              if (_suspended !== null) {
-                workInProgress.effectTag |= DidCapture;
-                didSuspendAlready = true; // Ensure we transfer the update queue to the parent so that it doesn't
-                // get lost if this row ends up dropped during a second pass.
-
-                var _newThennables = _suspended.updateQueue;
-
-                if (_newThennables !== null) {
-                  workInProgress.updateQueue = _newThennables;
-                  workInProgress.effectTag |= Update;
-                }
-
-                cutOffTailIfNeeded(renderState, true); // This might have been modified.
-
-                if (renderState.tail === null && renderState.tailMode === 'hidden' && !renderedTail.alternate) {
-                  // We need to delete the row we just rendered.
-                  // Reset the effect list to what it was before we rendered this
-                  // child. The nested children have already appended themselves.
-                  var lastEffect = workInProgress.lastEffect = renderState.lastEffect; // Remove any effects that were appended after this point.
-
-                  if (lastEffect !== null) {
-                    lastEffect.nextEffect = null;
-                  } // We're done.
-
-
-                  return null;
-                }
-              } else if (now() > renderState.tailExpiration && renderExpirationTime > Never) {
-                // We have now passed our CPU deadline and we'll just give up further
-                // attempts to render the main content and only render fallbacks.
-                // The assumption is that this is usually faster.
-                workInProgress.effectTag |= DidCapture;
-                didSuspendAlready = true;
-                cutOffTailIfNeeded(renderState, false); // Since nothing actually suspended, there will nothing to ping this
-                // to get it started back up to attempt the next item. If we can show
-                // them, then they really have the same priority as this render.
-                // So we'll pick it back up the very next render pass once we've had
-                // an opportunity to yield for paint.
-
-                var nextPriority = renderExpirationTime - 1;
-                workInProgress.expirationTime = workInProgress.childExpirationTime = nextPriority;
-
-                if (enableSchedulerTracing) {
-                  markSpawnedWork(nextPriority);
-                }
-              }
-            }
-
-            if (renderState.isBackwards) {
-              // The effect list of the backwards tail will have been added
-              // to the end. This breaks the guarantee that life-cycles fire in
-              // sibling order but that isn't a strong guarantee promised by React.
-              // Especially since these might also just pop in during future commits.
-              // Append to the beginning of the list.
-              renderedTail.sibling = workInProgress.child;
-              workInProgress.child = renderedTail;
-            } else {
-              var previousSibling = renderState.last;
-
-              if (previousSibling !== null) {
-                previousSibling.sibling = renderedTail;
-              } else {
-                workInProgress.child = renderedTail;
-              }
-
-              renderState.last = renderedTail;
-            }
-          }
-
-          if (renderState.tail !== null) {
-            // We still have tail rows to render.
-            if (renderState.tailExpiration === 0) {
-              // Heuristic for how long we're willing to spend rendering rows
-              // until we just give up and show what we have so far.
-              var TAIL_EXPIRATION_TIMEOUT_MS = 500;
-              renderState.tailExpiration = now() + TAIL_EXPIRATION_TIMEOUT_MS;
-            } // Pop a row.
-
-
-            var next = renderState.tail;
-            renderState.rendering = next;
-            renderState.tail = next.sibling;
-            renderState.lastEffect = workInProgress.lastEffect;
-            next.sibling = null; // Restore the context.
-            // TODO: We can probably just avoid popping it instead and only
-            // setting it the first time we go from not suspended to suspended.
-
-            var suspenseContext = suspenseStackCursor.current;
-
-            if (didSuspendAlready) {
-              suspenseContext = setShallowSuspenseContext(suspenseContext, ForceSuspenseFallback);
-            } else {
-              suspenseContext = setDefaultShallowSuspenseContext(suspenseContext);
-            }
-
-            pushSuspenseContext(workInProgress, suspenseContext); // Do a pass over the next row.
-
-            return next;
           }
 
           break;
@@ -20722,8 +20341,6 @@
     resetTextContent(current$$1.stateNode);
   }
 
-  var PossiblyWeakMap$1 = typeof WeakMap === 'function' ? WeakMap : Map;
-
   function createRootErrorUpdate(fiber, errorInfo, expirationTime) {
     var update = createUpdate(expirationTime, null); // Unmount the root by rendering null.
 
@@ -20800,161 +20417,11 @@
     return update;
   }
 
-  function attachPingListener(root, renderExpirationTime, thenable) {
-    // Attach a listener to the promise to "ping" the root and retry. But
-    // only if one does not already exist for the current render expiration
-    // time (which acts like a "thread ID" here).
-    var pingCache = root.pingCache;
-    var threadIDs;
-
-    if (pingCache === null) {
-      pingCache = root.pingCache = new PossiblyWeakMap$1();
-      threadIDs = new Set();
-      pingCache.set(thenable, threadIDs);
-    } else {
-      threadIDs = pingCache.get(thenable);
-
-      if (threadIDs === undefined) {
-        threadIDs = new Set();
-        pingCache.set(thenable, threadIDs);
-      }
-    }
-
-    if (!threadIDs.has(renderExpirationTime)) {
-      // Memoize using the thread ID to prevent redundant listeners.
-      threadIDs.add(renderExpirationTime);
-      var ping = pingSuspendedRoot.bind(null, root, thenable, renderExpirationTime);
-      thenable.then(ping, ping);
-    }
-  }
-
   function throwException(root, returnFiber, sourceFiber, value, renderExpirationTime) {
     // The source fiber did not complete.
     sourceFiber.effectTag |= Incomplete; // Its effect list is no longer valid.
 
     sourceFiber.firstEffect = sourceFiber.lastEffect = null;
-
-    if (value !== null && typeof value === 'object' && typeof value.then === 'function') {
-      // This is a thenable.
-      var thenable = value;
-      checkForWrongSuspensePriorityInDEV(sourceFiber);
-      var hasInvisibleParentBoundary = hasSuspenseContext(suspenseStackCursor.current, InvisibleParentSuspenseContext); // Schedule the nearest Suspense to re-render the timed out view.
-
-      var _workInProgress = returnFiber;
-
-      do {
-        if (_workInProgress.tag === SuspenseComponent && shouldCaptureSuspense(_workInProgress, hasInvisibleParentBoundary)) {
-          // Found the nearest boundary.
-          // Stash the promise on the boundary fiber. If the boundary times out, we'll
-          // attach another listener to flip the boundary back to its normal state.
-          var thenables = _workInProgress.updateQueue;
-
-          if (thenables === null) {
-            var updateQueue = new Set();
-            updateQueue.add(thenable);
-            _workInProgress.updateQueue = updateQueue;
-          } else {
-            thenables.add(thenable);
-          } // If the boundary is outside of blocking mode, we should *not*
-          // suspend the commit. Pretend as if the suspended component rendered
-          // null and keep rendering. In the commit phase, we'll schedule a
-          // subsequent synchronous update to re-render the Suspense.
-          //
-          // Note: It doesn't matter whether the component that suspended was
-          // inside a blocking mode tree. If the Suspense is outside of it, we
-          // should *not* suspend the commit.
-
-
-          if ((_workInProgress.mode & BlockingMode) === NoMode) {
-            _workInProgress.effectTag |= DidCapture; // We're going to commit this fiber even though it didn't complete.
-            // But we shouldn't call any lifecycle methods or callbacks. Remove
-            // all lifecycle effect tags.
-
-            sourceFiber.effectTag &= ~(LifecycleEffectMask | Incomplete);
-
-            if (sourceFiber.tag === ClassComponent) {
-              var currentSourceFiber = sourceFiber.alternate;
-
-              if (currentSourceFiber === null) {
-                // This is a new mount. Change the tag so it's not mistaken for a
-                // completed class component. For example, we should not call
-                // componentWillUnmount if it is deleted.
-                sourceFiber.tag = IncompleteClassComponent;
-              } else {
-                // When we try rendering again, we should not reuse the current fiber,
-                // since it's known to be in an inconsistent state. Use a force update to
-                // prevent a bail out.
-                var update = createUpdate(Sync, null);
-                update.tag = ForceUpdate;
-                enqueueUpdate(sourceFiber, update);
-              }
-            } // The source fiber did not complete. Mark it with Sync priority to
-            // indicate that it still has pending work.
-
-
-            sourceFiber.expirationTime = Sync; // Exit without suspending.
-
-            return;
-          } // Confirmed that the boundary is in a concurrent mode tree. Continue
-          // with the normal suspend path.
-          //
-          // After this we'll use a set of heuristics to determine whether this
-          // render pass will run to completion or restart or "suspend" the commit.
-          // The actual logic for this is spread out in different places.
-          //
-          // This first principle is that if we're going to suspend when we complete
-          // a root, then we should also restart if we get an update or ping that
-          // might unsuspend it, and vice versa. The only reason to suspend is
-          // because you think you might want to restart before committing. However,
-          // it doesn't make sense to restart only while in the period we're suspended.
-          //
-          // Restarting too aggressively is also not good because it starves out any
-          // intermediate loading state. So we use heuristics to determine when.
-          // Suspense Heuristics
-          //
-          // If nothing threw a Promise or all the same fallbacks are already showing,
-          // then don't suspend/restart.
-          //
-          // If this is an initial render of a new tree of Suspense boundaries and
-          // those trigger a fallback, then don't suspend/restart. We want to ensure
-          // that we can show the initial loading state as quickly as possible.
-          //
-          // If we hit a "Delayed" case, such as when we'd switch from content back into
-          // a fallback, then we should always suspend/restart. SuspenseConfig applies to
-          // this case. If none is defined, JND is used instead.
-          //
-          // If we're already showing a fallback and it gets "retried", allowing us to show
-          // another level, but there's still an inner boundary that would show a fallback,
-          // then we suspend/restart for 500ms since the last time we showed a fallback
-          // anywhere in the tree. This effectively throttles progressive loading into a
-          // consistent train of commits. This also gives us an opportunity to restart to
-          // get to the completed state slightly earlier.
-          //
-          // If there's ambiguity due to batching it's resolved in preference of:
-          // 1) "delayed", 2) "initial render", 3) "retry".
-          //
-          // We want to ensure that a "busy" state doesn't get force committed. We want to
-          // ensure that new initial loading states can commit as soon as possible.
-
-
-          attachPingListener(root, renderExpirationTime, thenable);
-          _workInProgress.effectTag |= ShouldCapture;
-          _workInProgress.expirationTime = renderExpirationTime;
-          return;
-        } // This boundary already captured during this render. Continue to the next
-        // boundary.
-
-
-        _workInProgress = _workInProgress.return;
-      } while (_workInProgress !== null); // No boundary was found. Fallthrough to error mode.
-      // TODO: Use invariant so the message is stripped in prod?
-
-
-      value = new Error((getComponentName(sourceFiber.type) || 'A React component') + ' suspended while rendering, but no fallback UI was specified.\n' + '\n' + 'Add a <Suspense fallback=...> component higher in the tree to ' + 'provide a loading indicator or placeholder to display.' + getStackByFiberInDevAndProd(sourceFiber));
-    } // We didn't find a boundary that could handle this type of exception. Start
-    // over and traverse parent path again, this time treating the exception
-    // as an error.
-
 
     renderDidError();
     value = createCapturedValue(value, sourceFiber);
@@ -21000,31 +20467,16 @@
     } while (workInProgress !== null);
   }
 
-  var ceil = Math.ceil;
   var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
   var ReactCurrentOwner$2 = ReactSharedInternals.ReactCurrentOwner;
   var IsSomeRendererActing = ReactSharedInternals.IsSomeRendererActing;
-  var NoContext =
-    /*                    */
-    0;
-  var BatchedContext =
-    /*               */
-    1;
-  var EventContext =
-    /*                 */
-    2;
-  var DiscreteEventContext =
-    /*         */
-    4;
-  var LegacyUnbatchedContext =
-    /*       */
-    8;
-  var RenderContext =
-    /*                */
-    16;
-  var CommitContext =
-    /*                */
-    32;
+  var NoContext = 0;
+  var BatchedContext = 1;
+  var EventContext = 2;
+  var DiscreteEventContext = 4;
+  var LegacyUnbatchedContext = 8;
+  var RenderContext = 16;
+  var CommitContext = 32;
   var RootIncomplete = 0;
   var RootFatalErrored = 1;
   var RootErrored = 2;
@@ -21033,32 +20485,23 @@
   var RootCompleted = 5;
   // Describes where we are in the React execution stack
   var executionContext = NoContext; // The root we're working on
-
   var workInProgressRoot = null; // The fiber we're working on
-
   var workInProgress = null; // The expiration time we're rendering
-
   var renderExpirationTime = NoWork; // Whether to root completed, errored, suspended, etc.
-
   var workInProgressRootExitStatus = RootIncomplete; // A fatal error, if one is thrown
-
   var workInProgressRootFatalError = null; // Most recent event time among processed updates during this render.
   // This is conceptually a time stamp but expressed in terms of an ExpirationTime
   // because we deal mostly with expiration times in the hot path, so this avoids
   // the conversion happening in the hot path.
-
   var workInProgressRootLatestProcessedExpirationTime = Sync;
   var workInProgressRootLatestSuspenseTimeout = Sync;
   var workInProgressRootCanSuspendUsingConfig = null; // The work left over by components that were visited during this render. Only
   // includes unprocessed updates, not work in bailed out children.
-
   var workInProgressRootNextUnprocessedUpdateTime = NoWork; // If we're pinged while rendering we don't always restart immediately.
   // This flag determines if it might be worthwhile to restart if an opportunity
   // happens latere.
-
   var workInProgressRootHasPendingPing = false; // The most recent time we committed a fallback. This lets us ensure a train
   // model where we don't commit new loading states in too quick succession.
-
   var globalMostRecentFallbackTime = 0;
   var FALLBACK_THROTTLE_MS = 500;
   var nextEffect = null;
@@ -21070,7 +20513,6 @@
   var pendingPassiveEffectsRenderPriority = NoPriority;
   var pendingPassiveEffectsExpirationTime = NoWork;
   var rootsWithPendingDiscreteUpdates = null; // Use these to prevent an infinite loop of nested updates
-
   var NESTED_UPDATE_LIMIT = 50;
   var nestedUpdateCount = 0;
   var rootWithNestedUpdates = null;
@@ -21080,7 +20522,6 @@
   // during the commit phase. This enables them to be traced across components
   // that spawn new work during render. E.g. hidden boundaries, suspended SSR
   // hydration or SuspenseList.
-
   var spawnedWorkDuringRender = null; // Expiration times are computed by adding to the current time (the start
   // time). However, if two updates are scheduled within the same event, we
   // should treat their start times as simultaneous, even if the actual clock
@@ -21551,13 +20992,6 @@
           if (expirationTime === lastSuspendedTime) {
             root.nextKnownPendingLevel = getRemainingExpirationTime(finishedWork);
           }
-
-          flushSuspensePriorityWarningInDEV(); // We have an acceptable loading state. We need to figure out if we
-          // should immediately commit it or wait a bit.
-          // If we have processed new updates during this render, we may now
-          // have a new loading state ready. We want to ensure that we commit
-          // that as soon as possible.
-
           var hasNotProcessedNewUpdates = workInProgressRootLatestProcessedExpirationTime === Sync;
 
           if (hasNotProcessedNewUpdates && // do not delay if we're inside an act() scope
@@ -21602,96 +21036,6 @@
 
 
               root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root), msUntilTimeout);
-              break;
-            }
-          } // The work expired. Commit immediately.
-
-
-          commitRoot(root);
-          break;
-        }
-
-      case RootSuspendedWithDelay:
-        {
-          markRootSuspendedAtTime(root, expirationTime);
-          var _lastSuspendedTime = root.lastSuspendedTime;
-
-          if (expirationTime === _lastSuspendedTime) {
-            root.nextKnownPendingLevel = getRemainingExpirationTime(finishedWork);
-          }
-
-          flushSuspensePriorityWarningInDEV();
-
-          if ( // do not delay if we're inside an act() scope
-            !(true && flushSuspenseFallbacksInTests && IsThisRendererActing.current)) {
-            // We're suspended in a state that should be avoided. We'll try to
-            // avoid committing it for as long as the timeouts let us.
-            if (workInProgressRootHasPendingPing) {
-              var _lastPingedTime = root.lastPingedTime;
-
-              if (_lastPingedTime === NoWork || _lastPingedTime >= expirationTime) {
-                // This render was pinged but we didn't get to restart earlier
-                // so try restarting now instead.
-                root.lastPingedTime = expirationTime;
-                prepareFreshStack(root, expirationTime);
-                break;
-              }
-            }
-
-            var _nextTime = getNextRootExpirationTimeToWorkOn(root);
-
-            if (_nextTime !== NoWork && _nextTime !== expirationTime) {
-              // There's additional work on this root.
-              break;
-            }
-
-            if (_lastSuspendedTime !== NoWork && _lastSuspendedTime !== expirationTime) {
-              // We should prefer to render the fallback of at the last
-              // suspended level. Ping the last suspended level to try
-              // rendering it again.
-              root.lastPingedTime = _lastSuspendedTime;
-              break;
-            }
-
-            var _msUntilTimeout;
-
-            if (workInProgressRootLatestSuspenseTimeout !== Sync) {
-              // We have processed a suspense config whose expiration time we
-              // can use as the timeout.
-              _msUntilTimeout = expirationTimeToMs(workInProgressRootLatestSuspenseTimeout) - now();
-            } else if (workInProgressRootLatestProcessedExpirationTime === Sync) {
-              // This should never normally happen because only new updates
-              // cause delayed states, so we should have processed something.
-              // However, this could also happen in an offscreen tree.
-              _msUntilTimeout = 0;
-            } else {
-              // If we don't have a suspense config, we're going to use a
-              // heuristic to determine how long we can suspend.
-              var eventTimeMs = inferTimeFromExpirationTime(workInProgressRootLatestProcessedExpirationTime);
-              var currentTimeMs = now();
-              var timeUntilExpirationMs = expirationTimeToMs(expirationTime) - currentTimeMs;
-              var timeElapsed = currentTimeMs - eventTimeMs;
-
-              if (timeElapsed < 0) {
-                // We get this wrong some time since we estimate the time.
-                timeElapsed = 0;
-              }
-
-              _msUntilTimeout = jnd(timeElapsed) - timeElapsed; // Clamp the timeout to the expiration time. TODO: Once the
-              // event time is exact instead of inferred from expiration time
-              // we don't need this.
-
-              if (timeUntilExpirationMs < _msUntilTimeout) {
-                _msUntilTimeout = timeUntilExpirationMs;
-              }
-            } // Don't bother with a very short suspense time.
-
-
-            if (_msUntilTimeout > 10) {
-              // The render is suspended, it hasn't timed out, and there's no
-              // lower priority work to do. Instead of committing the fallback
-              // immediately, wait for more data to arrive.
-              root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root), _msUntilTimeout);
               break;
             }
           } // The work expired. Commit immediately.
@@ -21809,7 +21153,7 @@
           stopFinishedWorkLoopTimer();
           root.finishedWork = root.current.alternate;
           root.finishedExpirationTime = expirationTime;
-          finishSyncRender(root, workInProgressRootExitStatus, expirationTime);
+          commitRoot(root);
         } // Before exiting, make sure there's a callback scheduled for the next
         // pending level.
 
@@ -21819,19 +21163,6 @@
     }
 
     return null;
-  }
-
-  function finishSyncRender(root, exitStatus) {
-    // Set this to null to indicate there's no in-progress render.
-    workInProgressRoot = null;
-
-    {
-      if (exitStatus === RootSuspended || exitStatus === RootSuspendedWithDelay) {
-        flushSuspensePriorityWarningInDEV();
-      }
-    }
-
-    commitRoot(root);
   }
 
   function flushDiscreteUpdates() {
@@ -22010,7 +21341,6 @@
 
     {
       ReactStrictModeWarnings.discardPendingWarnings();
-      componentsThatTriggeredHighPriSuspend = null;
     }
   }
 
@@ -22133,19 +21463,6 @@
     }
   } // Called during render to determine if anything has suspended.
   // Returns false if we're not sure.
-
-  function renderHasNotSuspendedYet() {
-    // If something errored or completed, we can't really be sure,
-    // so those are false.
-    return workInProgressRootExitStatus === RootIncomplete;
-  }
-
-  function inferTimeFromExpirationTime(expirationTime) {
-    // We don't know exactly when the update was scheduled, but we can infer an
-    // approximate start time from the expiration time.
-    var earliestExpirationTimeMs = expirationTimeToMs(expirationTime);
-    return earliestExpirationTimeMs - LOW_PRIORITY_EXPIRATION;
-  }
 
   function inferTimeFromExpirationTimeWithSuspenseConfig(expirationTime, suspenseConfig) {
     // We don't know exactly when the update was scheduled, but we can infer an
@@ -22982,65 +22299,6 @@
       fiber = fiber.return;
     }
   }
-  function pingSuspendedRoot(root, thenable, suspendedTime) {
-    var pingCache = root.pingCache;
-
-    if (pingCache !== null) {
-      // The thenable resolved, so we no longer need to memoize, because it will
-      // never be thrown again.
-      pingCache.delete(thenable);
-    }
-
-    if (workInProgressRoot === root && renderExpirationTime === suspendedTime) {
-      // Received a ping at the same priority level at which we're currently
-      // rendering. We might want to restart this render. This should mirror
-      // the logic of whether or not a root suspends once it completes.
-      // TODO: If we're rendering sync either due to Sync, Batched or expired,
-      // we should probably never restart.
-      // If we're suspended with delay, we'll always suspend so we can always
-      // restart. If we're suspended without any updates, it might be a retry.
-      // If it's early in the retry we can restart. We can't know for sure
-      // whether we'll eventually process an update during this render pass,
-      // but it's somewhat unlikely that we get to a ping before that, since
-      // getting to the root most update is usually very fast.
-      if (workInProgressRootExitStatus === RootSuspendedWithDelay || workInProgressRootExitStatus === RootSuspended && workInProgressRootLatestProcessedExpirationTime === Sync && now() - globalMostRecentFallbackTime < FALLBACK_THROTTLE_MS) {
-        // Restart from the root. Don't need to schedule a ping because
-        // we're already working on this tree.
-        prepareFreshStack(root, renderExpirationTime);
-      } else {
-        // Even though we can't restart right now, we might get an
-        // opportunity later. So we mark this render as having a ping.
-        workInProgressRootHasPendingPing = true;
-      }
-
-      return;
-    }
-
-    if (!isRootSuspendedAtTime(root, suspendedTime)) {
-      // The root is no longer suspended at this time.
-      return;
-    }
-
-    var lastPingedTime = root.lastPingedTime;
-
-    if (lastPingedTime !== NoWork && lastPingedTime < suspendedTime) {
-      // There's already a lower priority ping scheduled.
-      return;
-    } // Mark the time at which this ping was scheduled.
-
-
-    root.lastPingedTime = suspendedTime;
-
-    if (root.finishedExpirationTime === suspendedTime) {
-      // If there's a pending fallback waiting to commit, throw it away.
-      root.finishedExpirationTime = NoWork;
-      root.finishedWork = null;
-    }
-
-    ensureRootIsScheduled(root);
-    schedulePendingInteractions(root, suspendedTime);
-  }
-
   function retryTimedOutBoundary(boundaryFiber, retryTime) {
     // The boundary fiber (a Suspense component or SuspenseList component)
     // previously was rendered in its fallback state. One of the promises that
@@ -23101,18 +22359,6 @@
     }
 
     retryTimedOutBoundary(boundaryFiber, retryTime);
-  } // Computes the next Just Noticeable Difference (JND) boundary.
-  // The theory is that a person can't tell the difference between small differences in time.
-  // Therefore, if we wait a bit longer than necessary that won't translate to a noticeable
-  // difference in the experience. However, waiting for longer might mean that we can avoid
-  // showing an intermediate loading state. The longer we have already waited, the harder it
-  // is to tell small differences in time. Therefore, the longer we've already waited,
-  // the longer we can wait additionally. At some point we have to give up though.
-  // We pick a train model where the next boundary commits at a consistent schedule.
-  // These particular numbers are vague estimates. We expect to adjust them based on research.
-
-  function jnd(timeElapsed) {
-    return timeElapsed < 120 ? 120 : timeElapsed < 480 ? 480 : timeElapsed < 1080 ? 1080 : timeElapsed < 1920 ? 1920 : timeElapsed < 3000 ? 3000 : timeElapsed < 4320 ? 4320 : ceil(timeElapsed / 1960) * 1960;
   }
 
   function computeMsUntilSuspenseLoadingDelay(mostRecentEventTime, committedExpirationTime, suspenseConfig) {
@@ -23344,106 +22590,6 @@
         } else if (warnAboutUnmockedScheduler === true) {
           didWarnAboutUnmockedScheduler = true;
           warningWithoutStack$1(false, 'Starting from React v17, the "scheduler" module will need to be mocked ' + 'to guarantee consistent behaviour across tests and browsers. ' + 'For example, with jest: \n' + "jest.mock('scheduler', () => require('scheduler/unstable_mock'));\n\n" + 'For more info, visit https://fb.me/react-mock-scheduler');
-        }
-      }
-    }
-  }
-  var componentsThatTriggeredHighPriSuspend = null;
-  function checkForWrongSuspensePriorityInDEV(sourceFiber) {
-    {
-      var currentPriorityLevel = getCurrentPriorityLevel();
-
-      if ((sourceFiber.mode & ConcurrentMode) !== NoEffect && (currentPriorityLevel === UserBlockingPriority$2 || currentPriorityLevel === ImmediatePriority)) {
-        var workInProgressNode = sourceFiber;
-
-        while (workInProgressNode !== null) {
-          // Add the component that triggered the suspense
-          var current$$1 = workInProgressNode.alternate;
-
-          if (current$$1 !== null) {
-            // TODO: warn component that triggers the high priority
-            // suspend is the HostRoot
-            switch (workInProgressNode.tag) {
-              case ClassComponent:
-                // Loop through the component's update queue and see whether the component
-                // has triggered any high priority updates
-                var updateQueue = current$$1.updateQueue;
-
-                if (updateQueue !== null) {
-                  var update = updateQueue.firstUpdate;
-
-                  while (update !== null) {
-                    var priorityLevel = update.priority;
-
-                    if (priorityLevel === UserBlockingPriority$2 || priorityLevel === ImmediatePriority) {
-                      if (componentsThatTriggeredHighPriSuspend === null) {
-                        componentsThatTriggeredHighPriSuspend = new Set([getComponentName(workInProgressNode.type)]);
-                      } else {
-                        componentsThatTriggeredHighPriSuspend.add(getComponentName(workInProgressNode.type));
-                      }
-
-                      break;
-                    }
-
-                    update = update.next;
-                  }
-                }
-
-                break;
-
-              case FunctionComponent:
-              case ForwardRef:
-              case SimpleMemoComponent:
-                if (workInProgressNode.memoizedState !== null && workInProgressNode.memoizedState.baseUpdate !== null) {
-                  var _update = workInProgressNode.memoizedState.baseUpdate; // Loop through the functional component's memoized state to see whether
-                  // the component has triggered any high pri updates
-
-                  while (_update !== null) {
-                    var priority = _update.priority;
-
-                    if (priority === UserBlockingPriority$2 || priority === ImmediatePriority) {
-                      if (componentsThatTriggeredHighPriSuspend === null) {
-                        componentsThatTriggeredHighPriSuspend = new Set([getComponentName(workInProgressNode.type)]);
-                      } else {
-                        componentsThatTriggeredHighPriSuspend.add(getComponentName(workInProgressNode.type));
-                      }
-
-                      break;
-                    }
-
-                    if (_update.next === workInProgressNode.memoizedState.baseUpdate) {
-                      break;
-                    }
-
-                    _update = _update.next;
-                  }
-                }
-
-                break;
-
-              default:
-                break;
-            }
-          }
-
-          workInProgressNode = workInProgressNode.return;
-        }
-      }
-    }
-  }
-
-  function flushSuspensePriorityWarningInDEV() {
-    {
-      if (componentsThatTriggeredHighPriSuspend !== null) {
-        var componentNames = [];
-        componentsThatTriggeredHighPriSuspend.forEach(function (name) {
-          return componentNames.push(name);
-        });
-        componentsThatTriggeredHighPriSuspend = null;
-
-        if (componentNames.length > 0) {
-          warningWithoutStack$1(false, '%s triggered a user-blocking update that suspended.' + '\n\n' + 'The fix is to split the update into multiple parts: a user-blocking ' + 'update to provide immediate feedback, and another update that ' + 'triggers the bulk of the changes.' + '\n\n' + 'Refer to the documentation for useTransition to learn how ' + 'to implement this pattern.', // TODO: Add link to React docs with more information, once it exists
-            componentNames.sort().join(', '));
         }
       }
     }
@@ -23851,65 +22997,6 @@
     return workInProgress;
   } // Used to reuse a Fiber for a second pass.
 
-  function resetWorkInProgress(workInProgress, renderExpirationTime) {
-    // This resets the Fiber to what createFiber or createWorkInProgress would
-    // have set the values to before during the first pass. Ideally this wouldn't
-    // be necessary but unfortunately many code paths reads from the workInProgress
-    // when they should be reading from current and writing to workInProgress.
-    // We assume pendingProps, index, key, ref, return are still untouched to
-    // avoid doing another reconciliation.
-    // Reset the effect tag but keep any Placement tags, since that's something
-    // that child fiber is setting, not the reconciliation.
-    workInProgress.effectTag &= Placement; // The effect list is no longer valid.
-
-    workInProgress.nextEffect = null;
-    workInProgress.firstEffect = null;
-    workInProgress.lastEffect = null;
-    var current = workInProgress.alternate;
-
-    if (current === null) {
-      // Reset to createFiber's initial values.
-      workInProgress.childExpirationTime = NoWork;
-      workInProgress.expirationTime = renderExpirationTime;
-      workInProgress.child = null;
-      workInProgress.memoizedProps = null;
-      workInProgress.memoizedState = null;
-      workInProgress.updateQueue = null;
-      workInProgress.dependencies = null;
-
-      if (enableProfilerTimer) {
-        // Note: We don't reset the actualTime counts. It's useful to accumulate
-        // actual time across multiple render passes.
-        workInProgress.selfBaseDuration = 0;
-        workInProgress.treeBaseDuration = 0;
-      }
-    } else {
-      // Reset to the cloned values that createWorkInProgress would've.
-      workInProgress.childExpirationTime = current.childExpirationTime;
-      workInProgress.expirationTime = current.expirationTime;
-      workInProgress.child = current.child;
-      workInProgress.memoizedProps = current.memoizedProps;
-      workInProgress.memoizedState = current.memoizedState;
-      workInProgress.updateQueue = current.updateQueue; // Clone the dependencies object. This is mutated during the render phase, so
-      // it cannot be shared with the current fiber.
-
-      var currentDependencies = current.dependencies;
-      workInProgress.dependencies = currentDependencies === null ? null : {
-        expirationTime: currentDependencies.expirationTime,
-        firstContext: currentDependencies.firstContext,
-        responders: currentDependencies.responders
-      };
-
-      if (enableProfilerTimer) {
-        // Note: We don't reset the actualTime counts. It's useful to accumulate
-        // actual time across multiple render passes.
-        workInProgress.selfBaseDuration = current.selfBaseDuration;
-        workInProgress.treeBaseDuration = current.treeBaseDuration;
-      }
-    }
-
-    return workInProgress;
-  }
   function createHostRootFiber(tag) {
     var mode;
 

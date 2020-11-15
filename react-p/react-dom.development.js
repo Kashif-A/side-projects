@@ -23049,12 +23049,6 @@
         case REACT_PROFILER_TYPE:
           return createFiberFromProfiler(pendingProps, mode, expirationTime, key);
 
-        case REACT_SUSPENSE_TYPE:
-          return createFiberFromSuspense(pendingProps, mode, expirationTime, key);
-
-        case REACT_SUSPENSE_LIST_TYPE:
-          return createFiberFromSuspenseList(pendingProps, mode, expirationTime, key);
-
         default:
           {
             if (typeof type === 'object' && type !== null) {
@@ -23185,30 +23179,6 @@
     return fiber;
   }
 
-  function createFiberFromSuspense(pendingProps, mode, expirationTime, key) {
-    var fiber = createFiber(SuspenseComponent, pendingProps, key, mode); // TODO: The SuspenseComponent fiber shouldn't have a type. It has a tag.
-    // This needs to be fixed in getComponentName so that it relies on the tag
-    // instead.
-
-    fiber.type = REACT_SUSPENSE_TYPE;
-    fiber.elementType = REACT_SUSPENSE_TYPE;
-    fiber.expirationTime = expirationTime;
-    return fiber;
-  }
-  function createFiberFromSuspenseList(pendingProps, mode, expirationTime, key) {
-    var fiber = createFiber(SuspenseListComponent, pendingProps, key, mode);
-
-    {
-      // TODO: The SuspenseListComponent fiber shouldn't have a type. It has a tag.
-      // This needs to be fixed in getComponentName so that it relies on the tag
-      // instead.
-      fiber.type = REACT_SUSPENSE_LIST_TYPE;
-    }
-
-    fiber.elementType = REACT_SUSPENSE_LIST_TYPE;
-    fiber.expirationTime = expirationTime;
-    return fiber;
-  }
   function createFiberFromText(content, mode, expirationTime) {
     var fiber = createFiber(HostText, content, null, mode);
     fiber.expirationTime = expirationTime;
@@ -23631,8 +23601,6 @@
         throw Error("createRoot(...): Target container is not a DOM element.");
       }
     }
-
-    warnIfReactDOMContainerInDEV(container);
     return new ReactDOMRoot(container, options);
   }
   function createBlockingRoot(container, options) {
@@ -23641,8 +23609,6 @@
         throw Error("createRoot(...): Target container is not a DOM element.");
       }
     }
-
-    warnIfReactDOMContainerInDEV(container);
     return new ReactDOMBlockingRoot(container, BlockingRoot, options);
   }
   function createLegacyRoot(container, options) {
@@ -23654,18 +23620,6 @@
   function warnOnInvalidCallback(callback, callerName) {
     {
       !(callback === null || typeof callback === 'function') ? warningWithoutStack$1(false, '%s(...): Expected the last optional `callback` argument to be a ' + 'function. Instead received: %s.', callerName, callback) : void 0;
-    }
-  }
-
-  function warnIfReactDOMContainerInDEV(container) {
-    {
-      if (isContainerMarkedAsRoot(container)) {
-        if (container._reactRootContainer) {
-          warningWithoutStack$1(false, 'You are calling ReactDOM.createRoot() on a container that was previously ' + 'passed to ReactDOM.render(). This is not supported.');
-        } else {
-          warningWithoutStack$1(false, 'You are calling ReactDOM.createRoot() on a container that ' + 'has already been passed to createRoot() before. Instead, call ' + 'root.render() on the existing root instead if you want to update it.');
-        }
-      }
     }
   }
 

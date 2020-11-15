@@ -9756,38 +9756,7 @@ function unhideTextInstance(textInstance, text) {
 // -------------------
 
 var supportsHydration = true;
-function canHydrateInstance(instance, type) {
-  if (instance.nodeType !== ELEMENT_NODE || type.toLowerCase() !== instance.nodeName.toLowerCase()) {
-    return null;
-  } // This has now been refined to an element node.
 
-
-  return instance;
-}
-function canHydrateTextInstance(instance, text) {
-  if (text === '' || instance.nodeType !== TEXT_NODE) {
-    // Empty strings are not parsed by HTML so there won't be a correct match here.
-    return null;
-  } // This has now been refined to a text node.
-
-
-  return instance;
-}
-function canHydrateSuspenseInstance(instance) {
-  if (instance.nodeType !== COMMENT_NODE) {
-    // Empty strings are not parsed by HTML so there won't be a correct match here.
-    return null;
-  } // This has now been refined to a suspense node.
-
-
-  return instance;
-}
-function isSuspenseInstancePending(instance) {
-  return instance.data === SUSPENSE_PENDING_START_DATA;
-}
-function isSuspenseInstanceFallback(instance) {
-  return instance.data === SUSPENSE_FALLBACK_START_DATA;
-}
 function registerSuspenseInstanceRetry(instance, callback) {
   instance._reactRetry = callback;
 }

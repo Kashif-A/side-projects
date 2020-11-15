@@ -26259,74 +26259,7 @@ function finishPendingInteractions(root, committedExpirationTime) {
 
 var onCommitFiberRoot = null;
 var onCommitFiberUnmount = null;
-var hasLoggedError = false;
-var isDevToolsPresent = typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined';
-function injectInternals(internals) {
-  if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined') {
-    // No DevTools
-    return false;
-  }
 
-  var hook = __REACT_DEVTOOLS_GLOBAL_HOOK__;
-
-  if (hook.isDisabled) {
-    // This isn't a real property on the hook, but it can be set to opt out
-    // of DevTools integration and associated warnings and logs.
-    // https://github.com/facebook/react/issues/3877
-    return true;
-  }
-
-  if (!hook.supportsFiber) {
-    {
-      warningWithoutStack$1(false, 'The installed version of React DevTools is too old and will not work ' + 'with the current version of React. Please update React DevTools. ' + 'https://fb.me/react-devtools');
-    } // DevTools exists, even though it doesn't support Fiber.
-
-
-    return true;
-  }
-
-  try {
-    var rendererID = hook.inject(internals); // We have successfully injected, so now it is safe to set up hooks.
-
-    onCommitFiberRoot = function (root, expirationTime) {
-      try {
-        var didError = (root.current.effectTag & DidCapture) === DidCapture;
-
-        if (enableProfilerTimer) {
-          var currentTime = getCurrentTime();
-          var priorityLevel = inferPriorityFromExpirationTime(currentTime, expirationTime);
-          hook.onCommitFiberRoot(rendererID, root, priorityLevel, didError);
-        } else {
-          hook.onCommitFiberRoot(rendererID, root, undefined, didError);
-        }
-      } catch (err) {
-        if (true && !hasLoggedError) {
-          hasLoggedError = true;
-          warningWithoutStack$1(false, 'React DevTools encountered an error: %s', err);
-        }
-      }
-    };
-
-    onCommitFiberUnmount = function (fiber) {
-      try {
-        hook.onCommitFiberUnmount(rendererID, fiber);
-      } catch (err) {
-        if (true && !hasLoggedError) {
-          hasLoggedError = true;
-          warningWithoutStack$1(false, 'React DevTools encountered an error: %s', err);
-        }
-      }
-    };
-  } catch (err) {
-    // Catch all errors because it is unsafe to throw during initialization.
-    {
-      warningWithoutStack$1(false, 'React DevTools encountered an error: %s.', err);
-    }
-  } // DevTools exists
-
-
-  return true;
-}
 function onCommitRoot(root, expirationTime) {
   if (typeof onCommitFiberRoot === 'function') {
     onCommitFiberRoot(root, expirationTime);
@@ -26639,13 +26572,6 @@ function createHostRootFiber(tag) {
     mode = BlockingMode | StrictMode;
   } else {
     mode = NoMode;
-  }
-
-  if (enableProfilerTimer && isDevToolsPresent) {
-    // Always collect profile timings when DevTools are present.
-    // This enables DevTools to start capturing timing at any point–
-    // Without some nodes in the tree having empty base times.
-    mode |= ProfileMode;
   }
 
   return createFiber(HostRoot, null, null, mode);
@@ -27420,44 +27346,6 @@ var setSuspenseHandler = null;
   };
 }
 
-function injectIntoDevTools(devToolsConfig) {
-  var findFiberByHostInstance = devToolsConfig.findFiberByHostInstance;
-  var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
-  return injectInternals(_assign({}, devToolsConfig, {
-    overrideHookState: overrideHookState,
-    overrideProps: overrideProps,
-    setSuspenseHandler: setSuspenseHandler,
-    scheduleUpdate: scheduleUpdate,
-    currentDispatcherRef: ReactCurrentDispatcher,
-    findHostInstanceByFiber: function (fiber) {
-      var hostFiber = findCurrentHostFiber(fiber);
-
-      if (hostFiber === null) {
-        return null;
-      }
-
-      return hostFiber.stateNode;
-    },
-    findFiberByHostInstance: function (instance) {
-      if (!findFiberByHostInstance) {
-        // Might not be implemented by the renderer.
-        return null;
-      }
-
-      return findFiberByHostInstance(instance);
-    },
-    // React Refresh
-    findHostInstancesForRefresh: findHostInstancesForRefresh,
-    scheduleRefresh: scheduleRefresh,
-    scheduleRoot: scheduleRoot,
-    setRefreshHandler: setRefreshHandler,
-    // Enables DevTools to append owner stacks to error messages in DEV mode.
-    getCurrentFiber: function () {
-      return current;
-    }
-  }));
-}
-
 // This file intentionally does *not* have the Flow annotation.
 // Don't add it. See `./inline-typed.js` for an explanation.
 
@@ -27812,10 +27700,6 @@ implementation) {
   };
 }
 
-// TODO: this is special because it gets imported during build.
-
-var ReactVersion = '16.12.0';
-
 setAttemptSynchronousHydration(attemptSynchronousHydration$1);
 setAttemptUserBlockingHydration(attemptUserBlockingHydration$1);
 setAttemptContinuousHydration(attemptContinuousHydration$1);
@@ -27886,28 +27770,6 @@ if (exposeConcurrentModeAPIs) {
     }
   };
 }
-
-var foundDevTools = injectIntoDevTools({
-  findFiberByHostInstance: getClosestInstanceFromNode,
-  bundleType: 1,
-  version: ReactVersion,
-  rendererPackageName: 'react-dom'
-});
-
-{
-  if (!foundDevTools && canUseDOM && window.top === window.self) {
-    // If we're in Chrome or Firefox, provide a download link if not installed.
-    if (navigator.userAgent.indexOf('Chrome') > -1 && navigator.userAgent.indexOf('Edge') === -1 || navigator.userAgent.indexOf('Firefox') > -1) {
-      var protocol = window.location.protocol; // Don't warn in exotic cases like chrome-extension://.
-
-      if (/^(https?|file):$/.test(protocol)) {
-        console.info('%cDownload the React DevTools ' + 'for a better development experience: ' + 'https://fb.me/react-devtools' + (protocol === 'file:' ? '\nYou might need to use a local HTTP server (instead of file://): ' + 'https://fb.me/react-devtools-faq' : ''), 'font-weight:bold');
-      }
-    }
-  }
-}
-
-
 
 var ReactDOM$2 = Object.freeze({
 	default: ReactDOM

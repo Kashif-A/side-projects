@@ -17115,43 +17115,6 @@ function warnIfHydrating() {
   }
 }
 
-function insertNonHydratedInstance(returnFiber, fiber) {
-  fiber.effectTag = fiber.effectTag & ~Hydrating | Placement;
-
-  {
-    switch (returnFiber.tag) {
-      case HostComponent:
-        {
-          var parentType = returnFiber.type;
-          var parentProps = returnFiber.memoizedProps;
-          var parentInstance = returnFiber.stateNode;
-
-          switch (fiber.tag) {
-            case HostComponent:
-              var _type = fiber.type;
-              var _props = fiber.pendingProps;
-              didNotFindHydratableInstance(parentType, parentProps, parentInstance, _type, _props);
-              break;
-
-            case HostText:
-              var _text = fiber.pendingProps;
-              didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, _text);
-              break;
-
-            case SuspenseComponent:
-              didNotFindHydratableSuspenseInstance(parentType, parentProps, parentInstance);
-              break;
-          }
-
-          break;
-        }
-
-      default:
-        return;
-    }
-  }
-}
-
 function tryToClaimNextHydratableInstance(fiber) {
   if (!isHydrating) {
     return;
@@ -17160,79 +17123,11 @@ function tryToClaimNextHydratableInstance(fiber) {
   var nextInstance = nextHydratableInstance;
 
   if (!nextInstance) {
-    // Nothing to hydrate. Make it an insertion.
-    insertNonHydratedInstance(hydrationParentFiber, fiber);
     isHydrating = false;
     hydrationParentFiber = fiber;
     return;
   }
   hydrationParentFiber = fiber;
-}
-
-function prepareToHydrateHostInstance(fiber, rootContainerInstance, hostContext) {
-  if (!supportsHydration) {
-    {
-      {
-        throw Error("Expected prepareToHydrateHostInstance() to never be called. This error is likely caused by a bug in React. Please file an issue.");
-      }
-    }
-  }
-
-  var instance = fiber.stateNode;
-  var updatePayload = hydrateInstance(instance, fiber.type, fiber.memoizedProps, rootContainerInstance, hostContext, fiber); // TODO: Type this specific to this type of component.
-
-  fiber.updateQueue = updatePayload; // If the update payload indicates that there is a change or if there
-  // is a new ref we mark this as an update.
-
-  if (updatePayload !== null) {
-    return true;
-  }
-
-  return false;
-}
-
-function prepareToHydrateHostTextInstance(fiber) {
-  if (!supportsHydration) {
-    {
-      {
-        throw Error("Expected prepareToHydrateHostTextInstance() to never be called. This error is likely caused by a bug in React. Please file an issue.");
-      }
-    }
-  }
-
-  var textInstance = fiber.stateNode;
-  var textContent = fiber.memoizedProps;
-  var shouldUpdate = hydrateTextInstance(textInstance, textContent, fiber);
-
-  {
-    if (shouldUpdate) {
-      // We assume that prepareToHydrateHostTextInstance is called in a context where the
-      // hydration parent is the parent host component of this host text.
-      var returnFiber = hydrationParentFiber;
-
-      if (returnFiber !== null) {
-        switch (returnFiber.tag) {
-          case HostRoot:
-            {
-              var parentContainer = returnFiber.stateNode.containerInfo;
-              didNotMatchHydratedContainerTextInstance(parentContainer, textInstance, textContent);
-              break;
-            }
-
-          case HostComponent:
-            {
-              var parentType = returnFiber.type;
-              var parentProps = returnFiber.memoizedProps;
-              var parentInstance = returnFiber.stateNode;
-              didNotMatchHydratedTextInstance(parentType, parentProps, parentInstance, textInstance, textContent);
-              break;
-            }
-        }
-      }
-    }
-  }
-
-  return shouldUpdate;
 }
 
 function prepareToHydrateHostSuspenseInstance(fiber) {
@@ -17252,8 +17147,6 @@ function prepareToHydrateHostSuspenseInstance(fiber) {
       throw Error("Expected to have a hydrated suspense instance. This error is likely caused by a bug in React. Please file an issue.");
     }
   }
-
-  hydrateSuspenseInstance(suspenseInstance, fiber);
 }
 
 function skipPastDehydratedSuspenseInstance(fiber) {
@@ -17307,22 +17200,12 @@ function popHydrationState(fiber) {
     return false;
   }
 
-  var type = fiber.type; // If we have any remaining hydratable nodes, we need to delete them now.
-  // We only do this deeper than head and body since they tend to have random
-  // other nodes in them. We also ignore components with pure text content in
-  // side of them.
-  // TODO: Better heuristic.
-
-  if (fiber.tag !== HostComponent || type !== 'head' && type !== 'body' && !shouldSetTextContent(type, fiber.memoizedProps)) {
-    var nextInstance = nextHydratableInstance;
-  }
-
   popToNextHostParent(fiber);
 
   if (fiber.tag === SuspenseComponent) {
     nextHydratableInstance = skipPastDehydratedSuspenseInstance(fiber);
   } else {
-    nextHydratableInstance = hydrationParentFiber ? getNextHydratableSibling(fiber.stateNode) : null;
+    nextHydratableInstance = null;
   }
 
   return true;
@@ -17824,33 +17707,10 @@ function updateHostRoot(current$$1, workInProgress, renderExpirationTime) {
     return bailoutOnAlreadyFinishedWork(current$$1, workInProgress, renderExpirationTime);
   }
 
-  var root = workInProgress.stateNode;
-
-  if (root.hydrate && enterHydrationState(workInProgress)) {
-    // If we don't have any current children this might be the first pass.
-    // We always try to hydrate. If this isn't a hydration pass there won't
-    // be any children to hydrate which is effectively the same thing as
-    // not hydrating.
-    var child = mountChildFibers(workInProgress, null, nextChildren, renderExpirationTime);
-    workInProgress.child = child;
-    var node = child;
-
-    while (node) {
-      // Mark each child as hydrating. This is a fast path to know whether this
-      // tree is part of a hydrating tree. This is used to determine if a child
-      // node has fully mounted yet, and for scheduling event replaying.
-      // Conceptually this is similar to Placement in that a new subtree is
-      // inserted into the React tree here. It just happens to not need DOM
-      // mutations because it already exists.
-      node.effectTag = node.effectTag & ~Placement | Hydrating;
-      node = node.sibling;
-    }
-  } else {
     // Otherwise reset hydration state in case we aborted and resumed another
     // root.
     reconcileChildren(current$$1, workInProgress, nextChildren, renderExpirationTime);
     resetHydrationState();
-  }
 
   return workInProgress.child;
 }
@@ -20317,14 +20177,6 @@ function completeWork(current, workInProgress, renderExpirationTime) {
           var _wasHydrated = popHydrationState(workInProgress);
 
           if (_wasHydrated) {
-            // TODO: Move this and createInstance step into the beginPhase
-            // to consolidate.
-            if (prepareToHydrateHostInstance(workInProgress, rootContainerInstance, currentHostContext)) {
-              // If changes to the hydrated node needs to be applied at the
-              // commit-phase we mark this as such.
-              markUpdate(workInProgress);
-            }
-
             if (enableFlareAPI) {
               var listeners = newProps.listeners;
 
@@ -25860,18 +25712,6 @@ function createFiberFromSuspenseList(pendingProps, mode, expirationTime, key) {
 function createFiberFromText(content, mode, expirationTime) {
   var fiber = createFiber(HostText, content, null, mode);
   fiber.expirationTime = expirationTime;
-  return fiber;
-}
-function createFiberFromHostInstanceForDeletion() {
-  var fiber = createFiber(HostComponent, null, null, NoMode); // TODO: These should not need a type.
-
-  fiber.elementType = 'DELETED';
-  fiber.type = 'DELETED';
-  return fiber;
-}
-function createFiberFromDehydratedFragment(dehydratedNode) {
-  var fiber = createFiber(DehydratedFragment, null, null, NoMode);
-  fiber.stateNode = dehydratedNode;
   return fiber;
 }
 function createFiberFromPortal(portal, mode, expirationTime) {

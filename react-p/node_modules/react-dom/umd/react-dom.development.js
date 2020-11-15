@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /* eslint-disable no-constant-condition */
 /* eslint-disable no-prototype-builtins */
 'use strict';
@@ -9958,7 +9959,7 @@ function didNotFindHydratableTextInstance(parentType, parentProps, parentInstanc
     warnForInsertedHydratedText(parentInstance, text);
   }
 }
-function didNotFindHydratableSuspenseInstance(parentType, parentProps, parentInstance) {
+function didNotFindHydratableSuspenseInstance(parentType, parentProps) {
   if (true && parentProps[SUPPRESS_HYDRATION_WARNING] !== true) {// TODO: warnForInsertedHydratedSuspense(parentInstance);
   }
 }
@@ -10677,7 +10678,7 @@ function extractBeforeInputEvent(topLevelType, targetInst, nativeEvent, nativeEv
 
 var BeforeInputEventPlugin = {
   eventTypes: eventTypes$1,
-  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget, eventSystemFlags) {
+  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
     var composition = extractCompositionEvent(topLevelType, targetInst, nativeEvent, nativeEventTarget);
     var beforeInput = extractBeforeInputEvent(topLevelType, targetInst, nativeEvent, nativeEventTarget);
 
@@ -10870,7 +10871,7 @@ function handleEventsForInputEventPolyfill(topLevelType, target, targetInst) {
 } // For IE8 and IE9.
 
 
-function getTargetInstForInputEventPolyfill(topLevelType, targetInst) {
+function getTargetInstForInputEventPolyfill(topLevelType) {
   if (topLevelType === TOP_SELECTION_CHANGE || topLevelType === TOP_KEY_UP || topLevelType === TOP_KEY_DOWN) {
     // On the selectionchange event, the target is just document which isn't
     // helpful for us so just check activeElement instead.
@@ -10937,7 +10938,7 @@ function handleControlledInputBlur(node) {
 var ChangeEventPlugin = {
   eventTypes: eventTypes$2,
   _isInputEventSupported: isInputEventSupported,
-  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget, eventSystemFlags) {
+  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
     var targetNode = targetInst ? getNodeFromInstance$1(targetInst) : window;
     var getTargetInstFunc, handleEventFunc;
 
@@ -11261,7 +11262,7 @@ function constructSelectEvent(nativeEvent, nativeEventTarget) {
 
 var SelectEventPlugin = {
   eventTypes: eventTypes$4,
-  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget, eventSystemFlags) {
+  extractEvents: function (topLevelType, targetInst, nativeEvent, nativeEventTarget) {
     var doc = getEventTargetDocument(nativeEventTarget); // Track whether all listeners exists for this plugin. If none exist, we do
     // not extract events. See #3639.
 
@@ -12372,7 +12373,7 @@ var HIGH_PRIORITY_BATCH_SIZE = 100;
 function computeInteractiveExpiration(currentTime) {
   return computeExpirationBucket(currentTime, HIGH_PRIORITY_EXPIRATION, HIGH_PRIORITY_BATCH_SIZE);
 }
-function computeContinuousHydrationExpiration(currentTime) {
+function computeContinuousHydrationExpiration() {
   // Each time we ask for a new one of these we increase the priority.
   // This ensures that the last one always wins since we can't deprioritize
   // once we've scheduled work already.
@@ -12462,9 +12463,9 @@ var lowPriorityWarningWithoutStack = function () {};
 var lowPriorityWarningWithoutStack$1 = lowPriorityWarningWithoutStack;
 
 var ReactStrictModeWarnings = {
-  recordUnsafeLifecycleWarnings: function (fiber, instance) {},
+  recordUnsafeLifecycleWarnings: function () {},
   flushPendingUnsafeLifecycleWarnings: function () {},
-  recordLegacyContextWarning: function (fiber, instance) {},
+  recordLegacyContextWarning: function () {},
   flushLegacyContextWarning: function () {},
   discardPendingWarnings: function () {}
 };
@@ -12690,11 +12691,6 @@ var ReactStrictModeWarnings = {
 var resolveFamily = null; // $FlowFixMe Flow gets confused by a WeakSet feature check below.
 
 var failedBoundaries = null;
-var setRefreshHandler = function (handler) {
-  {
-    resolveFamily = handler;
-  }
-};
 function resolveFunctionForHotReloading(type) {
   {
     if (resolveFamily === null) {
@@ -12856,36 +12852,6 @@ function markFailedErrorBoundaryForHotReloading(fiber) {
     failedBoundaries.add(fiber);
   }
 }
-var scheduleRefresh = function (root, update) {
-  {
-    if (resolveFamily === null) {
-      // Hot reloading is disabled.
-      return;
-    }
-
-    var staleFamilies = update.staleFamilies,
-        updatedFamilies = update.updatedFamilies;
-    flushPassiveEffects();
-    flushSync(function () {
-      scheduleFibersWithFamiliesRecursively(root.current, updatedFamilies, staleFamilies);
-    });
-  }
-};
-var scheduleRoot = function (root, element) {
-  {
-    if (root.context !== emptyContextObject) {
-      // Super edge case: root has a legacy _renderSubtree context
-      // but we don't know the parentComponent so we can't pass it.
-      // Just ignore. We'll delete this with _renderSubtree code path later.
-      return;
-    }
-
-    flushPassiveEffects();
-    syncUpdates(function () {
-      updateContainer(element, root, null, null);
-    });
-  }
-};
 
 function scheduleFibersWithFamiliesRecursively(fiber, updatedFamilies, staleFamilies) {
   {
@@ -13085,8 +13051,6 @@ function findChildHostInstancesForFiberShallowly(fiber, hostInstances) {
       node = node.sibling;
     }
   }
-
-  return false;
 }
 
 function resolveDefaultProps(Component, baseProps) {
@@ -13914,7 +13878,7 @@ function resetHasForceUpdateBeforeProcessing() {
 function checkHasForceUpdateAfterProcessing() {
   return hasForceUpdate;
 }
-function commitUpdateQueue(finishedWork, finishedQueue, instance, renderExpirationTime) {
+function commitUpdateQueue(finishedWork, finishedQueue, instance) {
   // If the finished render included captured updates, and there are still
   // lower priority updates left over, we need to keep the captured updates
   // in the queue so that they are rebased and not dropped once we process the
@@ -14231,7 +14195,7 @@ function adoptClassInstance(workInProgress, instance) {
   }
 }
 
-function constructClassInstance(workInProgress, ctor, props, renderExpirationTime) {
+function constructClassInstance(workInProgress, ctor, props) {
   var isLegacyContextConsumer = false;
   var unmaskedContext = emptyContextObject;
   var context = emptyContextObject;
@@ -14685,7 +14649,7 @@ var didWarnAboutStringRefs;
 var ownerHasKeyUseWarning;
 var ownerHasFunctionTypeWarning;
 
-var warnForMissingKey = function (child) {};
+var warnForMissingKey = function () {};
 
 {
   didWarnAboutMaps = false;
@@ -16546,7 +16510,7 @@ function mountReducer(reducer, initialArg, init) {
   return [hook.memoizedState, dispatch];
 }
 
-function updateReducer(reducer, initialArg, init) {
+function updateReducer(reducer) {
   var hook = updateWorkInProgressHook();
   var queue = hook.queue;
 
@@ -16762,7 +16726,7 @@ function mountRef(initialValue) {
   return ref;
 }
 
-function updateRef(initialValue) {
+function updateRef() {
   var hook = updateWorkInProgressHook();
   return hook.memoizedState;
 }
@@ -16872,13 +16836,6 @@ function updateImperativeHandle(ref, create, deps) {
   var effectDeps = deps !== null && deps !== undefined ? deps.concat([ref]) : null;
   return updateEffectImpl(Update, UnmountMutation | MountLayout, imperativeHandleEffect.bind(null, create, ref), effectDeps);
 }
-
-function mountDebugValue(value, formatterFn) {// This hook is normally a no-op.
-  // The react-debug-hooks package injects its own implementation
-  // so that e.g. DevTools can display custom hook values.
-}
-
-var updateDebugValue = mountDebugValue;
 
 function mountCallback(callback, deps) {
   var hook = mountWorkInProgressHook();
@@ -17262,11 +17219,6 @@ var InvalidNestedHooksDispatcherOnUpdateInDEV = null;
         ReactCurrentDispatcher$1.current = prevDispatcher;
       }
     },
-    useDebugValue: function (value, formatterFn) {
-      currentHookNameInDev = 'useDebugValue';
-      mountHookTypesDev();
-      return mountDebugValue(value, formatterFn);
-    },
     useResponder: function (responder, props) {
       currentHookNameInDev = 'useResponder';
       mountHookTypesDev();
@@ -17353,11 +17305,6 @@ var InvalidNestedHooksDispatcherOnUpdateInDEV = null;
         ReactCurrentDispatcher$1.current = prevDispatcher;
       }
     },
-    useDebugValue: function (value, formatterFn) {
-      currentHookNameInDev = 'useDebugValue';
-      updateHookTypesDev();
-      return mountDebugValue(value, formatterFn);
-    },
     useResponder: function (responder, props) {
       currentHookNameInDev = 'useResponder';
       updateHookTypesDev();
@@ -17443,11 +17390,6 @@ var InvalidNestedHooksDispatcherOnUpdateInDEV = null;
       } finally {
         ReactCurrentDispatcher$1.current = prevDispatcher;
       }
-    },
-    useDebugValue: function (value, formatterFn) {
-      currentHookNameInDev = 'useDebugValue';
-      updateHookTypesDev();
-      return updateDebugValue(value, formatterFn);
     },
     useResponder: function (responder, props) {
       currentHookNameInDev = 'useResponder';
@@ -17544,12 +17486,6 @@ var InvalidNestedHooksDispatcherOnUpdateInDEV = null;
       } finally {
         ReactCurrentDispatcher$1.current = prevDispatcher;
       }
-    },
-    useDebugValue: function (value, formatterFn) {
-      currentHookNameInDev = 'useDebugValue';
-      warnInvalidHookAccess();
-      mountHookTypesDev();
-      return mountDebugValue(value, formatterFn);
     },
     useResponder: function (responder, props) {
       currentHookNameInDev = 'useResponder';
@@ -17650,12 +17586,6 @@ var InvalidNestedHooksDispatcherOnUpdateInDEV = null;
         ReactCurrentDispatcher$1.current = prevDispatcher;
       }
     },
-    useDebugValue: function (value, formatterFn) {
-      currentHookNameInDev = 'useDebugValue';
-      warnInvalidHookAccess();
-      updateHookTypesDev();
-      return updateDebugValue(value, formatterFn);
-    },
     useResponder: function (responder, props) {
       currentHookNameInDev = 'useResponder';
       warnInvalidHookAccess();
@@ -17707,7 +17637,7 @@ function startProfilerTimer(fiber) {
   }
 }
 
-function stopProfilerTimerIfRunning(fiber) {
+function stopProfilerTimerIfRunning() {
   if (!enableProfilerTimer) {
     return;
   }
@@ -18998,7 +18928,7 @@ var SUSPENDED_MARKER = {
   retryTime: NoWork
 };
 
-function shouldRemainOnFallback(suspenseContext, current$$1, workInProgress) {
+function shouldRemainOnFallback(suspenseContext, current$$1) {
   // If the context is telling us that we should show a fallback, and we're not
   // already showing content, then we should show the fallback instead.
   return hasSuspenseContext(suspenseContext, ForceSuspenseFallback) && (current$$1 === null || current$$1.memoizedState !== null);
@@ -19373,7 +19303,7 @@ function retrySuspenseComponentWithoutHydrating(current$$1, workInProgress, rend
   return workInProgress.child;
 }
 
-function mountDehydratedSuspenseComponent(workInProgress, suspenseInstance, renderExpirationTime) {
+function mountDehydratedSuspenseComponent(workInProgress, suspenseInstance) {
   // During the first pass, we'll bail out and not drill into the children.
   // Instead, we'll leave the content in place and try to hydrate it later.
   if ((workInProgress.mode & BlockingMode) === NoMode) {
@@ -21699,7 +21629,7 @@ function completeWork(current, workInProgress, renderExpirationTime) {
   return null;
 }
 
-function unwindWork(workInProgress, renderExpirationTime) {
+function unwindWork(workInProgress) {
   switch (workInProgress.tag) {
     case ClassComponent:
       {
@@ -21852,9 +21782,7 @@ function createCapturedValue(value, source) {
 // This module is forked in different environments.
 // By default, return `true` to log errors to the console.
 // Forks can return `false` if this isn't desirable.
-function showErrorDialog(capturedError) {
-  return true;
-}
+function showErrorDialog() { return true; }
 
 function logCapturedError(capturedError) {
   var logError = showErrorDialog(capturedError); // Allow injected showErrorDialog() to prevent default console.error logging.
@@ -23667,9 +23595,6 @@ function requestCurrentTimeForUpdate() {
   currentEventTime = msToExpirationTime(now());
   return currentEventTime;
 }
-function getCurrentTime() {
-  return msToExpirationTime(now());
-}
 function computeExpirationForFiber(currentTime, fiber, suspenseConfig) {
   var mode = fiber.mode;
 
@@ -24426,10 +24351,6 @@ function flushDiscreteUpdates() {
   // they fire before the next serial event.
 
   flushPassiveEffects();
-}
-
-function syncUpdates(fn, a, b, c) {
-  return runWithPriority$2(ImmediatePriority, fn.bind(null, a, b, c));
 }
 
 function flushPendingDiscreteUpdates() {
@@ -26958,34 +26879,6 @@ function getContextForSubtree(parentComponent) {
   return parentContext;
 }
 
-function findHostInstance(component) {
-  var fiber = get(component);
-
-  if (fiber === undefined) {
-    if (typeof component.render === 'function') {
-      {
-        {
-          throw Error("Unable to find node on an unmounted component.");
-        }
-      }
-    } else {
-      {
-        {
-          throw Error("Argument appears to not be a ReactComponent. Keys: " + Object.keys(component));
-        }
-      }
-    }
-  }
-
-  var hostFiber = findCurrentHostFiber(fiber);
-
-  if (hostFiber === null) {
-    return null;
-  }
-
-  return hostFiber.stateNode;
-}
-
 function findHostInstanceWithWarning(component, methodName) {
   {
     var fiber = get(component);
@@ -27454,8 +27347,6 @@ function findDOMNode(componentOrElement) {
   {
     return findHostInstanceWithWarning(componentOrElement, 'findDOMNode');
   }
-
-  return findHostInstance(componentOrElement);
 }
 function hydrate(element, container, callback) {
   if (!isValidContainer(container)) {

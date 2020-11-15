@@ -17115,59 +17115,6 @@ function warnIfHydrating() {
   }
 }
 
-function enterHydrationState(fiber) {
-  if (!supportsHydration) {
-    return false;
-  }
-
-  var parentInstance = fiber.stateNode.containerInfo;
-  nextHydratableInstance = getFirstHydratableChild(parentInstance);
-  hydrationParentFiber = fiber;
-  isHydrating = true;
-  return true;
-}
-
-function reenterHydrationStateFromDehydratedSuspenseInstance(fiber, suspenseInstance) {
-  if (!supportsHydration) {
-    return false;
-  }
-
-  nextHydratableInstance = getNextHydratableSibling(suspenseInstance);
-  popToNextHostParent(fiber);
-  isHydrating = true;
-  return true;
-}
-
-function deleteHydratableInstance(returnFiber, instance) {
-  {
-    switch (returnFiber.tag) {
-      case HostRoot:
-        didNotHydrateContainerInstance(returnFiber.stateNode.containerInfo, instance);
-        break;
-
-      case HostComponent:
-        didNotHydrateInstance(returnFiber.type, returnFiber.memoizedProps, returnFiber.stateNode, instance);
-        break;
-    }
-  }
-
-  var childToDelete = createFiberFromHostInstanceForDeletion();
-  childToDelete.stateNode = instance;
-  childToDelete.return = returnFiber;
-  childToDelete.effectTag = Deletion; // This might seem like it belongs on progressedFirstDeletion. However,
-  // these children are not part of the reconciliation list of children.
-  // Even if we abort and rereconcile the children, that will try to hydrate
-  // again and the nodes are still in the host tree so these will be
-  // recreated.
-
-  if (returnFiber.lastEffect !== null) {
-    returnFiber.lastEffect.nextEffect = childToDelete;
-    returnFiber.lastEffect = childToDelete;
-  } else {
-    returnFiber.firstEffect = returnFiber.lastEffect = childToDelete;
-  }
-}
-
 function insertNonHydratedInstance(returnFiber, fiber) {
   fiber.effectTag = fiber.effectTag & ~Hydrating | Placement;
 

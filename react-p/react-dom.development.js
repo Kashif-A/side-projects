@@ -4071,23 +4071,8 @@
   }
 
   var attemptSynchronousHydration;
-  function setAttemptSynchronousHydration(fn) {
-    attemptSynchronousHydration = fn;
-  }
-  var attemptUserBlockingHydration;
-  function setAttemptUserBlockingHydration(fn) {
-    attemptUserBlockingHydration = fn;
-  }
+  var attemptUserBlockingHydration; 
   var attemptContinuousHydration;
-  function setAttemptContinuousHydration(fn) {
-    attemptContinuousHydration = fn;
-  }
-  var attemptHydrationAtCurrentPriority;
-  function setAttemptHydrationAtCurrentPriority(fn) {
-    attemptHydrationAtCurrentPriority = fn;
-  } // TODO: Upgrade this definition once we're on a newer version of Flow that
-  // has this definition built-in.
-
   var hasScheduledReplayAttempt = false; // The queue of discrete events to be replayed.
 
   var queuedDiscreteEvents = []; // Indicates if any continuous event targets are non-null for early bailout.
@@ -11419,7 +11404,6 @@
   // and is used to increase priority of hover targets. It is increasing with
   // each usage so that last always wins.
 
-  var ContinuousHydration = 3;
   var Sync = MAX_SIGNED_31_BIT_INT;
   var Batched = Sync - 1;
   var UNIT_SIZE = 10;
@@ -11467,12 +11451,6 @@
   var HIGH_PRIORITY_BATCH_SIZE = 100;
   function computeInteractiveExpiration(currentTime) {
     return computeExpirationBucket(currentTime, HIGH_PRIORITY_EXPIRATION, HIGH_PRIORITY_BATCH_SIZE);
-  }
-  function computeContinuousHydrationExpiration() {
-    // Each time we ask for a new one of these we increase the priority.
-    // This ensures that the last one always wins since we can't deprioritize
-    // once we've scheduled work already.
-    return ContinuousHydration++;
   }
   function inferPriorityFromExpirationTime(currentTime, expirationTime) {
     if (expirationTime === Sync) {
@@ -22282,14 +22260,6 @@
     commitRoot(root);
   }
 
-  function flushRoot(root, expirationTime) {
-    markRootExpiredAtTime(root, expirationTime);
-    ensureRootIsScheduled(root);
-
-    if ((executionContext & (RenderContext | CommitContext)) === NoContext) {
-      flushSyncCallbackQueue();
-    }
-  }
   function flushDiscreteUpdates() {
     // TODO: Should be able to flush inside batchedUpdates, but not inside `act`.
     // However, `act` uses `batchedUpdates`, so there's no way to distinguish
@@ -24936,89 +24906,6 @@
         return containerFiber.child.stateNode;
     }
   }
-  function attemptSynchronousHydration$1(fiber) {
-    switch (fiber.tag) {
-      case HostRoot:
-        var root = fiber.stateNode;
-
-        if (root.hydrate) {
-          // Flush the first scheduled "update".
-          flushRoot(root, root.firstPendingTime);
-        }
-
-        break;
-
-      case SuspenseComponent:
-        flushSync(function () {
-          return scheduleWork(fiber, Sync);
-        }); // If we're still blocked after this, we need to increase
-        // the priority of any promises resolving within this
-        // boundary so that they next attempt also has higher pri.
-
-        var retryExpTime = computeInteractiveExpiration(requestCurrentTimeForUpdate());
-        markRetryTimeIfNotHydrated(fiber, retryExpTime);
-        break;
-    }
-  }
-
-  function markRetryTimeImpl(fiber, retryTime) {
-    var suspenseState = fiber.memoizedState;
-
-    if (suspenseState !== null && suspenseState.dehydrated !== null) {
-      if (suspenseState.retryTime < retryTime) {
-        suspenseState.retryTime = retryTime;
-      }
-    }
-  } // Increases the priority of thennables when they resolve within this boundary.
-
-
-  function markRetryTimeIfNotHydrated(fiber, retryTime) {
-    markRetryTimeImpl(fiber, retryTime);
-    var alternate = fiber.alternate;
-
-    if (alternate) {
-      markRetryTimeImpl(alternate, retryTime);
-    }
-  }
-
-  function attemptUserBlockingHydration$1(fiber) {
-    if (fiber.tag !== SuspenseComponent) {
-      // We ignore HostRoots here because we can't increase
-      // their priority and they should not suspend on I/O,
-      // since you have to wrap anything that might suspend in
-      // Suspense.
-      return;
-    }
-
-    var expTime = computeInteractiveExpiration(requestCurrentTimeForUpdate());
-    scheduleWork(fiber, expTime);
-    markRetryTimeIfNotHydrated(fiber, expTime);
-  }
-  function attemptContinuousHydration$1(fiber) {
-    if (fiber.tag !== SuspenseComponent) {
-      // We ignore HostRoots here because we can't increase
-      // their priority and they should not suspend on I/O,
-      // since you have to wrap anything that might suspend in
-      // Suspense.
-      return;
-    }
-
-    var expTime = computeContinuousHydrationExpiration(requestCurrentTimeForUpdate());
-    scheduleWork(fiber, expTime);
-    markRetryTimeIfNotHydrated(fiber, expTime);
-  }
-  function attemptHydrationAtCurrentPriority$1(fiber) {
-    if (fiber.tag !== SuspenseComponent) {
-      // We ignore HostRoots here because we can't increase
-      // their priority other than synchronously flush it.
-      return;
-    }
-
-    var currentTime = requestCurrentTimeForUpdate();
-    var expTime = computeExpirationForFiber(currentTime, fiber, null);
-    scheduleWork(fiber, expTime);
-    markRetryTimeIfNotHydrated(fiber, expTime);
-  }
   function findHostInstanceWithNoPortals(fiber) {
     var hostFiber = findCurrentHostFiberWithNoPortals(fiber);
 
@@ -25377,10 +25264,6 @@
     };
   }
 
-  setAttemptSynchronousHydration(attemptSynchronousHydration$1);
-  setAttemptUserBlockingHydration(attemptUserBlockingHydration$1);
-  setAttemptContinuousHydration(attemptContinuousHydration$1);
-  setAttemptHydrationAtCurrentPriority(attemptHydrationAtCurrentPriority$1);
   var didWarnAboutUnstableCreatePortal = false;
 
   {

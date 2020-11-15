@@ -1306,8 +1306,6 @@
   var flushSuspenseFallbacksInTests = true; // Add a callback property to suspense to notify which promises are currently
   // in the update queue. This allows reporting and tracing of what is causing
   // the user to see a loading state.
-  // Also allows hydration callbacks to fire when a dehydrated boundary gets
-  // hydrated or deleted.
 
   var enableSuspenseCallback = false; // Part of the simplification of React.createElement so we can eventually move
   // from React.createElement to React.jsx
@@ -3797,25 +3795,6 @@
 
     return null;
   }
-  function getSuspenseInstanceFromFiber(fiber) {
-    if (fiber.tag === SuspenseComponent) {
-      var suspenseState = fiber.memoizedState;
-
-      if (suspenseState === null) {
-        var current = fiber.alternate;
-
-        if (current !== null) {
-          suspenseState = current.memoizedState;
-        }
-      }
-
-      if (suspenseState !== null) {
-        return suspenseState.dehydrated;
-      }
-    }
-
-    return null;
-  }
   function getContainerFromFiber(fiber) {
     return fiber.tag === HostRoot ? fiber.stateNode.containerInfo : null;
   }
@@ -4331,19 +4310,7 @@
       if (nearestMounted !== null) {
         var tag = nearestMounted.tag;
 
-        if (tag === SuspenseComponent) {
-          var instance = getSuspenseInstanceFromFiber(nearestMounted);
-
-          if (instance !== null) {
-            // We're blocked on hydrating this boundary.
-            // Increase its priority.
-            queuedTarget.blockedOn = instance;
-            unstable_runWithPriority(queuedTarget.priority, function () {
-              attemptHydrationAtCurrentPriority(nearestMounted);
-            });
-            return;
-          }
-        } else if (tag === HostRoot) {
+        if (tag === HostRoot) {
           var root = nearestMounted.stateNode;
 
           if (root.hydrate) {
@@ -5951,22 +5918,7 @@
       } else {
         var tag = nearestMounted.tag;
 
-        if (tag === SuspenseComponent) {
-          var instance = getSuspenseInstanceFromFiber(nearestMounted);
-
-          if (instance !== null) {
-            // Queue the event to be replayed later. Abort dispatching since we
-            // don't want this event dispatched twice through the event system.
-            // TODO: If this is the first discrete event in the queue. Schedule an increased
-            // priority for this boundary.
-            return instance;
-          } // This shouldn't happen, something went wrong but to avoid blocking
-          // the whole system, dispatch the event without a target.
-          // TODO: Warn.
-
-
-          targetInst = null;
-        } else if (tag === HostRoot) {
+        if (tag === HostRoot) {
           var root = nearestMounted.stateNode;
 
           if (root.hydrate) {

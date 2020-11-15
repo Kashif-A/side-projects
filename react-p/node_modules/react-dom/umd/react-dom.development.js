@@ -24615,15 +24615,7 @@
     }
   }
 
-  function shouldHydrateDueToLegacyHeuristic(container) {
-    var rootElement = getReactRootElementInContainer(container);
-    return !!(rootElement && rootElement.nodeType === ELEMENT_NODE && rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME));
-  }
-
-  function legacyCreateRootFromDOMContainer(container, forceHydrate) {
-    var shouldHydrate = forceHydrate || shouldHydrateDueToLegacyHeuristic(container); // First clear any existing content.
-
-    if (!shouldHydrate) {
+  function legacyCreateRootFromDOMContainer(container) {
       var warned = false;
       var rootSibling;
 
@@ -24637,11 +24629,8 @@
 
         container.removeChild(rootSibling);
       }
-    }
 
-    return createLegacyRoot(container, shouldHydrate ? {
-      hydrate: true
-    } : undefined);
+    return createLegacyRoot(container, undefined);
   }
 
   function legacyRenderSubtreeIntoContainer(parentComponent, children, container, forceHydrate, callback) {
@@ -24657,7 +24646,7 @@
 
     if (!root) {
       // Initial mount
-      root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container, forceHydrate);
+      root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container);
       fiberRoot = root._internalRoot;
 
       if (typeof callback === 'function') {

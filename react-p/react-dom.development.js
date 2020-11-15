@@ -1101,7 +1101,6 @@
   function describeFiber(fiber) {
     switch (fiber.tag) {
       case HostRoot:
-      case HostPortal:
       case HostText:
       case Fragment:
       case ContextProvider:
@@ -1753,9 +1752,7 @@
         dependencies = _node.dependencies,
         tag = _node.tag;
 
-      if (tag === HostPortal) {
-        insidePortal = true;
-      } else if ((tag === HostComponent || tag === ScopeComponent) && dependencies !== null) {
+      if ((tag === HostComponent || tag === ScopeComponent) && dependencies !== null) {
         var respondersMap = dependencies.responders;
 
         if (respondersMap !== null) {
@@ -10515,7 +10512,6 @@
       case HostRoot:
       case HostComponent:
       case HostText:
-      case HostPortal:
       case Fragment:
       case ContextProvider:
       case ContextConsumer:
@@ -17937,10 +17933,6 @@
               break;
             }
 
-          case HostPortal:
-            pushHostContainer(workInProgress, workInProgress.stateNode.containerInfo);
-            break;
-
           case ContextProvider:
             {
               var newValue = workInProgress.memoizedProps.value;
@@ -18433,9 +18425,6 @@
           appendInitialChild(parent, node.stateNode);
         } else if (enableFundamentalAPI && node.tag === FundamentalComponent) {
           appendInitialChild(parent, node.stateNode.instance);
-        } else if (node.tag === HostPortal) {// If we have a portal child, then we don't want to traverse
-          // down its children. Instead, we'll get insertions from each child in
-          // the portal directly.
         } else if (node.child !== null) {
           node.child.return = node;
           node = node.child;
@@ -18538,9 +18527,6 @@
           }
 
           appendInitialChild(parent, _instance2);
-        } else if (node.tag === HostPortal) {// If we have a portal child, then we don't want to traverse
-          // down its children. Instead, we'll get insertions from each child in
-          // the portal directly.
         } else if (node.tag === SuspenseComponent) {
           if ((node.effectTag & Update) !== NoEffect) {
             // Need to toggle the visibility of the primary children.
@@ -18635,9 +18621,6 @@
           }
 
           appendChildToContainerChildSet(containerChildSet, _instance4);
-        } else if (node.tag === HostPortal) {// If we have a portal child, then we don't want to traverse
-          // down its children. Instead, we'll get insertions from each child in
-          // the portal directly.
         } else if (node.tag === SuspenseComponent) {
           if ((node.effectTag & Update) !== NoEffect) {
             // Need to toggle the visibility of the primary children.
@@ -19166,11 +19149,6 @@
       case Profiler:
         break;
 
-      case HostPortal:
-        popHostContainer(workInProgress);
-        updateHostContainer(workInProgress);
-        break;
-
       case ContextProvider:
         // Pop provider fiber
         popProvider(workInProgress);
@@ -19575,10 +19553,6 @@
           return null;
         }
 
-      case HostPortal:
-        popHostContainer(workInProgress);
-        return null;
-
       case ContextProvider:
         popProvider(workInProgress);
         return null;
@@ -19613,10 +19587,6 @@
           popHostContext(interruptedWork);
           break;
         }
-
-      case HostPortal:
-        popHostContainer(interruptedWork);
-        break;
 
       case SuspenseComponent:
         popSuspenseContext(interruptedWork);
@@ -19852,7 +19822,6 @@
       case HostRoot:
       case HostComponent:
       case HostText:
-      case HostPortal:
       case IncompleteClassComponent:
         // Nothing to do for these component types
         return;
@@ -20045,12 +20014,6 @@
       case HostText:
         {
           // We have no life-cycles associated with text.
-          return;
-        }
-
-      case HostPortal:
-        {
-          // We have no life-cycles associated with portals.
           return;
         }
 
@@ -20283,20 +20246,6 @@
           return;
         }
 
-      case HostPortal:
-        {
-          // TODO: this is recursive.
-          // We are also not using this parent because
-          // the portal will get pushed immediately.
-          if (supportsMutation) {
-            unmountHostComponents(finishedRoot, current$$1, renderPriorityLevel);
-          } else if (supportsPersistence) {
-            emptyPortalContainer(current$$1);
-          }
-
-          return;
-        }
-
       case FundamentalComponent:
         {
           if (enableFundamentalAPI) {
@@ -20397,17 +20346,6 @@
     }
   }
 
-  function emptyPortalContainer(current$$1) {
-    if (!supportsPersistence) {
-      return;
-    }
-
-    var portal = current$$1.stateNode;
-    var containerInfo = portal.containerInfo;
-    var emptyChildSet = createContainerChildSet(containerInfo);
-    replaceContainerChildren(containerInfo, emptyChildSet);
-  }
-
   function commitContainer(finishedWork) {
     if (!supportsPersistence) {
       return;
@@ -20423,7 +20361,6 @@
         }
 
       case HostRoot:
-      case HostPortal:
         {
           var portalOrRoot = finishedWork.stateNode;
           var containerInfo = portalOrRoot.containerInfo,
@@ -20462,7 +20399,7 @@
   }
 
   function isHostParent(fiber) {
-    return fiber.tag === HostComponent || fiber.tag === HostRoot || fiber.tag === HostPortal;
+    return fiber.tag === HostComponent || fiber.tag === HostRoot;
   }
 
   function getHostSibling(fiber) {
@@ -20494,10 +20431,8 @@
           // If we don't have a child, try the siblings instead.
           continue siblings;
         } // If we don't have a child, try the siblings instead.
-        // We also skip portals because they are not part of this host tree.
 
-
-        if (node.child === null || node.tag === HostPortal) {
+        if (node.child === null) {
           continue siblings;
         } else {
           node.child.return = node;
@@ -20532,11 +20467,6 @@
         break;
 
       case HostRoot:
-        parent = parentStateNode.containerInfo;
-        isContainer = true;
-        break;
-
-      case HostPortal:
         parent = parentStateNode.containerInfo;
         isContainer = true;
         break;
@@ -20589,9 +20519,6 @@
             appendChild(parent, stateNode);
           }
         }
-      } else if (node.tag === HostPortal) {// If the insertion itself is a portal, then we don't want to traverse
-        // down its children. Instead, we'll get insertions from each child in
-        // the portal directly.
       } else if (node.child !== null) {
         node.child.return = node;
         node = node.child;
@@ -20650,11 +20577,6 @@
               currentParentIsContainer = true;
               break findParent;
 
-            case HostPortal:
-              currentParent = parentStateNode.containerInfo;
-              currentParentIsContainer = true;
-              break findParent;
-
             case FundamentalComponent:
               if (enableFundamentalAPI) {
                 currentParent = parentStateNode.instance;
@@ -20708,17 +20630,6 @@
         } else {
           clearSuspenseBoundary(currentParent, node.stateNode);
         }
-      } else if (node.tag === HostPortal) {
-        if (node.child !== null) {
-          // When we go into a portal, it becomes the parent to remove from.
-          // We will reassign it back when we pop the portal on the way up.
-          currentParent = node.stateNode.containerInfo;
-          currentParentIsContainer = true; // Visit children because portals might contain host components.
-
-          node.child.return = node;
-          node = node.child;
-          continue;
-        }
       } else {
         commitUnmount(finishedRoot, node, renderPriorityLevel); // Visit children because we may find more host components below.
 
@@ -20739,12 +20650,6 @@
         }
 
         node = node.return;
-
-        if (node.tag === HostPortal) {
-          // When we go out of the portal, we need to restore the parent.
-          // Since we don't keep a stack of them, we will search for it.
-          currentParentIsValid = false;
-        }
       }
 
       node.sibling.return = node.return;
@@ -24451,19 +24356,6 @@
     fiber.expirationTime = expirationTime;
     return fiber;
   }
-  function createFiberFromPortal(portal, mode, expirationTime) {
-    var pendingProps = portal.children !== null ? portal.children : [];
-    var fiber = createFiber(HostPortal, pendingProps, portal.key, mode);
-    fiber.expirationTime = expirationTime;
-    fiber.stateNode = {
-      containerInfo: portal.containerInfo,
-      pendingChildren: null,
-      // Used by persistent updates
-      implementation: portal.implementation
-    };
-    return fiber;
-  } // Used for stashing WIP properties to replay failed work in DEV.
-
   function assignFiberPropertiesInDEV(target, source) {
     if (target === null) {
       // This Fiber's initial properties will always be overwritten.

@@ -4063,20 +4063,14 @@
   var attemptSynchronousHydration;
   var attemptUserBlockingHydration; 
   var attemptContinuousHydration;
-  var hasScheduledReplayAttempt = false; // The queue of discrete events to be replayed.
-
   var queuedDiscreteEvents = []; // Indicates if any continuous event targets are non-null for early bailout.
-
   // if the last target was dehydrated.
-
   var queuedFocus = null;
   var queuedDrag = null;
   var queuedMouse = null; // For pointer events there can be one latest event per pointerId.
-
   var queuedPointers = new Map();
   var queuedPointerCaptures = new Map(); // We could consider replaying selectionchange and touchmoves too.
 
-  var queuedExplicitHydrationTargets = [];
   function hasQueuedDiscreteEvents() {
     return queuedDiscreteEvents.length > 0;
   }
@@ -4273,34 +4267,6 @@
     return false;
   } // Check if this target is unblocked. Returns true if it's unblocked.
 
-  function attemptExplicitHydrationTarget(queuedTarget) {
-    // TODO: This function shares a lot of logic with attemptToDispatchEvent.
-    // Try to unify them. It's a bit tricky since it would require two return
-    // values.
-    var targetInst = getClosestInstanceFromNode(queuedTarget.target);
-
-    if (targetInst !== null) {
-      var nearestMounted = getNearestMountedFiber(targetInst);
-
-      if (nearestMounted !== null) {
-        var tag = nearestMounted.tag;
-
-        if (tag === HostRoot) {
-          var root = nearestMounted.stateNode;
-
-          if (root.hydrate) {
-            queuedTarget.blockedOn = getContainerFromFiber(nearestMounted); // We don't currently have a way to increase the priority of
-            // a root other than sync.
-
-            return;
-          }
-        }
-      }
-    }
-
-    queuedTarget.blockedOn = null;
-  }
-
   function attemptReplayContinuousQueuedEvent(queuedEvent) {
     if (queuedEvent.blockedOn !== null) {
       return false;
@@ -4330,8 +4296,6 @@
   }
 
   function replayUnblockedEvents() {
-    hasScheduledReplayAttempt = false; // First replay discrete events.
-
     while (queuedDiscreteEvents.length > 0) {
       var nextDiscreteEvent = queuedDiscreteEvents[0];
 
@@ -4374,81 +4338,6 @@
 
     queuedPointers.forEach(attemptReplayContinuousQueuedEventInMap);
     queuedPointerCaptures.forEach(attemptReplayContinuousQueuedEventInMap);
-  }
-
-  function scheduleCallbackIfUnblocked(queuedEvent, unblocked) {
-    if (queuedEvent.blockedOn === unblocked) {
-      queuedEvent.blockedOn = null;
-
-      if (!hasScheduledReplayAttempt) {
-        hasScheduledReplayAttempt = true; // Schedule a callback to attempt replaying as many events as are
-        // now unblocked. This first might not actually be unblocked yet.
-        // We could check it early to avoid scheduling an unnecessary callback.
-
-        unstable_scheduleCallback(unstable_NormalPriority, replayUnblockedEvents);
-      }
-    }
-  }
-
-  function retryIfBlockedOn(unblocked) {
-    // Mark anything that was blocked on this as no longer blocked
-    // and eligible for a replay.
-    if (queuedDiscreteEvents.length > 0) {
-      scheduleCallbackIfUnblocked(queuedDiscreteEvents[0], unblocked); // This is a exponential search for each boundary that commits. I think it's
-      // worth it because we expect very few discrete events to queue up and once
-      // we are actually fully unblocked it will be fast to replay them.
-
-      for (var i = 1; i < queuedDiscreteEvents.length; i++) {
-        var queuedEvent = queuedDiscreteEvents[i];
-
-        if (queuedEvent.blockedOn === unblocked) {
-          queuedEvent.blockedOn = null;
-        }
-      }
-    }
-
-    if (queuedFocus !== null) {
-      scheduleCallbackIfUnblocked(queuedFocus, unblocked);
-    }
-
-    if (queuedDrag !== null) {
-      scheduleCallbackIfUnblocked(queuedDrag, unblocked);
-    }
-
-    if (queuedMouse !== null) {
-      scheduleCallbackIfUnblocked(queuedMouse, unblocked);
-    }
-
-    var unblock = function (queuedEvent) {
-      return scheduleCallbackIfUnblocked(queuedEvent, unblocked);
-    };
-
-    queuedPointers.forEach(unblock);
-    queuedPointerCaptures.forEach(unblock);
-
-    for (var _i = 0; _i < queuedExplicitHydrationTargets.length; _i++) {
-      var queuedTarget = queuedExplicitHydrationTargets[_i];
-
-      if (queuedTarget.blockedOn === unblocked) {
-        queuedTarget.blockedOn = null;
-      }
-    }
-
-    while (queuedExplicitHydrationTargets.length > 0) {
-      var nextExplicitTarget = queuedExplicitHydrationTargets[0];
-
-      if (nextExplicitTarget.blockedOn !== null) {
-        // We're still blocked.
-        break;
-      } else {
-        attemptExplicitHydrationTarget(nextExplicitTarget);
-
-        if (nextExplicitTarget.blockedOn === null) {
-          // We're unblocked.
-          queuedExplicitHydrationTargets.shift();
-        }
-      }
-    }
   }
 
   function addEventBubbleListener(element, eventType, listener) {
@@ -8748,10 +8637,6 @@
   var cloneHiddenInstance = shim;
   var cloneHiddenTextInstance = shim;
 
-  var SUSPENSE_START_DATA = '$';
-  var SUSPENSE_END_DATA = '/$';
-  var SUSPENSE_PENDING_START_DATA = '$?';
-  var SUSPENSE_FALLBACK_START_DATA = '$!';
   var STYLE = 'style';
   var eventsEnabled = null;
   var selectionInformation = null;
@@ -8986,53 +8871,6 @@
       dispatchDetachedVisibleNodeEvent(child);
       container.removeChild(child);
     }
-  }
-  function clearSuspenseBoundary(parentInstance, suspenseInstance) {
-    var node = suspenseInstance; // Delete all nodes within this suspense boundary.
-    // There might be nested nodes so we need to keep track of how
-    // deep we are and only break out when we're back on top.
-
-    var depth = 0;
-
-    do {
-      var nextNode = node.nextSibling;
-      parentInstance.removeChild(node);
-
-      if (nextNode && nextNode.nodeType === COMMENT_NODE) {
-        var data = nextNode.data;
-
-        if (data === SUSPENSE_END_DATA) {
-          if (depth === 0) {
-            parentInstance.removeChild(nextNode); // Retry if any event replaying was blocked on this.
-
-            retryIfBlockedOn(suspenseInstance);
-            return;
-          } else {
-            depth--;
-          }
-        } else if (data === SUSPENSE_START_DATA || data === SUSPENSE_PENDING_START_DATA || data === SUSPENSE_FALLBACK_START_DATA) {
-          depth++;
-        }
-      }
-
-      node = nextNode;
-    } while (node); // TODO: Warn, we didn't find the end comment boundary.
-    // Retry if any event replaying was blocked on this.
-
-
-    retryIfBlockedOn(suspenseInstance);
-  }
-  function clearSuspenseBoundaryFromContainer(container, suspenseInstance) {
-    if (container.nodeType === COMMENT_NODE) {
-      clearSuspenseBoundary(container.parentNode, suspenseInstance);
-    } else if (container.nodeType === ELEMENT_NODE) {
-      clearSuspenseBoundary(container, suspenseInstance);
-      // eslint-disable-next-line no-empty
-    } else { } // Document nodes should never contain suspense boundaries.
-    // Retry if any event replaying was blocked on this.
-
-
-    retryIfBlockedOn(container);
   }
   function hideInstance(instance) {
     var style = instance.style;
@@ -12081,34 +11919,6 @@
       } else if (fiber.tag === ContextProvider) {
         // Don't scan deeper if this is a matching provider
         nextFiber = fiber.type === workInProgress.type ? null : fiber.child;
-      } else if (enableSuspenseServerRenderer && fiber.tag === DehydratedFragment) {
-        // If a dehydrated suspense bounudary is in this subtree, we don't know
-        // if it will have any context consumers in it. The best we can do is
-        // mark it as having updates.
-        var parentSuspense = fiber.return;
-
-        if (!(parentSuspense !== null)) {
-          {
-            throw Error("We just came from a parent so we must have had a parent. This is a bug in React.");
-          }
-        }
-
-        if (parentSuspense.expirationTime < renderExpirationTime) {
-          parentSuspense.expirationTime = renderExpirationTime;
-        }
-
-        var _alternate = parentSuspense.alternate;
-
-        if (_alternate !== null && _alternate.expirationTime < renderExpirationTime) {
-          _alternate.expirationTime = renderExpirationTime;
-        } // This is intentionally passing this fiber as the parent
-        // because we want to schedule this fiber as having work
-        // on its children. We'll use the childExpirationTime on
-        // this fiber to indicate that a context has changed.
-
-
-        scheduleWorkOnParentPath(parentSuspense, renderExpirationTime);
-        nextFiber = fiber.sibling;
       } else {
         // Traverse down.
         nextFiber = fiber.child;
@@ -20257,23 +20067,6 @@
           return;
         }
 
-      case DehydratedFragment:
-        {
-          if (enableSuspenseCallback) {
-            var hydrationCallbacks = finishedRoot.hydrationCallbacks;
-
-            if (hydrationCallbacks !== null) {
-              var onDeleted = hydrationCallbacks.onDeleted;
-
-              if (onDeleted) {
-                onDeleted(current$$1.stateNode);
-              }
-            }
-          }
-
-          return;
-        }
-
       case ScopeComponent:
         {
           if (enableScopeAPI) {
@@ -20607,25 +20400,6 @@
           removeChildFromContainer(currentParent, fundamentalNode);
         } else {
           removeChild(currentParent, fundamentalNode);
-        }
-      } else if (enableSuspenseServerRenderer && node.tag === DehydratedFragment) {
-        if (enableSuspenseCallback) {
-          var hydrationCallbacks = finishedRoot.hydrationCallbacks;
-
-          if (hydrationCallbacks !== null) {
-            var onDeleted = hydrationCallbacks.onDeleted;
-
-            if (onDeleted) {
-              onDeleted(node.stateNode);
-            }
-          }
-        } // Delete the dehydrated suspense boundary and all of its content.
-
-
-        if (currentParentIsContainer) {
-          clearSuspenseBoundaryFromContainer(currentParent, node.stateNode);
-        } else {
-          clearSuspenseBoundary(currentParent, node.stateNode);
         }
       } else {
         commitUnmount(finishedRoot, node, renderPriorityLevel); // Visit children because we may find more host components below.

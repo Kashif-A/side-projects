@@ -15330,7 +15330,7 @@ function findFirstSuspended(row) {
       if (state !== null) {
         var dehydrated = state.dehydrated;
 
-        if (dehydrated === null || isSuspenseInstancePending(dehydrated) || isSuspenseInstanceFallback(dehydrated)) {
+        if (dehydrated === null) {
           return node;
         }
       }
@@ -17120,30 +17120,6 @@ function insertNonHydratedInstance(returnFiber, fiber) {
 
   {
     switch (returnFiber.tag) {
-      case HostRoot:
-        {
-          var parentContainer = returnFiber.stateNode.containerInfo;
-
-          switch (fiber.tag) {
-            case HostComponent:
-              var type = fiber.type;
-              var props = fiber.pendingProps;
-              didNotFindHydratableContainerInstance(parentContainer, type, props);
-              break;
-
-            case HostText:
-              var text = fiber.pendingProps;
-              didNotFindHydratableContainerTextInstance(parentContainer, text);
-              break;
-
-            case SuspenseComponent:
-              
-              break;
-          }
-
-          break;
-        }
-
       case HostComponent:
         {
           var parentType = returnFiber.type;
@@ -17176,65 +17152,6 @@ function insertNonHydratedInstance(returnFiber, fiber) {
   }
 }
 
-function tryHydrate(fiber, nextInstance) {
-  switch (fiber.tag) {
-    case HostComponent:
-      {
-        var type = fiber.type;
-        var props = fiber.pendingProps;
-        var instance = canHydrateInstance(nextInstance, type, props);
-
-        if (instance !== null) {
-          fiber.stateNode = instance;
-          return true;
-        }
-
-        return false;
-      }
-
-    case HostText:
-      {
-        var text = fiber.pendingProps;
-        var textInstance = canHydrateTextInstance(nextInstance, text);
-
-        if (textInstance !== null) {
-          fiber.stateNode = textInstance;
-          return true;
-        }
-
-        return false;
-      }
-
-    case SuspenseComponent:
-      {
-        if (enableSuspenseServerRenderer) {
-          var suspenseInstance = canHydrateSuspenseInstance(nextInstance);
-
-          if (suspenseInstance !== null) {
-            var suspenseState = {
-              dehydrated: suspenseInstance,
-              retryTime: Never
-            };
-            fiber.memoizedState = suspenseState; // Store the dehydrated fragment as a child fiber.
-            // This simplifies the code for getHostSibling and deleting nodes,
-            // since it doesn't have to consider all Suspense boundaries and
-            // check if they're dehydrated ones or not.
-
-            var dehydratedFragment = createFiberFromDehydratedFragment(suspenseInstance);
-            dehydratedFragment.return = fiber;
-            fiber.child = dehydratedFragment;
-            return true;
-          }
-        }
-
-        return false;
-      }
-
-    default:
-      return false;
-  }
-}
-
 function tryToClaimNextHydratableInstance(fiber) {
   if (!isHydrating) {
     return;
@@ -17249,32 +17166,7 @@ function tryToClaimNextHydratableInstance(fiber) {
     hydrationParentFiber = fiber;
     return;
   }
-
-  var firstAttemptedInstance = nextInstance;
-
-  if (!tryHydrate(fiber, nextInstance)) {
-    // If we can't hydrate this instance let's try the next one.
-    // We use this as a heuristic. It's based on intuition and not data so it
-    // might be flawed or unnecessary.
-    nextInstance = getNextHydratableSibling(firstAttemptedInstance);
-
-    if (!nextInstance || !tryHydrate(fiber, nextInstance)) {
-      // Nothing to hydrate. Make it an insertion.
-      insertNonHydratedInstance(hydrationParentFiber, fiber);
-      isHydrating = false;
-      hydrationParentFiber = fiber;
-      return;
-    } // We matched the next one, we'll now assume that the first one was
-    // superfluous and we'll delete it. Since we can't eagerly delete it
-    // we'll have to schedule a deletion. To do that, this node needs a dummy
-    // fiber associated with it.
-
-
-    deleteHydratableInstance(hydrationParentFiber, firstAttemptedInstance);
-  }
-
   hydrationParentFiber = fiber;
-  nextHydratableInstance = getFirstHydratableChild(nextInstance);
 }
 
 function prepareToHydrateHostInstance(fiber, rootContainerInstance, hostContext) {
@@ -17423,11 +17315,6 @@ function popHydrationState(fiber) {
 
   if (fiber.tag !== HostComponent || type !== 'head' && type !== 'body' && !shouldSetTextContent(type, fiber.memoizedProps)) {
     var nextInstance = nextHydratableInstance;
-
-    while (nextInstance) {
-      deleteHydratableInstance(fiber, nextInstance);
-      nextInstance = getNextHydratableSibling(nextInstance);
-    }
   }
 
   popToNextHostParent(fiber);
@@ -18780,25 +18667,8 @@ function updateDehydratedSuspenseComponent(current$$1, workInProgress, suspenseI
 
     renderDidSuspendDelayIfPossible();
     return retrySuspenseComponentWithoutHydrating(current$$1, workInProgress, renderExpirationTime);
-  } else if (isSuspenseInstancePending(suspenseInstance)) {
-    // This component is still pending more data from the server, so we can't hydrate its
-    // content. We treat it as if this component suspended itself. It might seem as if
-    // we could just try to render it client-side instead. However, this will perform a
-    // lot of unnecessary work and is unlikely to complete since it often will suspend
-    // on missing data anyway. Additionally, the server might be able to render more
-    // than we can on the client yet. In that case we'd end up with more fallback states
-    // on the client than if we just leave it alone. If the server times out or errors
-    // these should update this boundary to the permanent Fallback state instead.
-    // Mark it as having captured (i.e. suspended).
-    workInProgress.effectTag |= DidCapture; // Leave the child in place. I.e. the dehydrated fragment.
-
-    workInProgress.child = current$$1.child; // Register a callback to retry this boundary once the server has sent the result.
-
-    registerSuspenseInstanceRetry(suspenseInstance, retryDehydratedSuspenseBoundary.bind(null, current$$1));
-    return null;
   } else {
     // This is the first attempt.
-    reenterHydrationStateFromDehydratedSuspenseInstance(workInProgress, suspenseInstance);
     var nextProps = workInProgress.pendingProps;
     var nextChildren = nextProps.children;
     var child = mountChildFibers(workInProgress, null, nextChildren, renderExpirationTime);
@@ -22318,21 +22188,6 @@ function commitWork(current$$1, finishedWork) {
           attachSuspenseRetryListeners(finishedWork);
           return;
         }
-
-      case HostRoot:
-        {
-          if (supportsHydration) {
-            var root = finishedWork.stateNode;
-
-            if (root.hydrate) {
-              // We've just hydrated. No need to hydrate again.
-              root.hydrate = false;
-              commitHydratedContainer(root.containerInfo);
-            }
-          }
-
-          break;
-        }
     }
 
     commitContainer(finishedWork);
@@ -22404,21 +22259,6 @@ function commitWork(current$$1, finishedWork) {
 
         var oldText = current$$1 !== null ? current$$1.memoizedProps : newText;
         commitTextUpdate(textInstance, oldText, newText);
-        return;
-      }
-
-    case HostRoot:
-      {
-        if (supportsHydration) {
-          var _root = finishedWork.stateNode;
-
-          if (_root.hydrate) {
-            // We've just hydrated. No need to hydrate again.
-            _root.hydrate = false;
-            commitHydratedContainer(_root.containerInfo);
-          }
-        }
-
         return;
       }
 
@@ -22540,7 +22380,6 @@ function commitSuspenseHydrationCallbacks(finishedRoot, finishedWork) {
         var suspenseInstance = prevState.dehydrated;
 
         if (suspenseInstance !== null) {
-          commitHydratedSuspenseInstance(suspenseInstance);
 
           if (enableSuspenseCallback) {
             var hydrationCallbacks = finishedRoot.hydrationCallbacks;

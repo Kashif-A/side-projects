@@ -9,6 +9,6 @@ const Child = () => {
   )
 }
 
-const App = () => <Child />
+const App = () => 'TEST'
 
 ReactDOM.render(<App />, document.getElementById('app'))

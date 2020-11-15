@@ -15979,29 +15979,10 @@
     hydrationParentFiber = fiber;
   }
 
-  function prepareToHydrateHostSuspenseInstance(fiber) {
-    if (!supportsHydration) {
-      {
-        {
-          throw Error("Expected prepareToHydrateHostSuspenseInstance() to never be called. This error is likely caused by a bug in React. Please file an issue.");
-        }
-      }
-    }
-
-    var suspenseState = fiber.memoizedState;
-    var suspenseInstance = suspenseState !== null ? suspenseState.dehydrated : null;
-
-    if (!suspenseInstance) {
-      {
-        throw Error("Expected to have a hydrated suspense instance. This error is likely caused by a bug in React. Please file an issue.");
-      }
-    }
-  }
-
   function popToNextHostParent(fiber) {
     var parent = fiber.return;
 
-    while (parent !== null && parent.tag !== HostComponent && parent.tag !== HostRoot && parent.tag !== SuspenseComponent) {
+    while (parent !== null && parent.tag !== HostComponent && parent.tag !== HostRoot) {
       parent = parent.return;
     }
 
@@ -17065,116 +17046,6 @@
       renderState.tailMode = tailMode;
       renderState.lastEffect = lastEffectBeforeRendering;
     }
-  } // This can end up rendering this component multiple passes.
-  // The first pass splits the children fibers into two sets. A head and tail.
-  // We first render the head. If anything is in fallback state, we do another
-  // pass through beginWork to rerender all children (including the tail) with
-  // the force suspend context. If the first render didn't have anything in
-  // in fallback state. Then we render each row in the tail one-by-one.
-  // That happens in the completeWork phase without going back to beginWork.
-
-
-  function updateSuspenseListComponent(current$$1, workInProgress, renderExpirationTime) {
-    var nextProps = workInProgress.pendingProps;
-    var revealOrder = nextProps.revealOrder;
-    var tailMode = nextProps.tail;
-    var newChildren = nextProps.children;
-    validateRevealOrder(revealOrder);
-    validateTailOptions(tailMode, revealOrder);
-    validateSuspenseListChildren(newChildren, revealOrder);
-    reconcileChildren(current$$1, workInProgress, newChildren, renderExpirationTime);
-    var suspenseContext = suspenseStackCursor.current;
-    var shouldForceFallback = hasSuspenseContext(suspenseContext, ForceSuspenseFallback);
-
-    if (shouldForceFallback) {
-      suspenseContext = setShallowSuspenseContext(suspenseContext, ForceSuspenseFallback);
-      workInProgress.effectTag |= DidCapture;
-    } else {
-      var didSuspendBefore = current$$1 !== null && (current$$1.effectTag & DidCapture) !== NoEffect;
-
-      if (didSuspendBefore) {
-        // If we previously forced a fallback, we need to schedule work
-        // on any nested boundaries to let them know to try to render
-        // again. This is the same as context updating.
-        propagateSuspenseContextChange(workInProgress, workInProgress.child, renderExpirationTime);
-      }
-
-      suspenseContext = setDefaultShallowSuspenseContext(suspenseContext);
-    }
-
-    pushSuspenseContext(workInProgress, suspenseContext);
-
-    if ((workInProgress.mode & BlockingMode) === NoMode) {
-      // Outside of blocking mode, SuspenseList doesn't work so we just
-      // use make it a noop by treating it as the default revealOrder.
-      workInProgress.memoizedState = null;
-    } else {
-      switch (revealOrder) {
-        case 'forwards':
-          {
-            var lastContentRow = findLastContentRow(workInProgress.child);
-            var tail;
-
-            if (lastContentRow === null) {
-              // The whole list is part of the tail.
-              // TODO: We could fast path by just rendering the tail now.
-              tail = workInProgress.child;
-              workInProgress.child = null;
-            } else {
-              // Disconnect the tail rows after the content row.
-              // We're going to render them separately later.
-              tail = lastContentRow.sibling;
-              lastContentRow.sibling = null;
-            }
-
-            initSuspenseListRenderState(workInProgress, false, // isBackwards
-              tail, lastContentRow, tailMode, workInProgress.lastEffect);
-            break;
-          }
-
-        case 'backwards':
-          {
-            // We're going to find the first row that has existing content.
-            // At the same time we're going to reverse the list of everything
-            // we pass in the meantime. That's going to be our tail in reverse
-            // order.
-            var _tail = null;
-            var row = workInProgress.child;
-            workInProgress.child = null;
-
-            while (row !== null) {
-              var nextRow = row.sibling;
-              row.sibling = _tail;
-              _tail = row;
-              row = nextRow;
-            } // TODO: If workInProgress.child is null, we can continue on the tail immediately.
-
-
-            initSuspenseListRenderState(workInProgress, true, // isBackwards
-              _tail, null, // last
-              tailMode, workInProgress.lastEffect);
-            break;
-          }
-
-        case 'together':
-          {
-            initSuspenseListRenderState(workInProgress, false, // isBackwards
-              null, // tail
-              null, // last
-              undefined, workInProgress.lastEffect);
-            break;
-          }
-
-        default:
-          {
-            // The default reveal order is the same as not having
-            // a boundary.
-            workInProgress.memoizedState = null;
-          }
-      }
-    }
-
-    return workInProgress.child;
   }
 
   function updateContextProvider(current$$1, workInProgress, renderExpirationTime) {
@@ -17574,11 +17445,6 @@
           return mountIncompleteClassComponent(current$$1, workInProgress, _Component3, _resolvedProps4, renderExpirationTime);
         }
 
-      case SuspenseListComponent:
-        {
-          return updateSuspenseListComponent(current$$1, workInProgress, renderExpirationTime);
-        }
-
       case FundamentalComponent:
         {
           if (enableFundamentalAPI) {
@@ -17632,11 +17498,6 @@
       }
 
       var child = node.child;
-
-      if (isFiberSuspenseAndTimedOut(node)) {
-        child = getSuspenseFallbackChild(node);
-      }
-
       if (child !== null) {
         collectScopedNodesFromChildren(child, fn, scopedNodes);
       }
@@ -17658,11 +17519,6 @@
       }
 
       var child = node.child;
-
-      if (isFiberSuspenseAndTimedOut(node)) {
-        child = getSuspenseFallbackChild(node);
-      }
-
       if (child !== null) {
         return collectFirstScopedNodeFromChildren(child, fn);
       }
@@ -17701,11 +17557,6 @@
       childrenScopes.push(node.stateNode.methods);
     } else {
       var child = node.child;
-
-      if (isFiberSuspenseAndTimedOut(node)) {
-        child = getSuspenseFallbackChild(node);
-      }
-
       if (child !== null) {
         collectNearestChildScopeMethods(child, scope, childrenScopes);
       }
@@ -18497,14 +18348,6 @@
           break;
         }
 
-      case SuspenseComponent:
-        popSuspenseContext(interruptedWork);
-        break;
-
-      case SuspenseListComponent:
-        popSuspenseContext(interruptedWork);
-        break;
-
       case ContextProvider:
         popProvider(interruptedWork);
         break;
@@ -18592,7 +18435,6 @@
     didWarnAboutUndefinedSnapshotBeforeUpdate = new Set();
   }
 
-  var PossiblyWeakSet = typeof WeakSet === 'function' ? WeakSet : Set;
   function logError(boundary, errorInfo) {
     var source = errorInfo.source;
     var stack = errorInfo.stack;
@@ -18943,13 +18785,6 @@
           return;
         }
 
-      case SuspenseComponent:
-        {
-          commitSuspenseHydrationCallbacks(finishedRoot, finishedWork);
-          return;
-        }
-
-      case SuspenseListComponent:
       case IncompleteClassComponent:
       case FundamentalComponent:
       case ScopeComponent:
@@ -18963,60 +18798,6 @@
             }
           }
         }
-    }
-  }
-
-  function hideOrUnhideAllChildren(finishedWork, isHidden) {
-    if (supportsMutation) {
-      // We only have the top Fiber that was inserted but we need to recurse down its
-      // children to find all the terminal nodes.
-      var node = finishedWork;
-
-      while (true) {
-        if (node.tag === HostComponent) {
-          var instance = node.stateNode;
-
-          if (isHidden) {
-            hideInstance(instance);
-          } else {
-            unhideInstance(node.stateNode, node.memoizedProps);
-          }
-        } else if (node.tag === HostText) {
-          var _instance3 = node.stateNode;
-
-          if (isHidden) {
-            hideTextInstance(_instance3);
-          } else {
-            unhideTextInstance(_instance3, node.memoizedProps);
-          }
-        } else if (node.tag === SuspenseComponent && node.memoizedState !== null && node.memoizedState.dehydrated === null) {
-          // Found a nested Suspense component that timed out. Skip over the
-          // primary child fragment, which should remain hidden.
-          var fallbackChildFragment = node.child.sibling;
-          fallbackChildFragment.return = node;
-          node = fallbackChildFragment;
-          continue;
-        } else if (node.child !== null) {
-          node.child.return = node;
-          node = node.child;
-          continue;
-        }
-
-        if (node === finishedWork) {
-          return;
-        }
-
-        while (node.sibling === null) {
-          if (node.return === null || node.return === finishedWork) {
-            return;
-          }
-
-          node = node.return;
-        }
-
-        node.sibling.return = node.return;
-        node = node.sibling;
-      }
     }
   }
 
@@ -19561,19 +19342,6 @@
           {
             return;
           }
-
-        case SuspenseComponent:
-          {
-            commitSuspenseComponent(finishedWork);
-            attachSuspenseRetryListeners(finishedWork);
-            return;
-          }
-
-        case SuspenseListComponent:
-          {
-            attachSuspenseRetryListeners(finishedWork);
-            return;
-          }
       }
 
       commitContainer(finishedWork);
@@ -19653,19 +19421,6 @@
           return;
         }
 
-      case SuspenseComponent:
-        {
-          commitSuspenseComponent(finishedWork);
-          attachSuspenseRetryListeners(finishedWork);
-          return;
-        }
-
-      case SuspenseListComponent:
-        {
-          attachSuspenseRetryListeners(finishedWork);
-          return;
-        }
-
       case IncompleteClassComponent:
         {
           return;
@@ -19712,107 +19467,6 @@
             }
           }
         }
-    }
-  }
-
-  function commitSuspenseComponent(finishedWork) {
-    var newState = finishedWork.memoizedState;
-    var newDidTimeout;
-    var primaryChildParent = finishedWork;
-
-    if (newState === null) {
-      newDidTimeout = false;
-    } else {
-      newDidTimeout = true;
-      primaryChildParent = finishedWork.child;
-      markCommitTimeOfFallback();
-    }
-
-    if (supportsMutation && primaryChildParent !== null) {
-      hideOrUnhideAllChildren(primaryChildParent, newDidTimeout);
-    }
-
-    if (enableSuspenseCallback && newState !== null) {
-      var suspenseCallback = finishedWork.memoizedProps.suspenseCallback;
-
-      if (typeof suspenseCallback === 'function') {
-        var thenables = finishedWork.updateQueue;
-
-        if (thenables !== null) {
-          suspenseCallback(new Set(thenables));
-        }
-      } else {
-        if (suspenseCallback !== undefined) {
-          warning$1(false, 'Unexpected type for suspenseCallback.');
-        }
-      }
-    }
-  }
-
-  function commitSuspenseHydrationCallbacks(finishedRoot, finishedWork) {
-    if (!supportsHydration) {
-      return;
-    }
-
-    var newState = finishedWork.memoizedState;
-
-    if (newState === null) {
-      var current$$1 = finishedWork.alternate;
-
-      if (current$$1 !== null) {
-        var prevState = current$$1.memoizedState;
-
-        if (prevState !== null) {
-          var suspenseInstance = prevState.dehydrated;
-
-          if (suspenseInstance !== null) {
-
-            if (enableSuspenseCallback) {
-              var hydrationCallbacks = finishedRoot.hydrationCallbacks;
-
-              if (hydrationCallbacks !== null) {
-                var onHydrated = hydrationCallbacks.onHydrated;
-
-                if (onHydrated) {
-                  onHydrated(suspenseInstance);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  function attachSuspenseRetryListeners(finishedWork) {
-    // If this boundary just timed out, then it will have a set of thenables.
-    // For each thenable, attach a listener so that when it resolves, React
-    // attempts to re-render the boundary in the primary (pre-timeout) state.
-    var thenables = finishedWork.updateQueue;
-
-    if (thenables !== null) {
-      finishedWork.updateQueue = null;
-      var retryCache = finishedWork.stateNode;
-
-      if (retryCache === null) {
-        retryCache = finishedWork.stateNode = new PossiblyWeakSet();
-      }
-
-      thenables.forEach(function (thenable) {
-        // Memoize using the boundary fiber to prevent redundant listeners.
-        var retry = resolveRetryThenable.bind(null, finishedWork, thenable);
-
-        if (!retryCache.has(thenable)) {
-          if (enableSchedulerTracing) {
-            if (thenable.__reactDoNotTraceInteractions !== true) {
-              retry = unstable_wrap(retry);
-            }
-          }
-
-          retryCache.add(thenable);
-          thenable.then(retry, retry);
-        }
-      });
     }
   }
 
@@ -20051,10 +19705,6 @@
 
     var expirationTime;
 
-    if (suspenseConfig !== null) {
-      // Compute an expiration time based on the Suspense timeout.
-      expirationTime = computeSuspenseExpiration(currentTime, suspenseConfig.timeoutMs | 0 || LOW_PRIORITY_EXPIRATION);
-    } else {
       // Compute an expiration time based on the Scheduler priority.
       switch (priorityLevel) {
         case ImmediatePriority:
@@ -20085,7 +19735,7 @@
           }
 
       }
-    } // If we're in the middle of rendering a tree, do not update at the same
+    // If we're in the middle of rendering a tree, do not update at the same
     // expiration time that is already rendering.
     // TODO: We shouldn't have to do this if the update is on a different root.
     // Refactor computeExpirationForFiber + scheduleUpdate so we have access to
@@ -20899,9 +20549,6 @@
     }
   }
 
-  function markCommitTimeOfFallback() {
-    globalMostRecentFallbackTime = now();
-  }
   function markRenderEventTimeAndConfig(expirationTime, suspenseConfig) {
     if (expirationTime < workInProgressRootLatestProcessedExpirationTime && expirationTime > Idle) {
       workInProgressRootLatestProcessedExpirationTime = expirationTime;
@@ -20920,26 +20567,7 @@
       workInProgressRootNextUnprocessedUpdateTime = expirationTime;
     }
   }
-  function renderDidSuspend() {
-    if (workInProgressRootExitStatus === RootIncomplete) {
-      workInProgressRootExitStatus = RootSuspended;
-    }
-  }
-  function renderDidSuspendDelayIfPossible() {
-    if (workInProgressRootExitStatus === RootIncomplete || workInProgressRootExitStatus === RootSuspended) {
-      workInProgressRootExitStatus = RootSuspendedWithDelay;
-    } // Check if there's a lower priority update somewhere else in the tree.
 
-
-    if (workInProgressRootNextUnprocessedUpdateTime !== NoWork && workInProgressRoot !== null) {
-      // Mark the current render as suspended, and then mark that there's a
-      // pending update.
-      // TODO: This should immediately interrupt the current render, instead
-      // of waiting until the next time we yield.
-      markRootSuspendedAtTime(workInProgressRoot, renderExpirationTime);
-      markRootUpdatedAtTime(workInProgressRoot, workInProgressRootNextUnprocessedUpdateTime);
-    }
-  }
   function renderDidError() {
     if (workInProgressRootExitStatus !== RootCompleted) {
       workInProgressRootExitStatus = RootErrored;
@@ -21782,68 +21410,6 @@
       fiber = fiber.return;
     }
   }
-  function retryTimedOutBoundary(boundaryFiber, retryTime) {
-    // The boundary fiber (a Suspense component or SuspenseList component)
-    // previously was rendered in its fallback state. One of the promises that
-    // suspended it has resolved, which means at least part of the tree was
-    // likely unblocked. Try rendering again, at a new expiration time.
-    if (retryTime === NoWork) {
-      var suspenseConfig = null; // Retries don't carry over the already committed update.
-
-      var currentTime = requestCurrentTimeForUpdate();
-      retryTime = computeExpirationForFiber(currentTime, boundaryFiber, suspenseConfig);
-    } // TODO: Special case idle priority?
-
-
-    var root = markUpdateTimeFromFiberToRoot(boundaryFiber, retryTime);
-
-    if (root !== null) {
-      ensureRootIsScheduled(root);
-      schedulePendingInteractions(root, retryTime);
-    }
-  }
-  function resolveRetryThenable(boundaryFiber, thenable) {
-    var retryTime = NoWork; // Default
-
-    var retryCache;
-
-    if (enableSuspenseServerRenderer) {
-      switch (boundaryFiber.tag) {
-        case SuspenseComponent:
-          retryCache = boundaryFiber.stateNode;
-          var suspenseState = boundaryFiber.memoizedState;
-
-          if (suspenseState !== null) {
-            retryTime = suspenseState.retryTime;
-          }
-
-          break;
-
-        case SuspenseListComponent:
-          retryCache = boundaryFiber.stateNode;
-          break;
-
-        default:
-          {
-            {
-              throw Error("Pinged unknown suspense boundary type. This is probably a bug in React.");
-            }
-          }
-
-      }
-    } else {
-      retryCache = boundaryFiber.stateNode;
-    }
-
-    if (retryCache !== null) {
-      // The thenable resolved, so we no longer need to memoize, because it will
-      // never be thrown again.
-      retryCache.delete(thenable);
-    }
-
-    retryTimedOutBoundary(boundaryFiber, retryTime);
-  }
-
   function computeMsUntilSuspenseLoadingDelay(mostRecentEventTime, committedExpirationTime, suspenseConfig) {
     var busyMinDurationMs = suspenseConfig.busyMinDurationMs | 0;
 

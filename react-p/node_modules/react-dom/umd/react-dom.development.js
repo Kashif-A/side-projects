@@ -1,14 +1,5 @@
-/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-constant-condition */
-/** @license React v16.12.0
- * react-dom.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
+/* eslint-disable no-prototype-builtins */
 'use strict';
 
 (function (global, factory) {
@@ -16,27 +7,6 @@
 	typeof define === 'function' && define.amd ? define(['react'], factory) :
 	(global.ReactDOM = factory(global.React));
 }(this, (function (React) { 'use strict';
-
-// Do not require this module directly! Use normal `invariant` calls with
-// template literal strings. The messages will be replaced with error codes
-// during build.
-
-/**
- * Use invariant() to assert state which your program assumes to be true.
- *
- * Provide sprintf-style format (only %s is supported) and arguments
- * to provide information about what broke and what you were
- * expecting.
- *
- * The invariant message will be stripped in production, but the invariant
- * will remain to ensure logic does not differ in production.
- */
-
-if (!React) {
-  {
-    throw Error("ReactDOM was loaded before React. Make sure you load the React package before loading ReactDOM.");
-  }
-}
 
 /**
  * Injectable ordering of event plugins.
@@ -250,7 +220,7 @@ function injectEventPluginsByName(injectedNamesToPlugins) {
   }
 }
 
-var invokeGuardedCallbackImpl = function (name, func, context, a, b, c, d, e, f) {
+var invokeGuardedCallbackImpl = function (name, func, context) {
   var funcArgs = Array.prototype.slice.call(arguments, 3);
 
   try {
@@ -284,7 +254,7 @@ var invokeGuardedCallbackImpl = function (name, func, context, a, b, c, d, e, f)
   if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function' && typeof document !== 'undefined' && typeof document.createEvent === 'function') {
     var fakeNode = document.createElement('react');
 
-    var invokeGuardedCallbackDev = function (name, func, context, a, b, c, d, e, f) {
+    var invokeGuardedCallbackDev = function (name, func, context) {
       // If document doesn't exist we know for sure we will crash in this method
       // when we call document.createEvent(). However this can cause confusing
       // errors: https://github.com/facebookincubator/create-react-app/issues/3482
@@ -430,7 +400,7 @@ var reporter = {
  * @param {...*} args Arguments for function
  */
 
-function invokeGuardedCallback(name, func, context, a, b, c, d, e, f) {
+function invokeGuardedCallback() {
   hasError = false;
   caughtError = null;
   invokeGuardedCallbackImpl$1.apply(reporter, arguments);
@@ -446,7 +416,7 @@ function invokeGuardedCallback(name, func, context, a, b, c, d, e, f) {
  * @param {...*} args Arguments for function
  */
 
-function invokeGuardedCallbackAndCatchFirstError(name, func, context, a, b, c, d, e, f) {
+function invokeGuardedCallbackAndCatchFirstError() {
   invokeGuardedCallback.apply(this, arguments);
 
   if (hasError) {
@@ -21019,13 +20989,11 @@ if (supportsMutation) {
   };
 } else {
   // No host operations
-  updateHostContainer = function (workInProgress) {};
+  updateHostContainer = function () {};
 
-  updateHostComponent$1 = function (current, workInProgress, type, newProps, rootContainerInstance) {// Noop
-  };
+  updateHostComponent$1 = function () {};
 
-  updateHostText$1 = function (current, workInProgress, oldText, newText) {// Noop
-  };
+  updateHostText$1 = function () {};
 }
 
 function cutOffTailIfNeeded(renderState, hasRenderedATailFallback) {

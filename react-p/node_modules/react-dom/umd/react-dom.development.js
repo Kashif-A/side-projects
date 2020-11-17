@@ -1262,9 +1262,6 @@
   var warnAboutUnmockedScheduler = false; // For tests, we flush suspense fallbacks in an act scope;
   // *except* in some of our own tests, where we test incremental loading states.
   var flushSuspenseFallbacksInTests = true; // Add a callback property to suspense to notify which promises are currently
-  // in the update queue. This allows reporting and tracing of what is causing
-  // the user to see a loading state.
-  var enableSuspenseCallback = false; // Part of the simplification of React.createElement so we can eventually move
   // from React.createElement to React.jsx
   // https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
   var warnAboutDefaultPropsOnFunctionComponents = false;
@@ -3642,9 +3639,6 @@
 
   function get(key) {
     return key._reactInternalFiber;
-  }
-  function has$1(key) {
-    return key._reactInternalFiber !== undefined;
   }
   function set(key, value) {
     key._reactInternalFiber = value;
@@ -21011,14 +21005,12 @@
     if (nestedUpdateCount > NESTED_UPDATE_LIMIT) {
       nestedUpdateCount = 0;
       rootWithNestedUpdates = null;
-
       {
         {
           throw Error("Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.");
         }
       }
     }
-
     {
       if (nestedPassiveUpdateCount > NESTED_PASSIVE_UPDATE_LIMIT) {
         nestedPassiveUpdateCount = 0;
@@ -21856,7 +21848,7 @@
     return target;
   }
 
-  function FiberRootNode(containerInfo, tag, hydrate) {
+  function FiberRootNode(containerInfo, tag) {
     this.tag = tag;
     this.current = null;
     this.containerInfo = containerInfo;
@@ -21867,7 +21859,6 @@
     this.timeoutHandle = noTimeout;
     this.context = null;
     this.pendingContext = null;
-    this.hydrate = hydrate;
     this.callbackNode = null;
     this.callbackPriority = NoPriority;
     this.firstPendingTime = NoWork;
@@ -21884,14 +21875,8 @@
     }
   }
 
-  function createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks) {
-    var root = new FiberRootNode(containerInfo, tag, hydrate);
-
-    if (enableSuspenseCallback) {
-      root.hydrationCallbacks = hydrationCallbacks;
-    } // Cyclic construction. This cheats the type system right now because
-    // stateNode is any.
-
+  function createFiberRoot(containerInfo, tag) {
+    var root = new FiberRootNode(containerInfo, tag);
 
     var uninitializedFiber = createHostRootFiber(tag);
     root.current = uninitializedFiber;
@@ -22063,8 +22048,8 @@
     }
   }
 
-  function createContainer(containerInfo, tag, hydrate, hydrationCallbacks) {
-    return createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks);
+  function createContainer(containerInfo, tag) {
+    return createFiberRoot(containerInfo, tag);
   }
   function updateContainer(element, container, parentComponent, callback) {
     var current$$1 = container.current;
@@ -22195,18 +22180,10 @@
     });
   };
 
-  function createRootImpl(container, tag, options) {
+  function createRootImpl(container, tag) {
     // Tag is either LegacyRoot or Concurrent Root
-    var hydrate = options != null && options.hydrate === true;
-    var hydrationCallbacks = options != null && options.hydrationOptions || null;
-    var root = createContainer(container, tag, hydrate, hydrationCallbacks);
+    var root = createContainer(container, tag);
     markContainerAsRoot(root.current, container);
-
-    if (hydrate && tag !== LegacyRoot) {
-      var doc = container.nodeType === DOCUMENT_NODE ? container : container.ownerDocument;
-      eagerlyTrapReplayableEvents(doc);
-    }
-
     return root;
   }
 

@@ -1,6 +1,8 @@
 import React from 'react'
 
-import { Box, HamburgerIcon, HStack, Image, SearchIcon, VStack } from 'native-base'
+import { Box, HamburgerIcon, HStack, Image, SearchIcon, View, VStack } from 'native-base'
+
+import Slider from './Slider'
 
 const Header = () =>
   <>
@@ -17,6 +19,9 @@ const Header = () =>
         </Box>
       </HStack>
     </VStack>
+
+    <Slider />
+
     <Box
       position='absolute'
       bottom={0}

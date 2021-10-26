@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import Home from './src/views/Home'
 import Header from './src/components/Header'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ActivityIndicator } from 'react-native'
 
 export interface News<T = string> {

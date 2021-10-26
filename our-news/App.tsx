@@ -14,19 +14,21 @@ import { ActivityIndicator, TouchableOpacity } from 'react-native'
 import { BookmarkIcon } from './src/svgs/BookmarkIcon'
 import { NewsIcon } from './src/svgs/NewsIcon'
 import { LatestNewsIcon } from './src/svgs/LatestNews'
+import BookmarksWrapper from './src/components/BookmarksWrapper'
+import Bookmarks from './src/views/Bookmarks'
 
-export interface News<T = string> {
+export interface News {
   source: {
-    id: T
-    name: T
+    id: string
+    name: string
   }
-  author: T
-  title: T
-  description: T
-  url: T
-  urlToImage: T
-  publishedAt: T
-  content: T
+  author: string
+  title: string
+  description: string
+  url: string
+  urlToImage: string
+  publishedAt: string
+  content: string
 }
 
 const theme = extendTheme({
@@ -88,45 +90,48 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <NativeBaseProvider theme={theme}>
-        <NavigationContainer>
-          <Tab.Navigator screenOptions={{
-            header: () => <Header />
-          }}>
-            <Tab.Screen
-              name='Latest News'
-              options={{
-                tabBarIcon: () =>
-                  <TouchableOpacity>
-                    <Box padding='2.5'>
-                      <LatestNewsIcon />
-                    </Box>
-                  </TouchableOpacity>
-              }}
-              component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
-            <Tab.Screen
-              name={'Today\'s Paper'}
-              options={{
-                tabBarIcon: () =>
-                  <TouchableOpacity>
-                    <Box padding='2.5'>
-                      <NewsIcon />
-                    </Box>
-                  </TouchableOpacity>
-              }}
-              component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
-            <Tab.Screen
-              name='Saved'
-              options={{
-                tabBarIcon: () =>
-                  <TouchableOpacity>
-                    <Box padding='2.5'>
-                      <BookmarkIcon />
-                    </Box>
-                  </TouchableOpacity>
-              }}
-              component={() => <View style={{ padding: 20, backgroundColor: 'green' }} />} />
-          </Tab.Navigator>
-        </NavigationContainer>
+        <BookmarksWrapper>
+          {(news) =>
+            <NavigationContainer>
+              <Tab.Navigator screenOptions={{
+                header: () => <Header />
+              }}>
+                <Tab.Screen
+                  name='Latest News'
+                  options={{
+                    tabBarIcon: () =>
+                      <TouchableOpacity>
+                        <Box padding='2.5'>
+                          <LatestNewsIcon />
+                        </Box>
+                      </TouchableOpacity>
+                  }}
+                  component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
+                <Tab.Screen
+                  name={'Today\'s Paper'}
+                  options={{
+                    tabBarIcon: () =>
+                      <TouchableOpacity>
+                        <Box padding='2.5'>
+                          <NewsIcon />
+                        </Box>
+                      </TouchableOpacity>
+                  }}
+                  component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
+                <Tab.Screen
+                  name='Saved'
+                  options={{
+                    tabBarIcon: () =>
+                      <TouchableOpacity>
+                        <Box padding='2.5'>
+                          <BookmarkIcon />
+                        </Box>
+                      </TouchableOpacity>
+                  }}
+                  component={() => <Bookmarks news={news} />} />
+              </Tab.Navigator>
+            </NavigationContainer>}
+        </BookmarksWrapper>
       </NativeBaseProvider>
     </SafeAreaProvider>
   )

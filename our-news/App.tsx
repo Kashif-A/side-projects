@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  Box,
   extendTheme,
   NativeBaseProvider, View
 } from 'native-base'
@@ -9,7 +10,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Home from './src/views/Home'
 import Header from './src/components/Header'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, TouchableOpacity } from 'react-native'
+import { BookmarkIcon } from './src/svgs/BookmarkIcon'
+import { NewsIcon } from './src/svgs/NewsIcon'
+import { LatestNewsIcon } from './src/svgs/LatestNews'
 
 export interface News<T = string> {
   source: {
@@ -88,10 +92,39 @@ const App = () => {
           <Tab.Navigator screenOptions={{
             header: () => <Header />
           }}>
-            <Tab.Screen name='Latest News' component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
-            <Tab.Screen name={'Today\'s Paper'} component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
-            <Tab.Screen name='Saved' component={() => <View style={{ padding: 20, backgroundColor: 'green' }} />} />
-            <Tab.Screen name='Notifications' component={() => <View style={{ padding: 20, backgroundColor: 'orange' }} />} />
+            <Tab.Screen
+              name='Latest News'
+              options={{
+                tabBarIcon: () =>
+                  <TouchableOpacity>
+                    <Box padding='2.5'>
+                      <LatestNewsIcon />
+                    </Box>
+                  </TouchableOpacity>
+              }}
+              component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
+            <Tab.Screen
+              name={'Today\'s Paper'}
+              options={{
+                tabBarIcon: () =>
+                  <TouchableOpacity>
+                    <Box padding='2.5'>
+                      <NewsIcon />
+                    </Box>
+                  </TouchableOpacity>
+              }}
+              component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
+            <Tab.Screen
+              name='Saved'
+              options={{
+                tabBarIcon: () =>
+                  <TouchableOpacity>
+                    <Box padding='2.5'>
+                      <BookmarkIcon />
+                    </Box>
+                  </TouchableOpacity>
+              }}
+              component={() => <View style={{ padding: 20, backgroundColor: 'green' }} />} />
           </Tab.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>

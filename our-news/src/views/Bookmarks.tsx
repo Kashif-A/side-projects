@@ -11,7 +11,6 @@ import { News } from '../../App'
 
 import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import NewsCard from '../components/NewsCard'
-import { bookmark } from './Home'
 
 export interface HomeProps {
   bookmarkedNews: News[]
@@ -29,10 +28,10 @@ export default ({ bookmarkedNews, setBookmarkedNews }: HomeProps) => {
         {bookmarkedNews.map(b =>
           <NewsCard
             {...b}
-            bookmarkedNews={bookmarkedNews}
-            bookmark={(add) => bookmark(add, b, bookmarkedNews, setBookmarkedNews)}
             isBookmarked={true}
+            bookmarkedNews={bookmarkedNews}
             key={`${b.title}${b.source.id}`}
+            setBookmarkedNews={setBookmarkedNews}
           />)}
       </ScrollView>
     )

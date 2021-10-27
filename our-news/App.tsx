@@ -113,7 +113,7 @@ const App = () => {
                       setBookmarkedNews={setBookmarkedNews}
                       bookmarkedNews={bookmarkedNews} />
                     : <ActivityIndicator />} />
-                <Tab.Screen
+                {/* <Tab.Screen
                   name={'Today\'s Paper'}
                   options={{
                     tabBarLabel: () => renderLabel('Today\'s Paper'),
@@ -124,7 +124,7 @@ const App = () => {
                       newsData={newsData}
                       setBookmarkedNews={setBookmarkedNews}
                       bookmarkedNews={bookmarkedNews} />
-                    : <ActivityIndicator />} />
+                    : <ActivityIndicator />} /> */}
                 <Tab.Screen
                   name='Saved'
                   options={{

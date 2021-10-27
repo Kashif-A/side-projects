@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 export interface CardProps extends News {
   isBookmarked: boolean
   bookmarkedNews: News[]
-  bookmark: (add: boolean) => void
+  setBookmarkedNews: any
 }
 
 const NewsCard = ({
@@ -25,7 +25,7 @@ const NewsCard = ({
   urlToImage,
   publishedAt,
   isBookmarked,
-  bookmark,
+  setBookmarkedNews,
   bookmarkedNews,
   ...rest
 }: CardProps) => {
@@ -42,7 +42,6 @@ const NewsCard = ({
       if (bookmarked) {
         payload = payload.filter(p => p.title !== title)
         await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))
-        bookmark(false)
         setBookmarked(false)
       } else {
         payload.push({
@@ -53,7 +52,6 @@ const NewsCard = ({
           ...rest
         })
         await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))
-        bookmark(true)
         setBookmarked(true)
       }
     } else {
@@ -64,9 +62,9 @@ const NewsCard = ({
         publishedAt,
         ...rest
       }]))
-      bookmark(true)
       setBookmarked(true)
     }
+    setBookmarkedNews(payload)
   }
 
   const date = new Date(publishedAt)

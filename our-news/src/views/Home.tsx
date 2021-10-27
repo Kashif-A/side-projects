@@ -13,7 +13,7 @@ export interface HomeProps {
 }
 
 export const bookmark = (add: boolean, item: News, bookmarkedNews: News[], setBookmarkedNews: (payload: News[]) => void) => {
-  const payload = add ? { ...bookmarkedNews, ...item } : bookmarkedNews.filter(b => b.title !== item.title)
+  const payload = add ? [{ ...bookmarkedNews, ...item }] : bookmarkedNews.filter(b => b.title !== item.title)
   setBookmarkedNews(payload)
 }
 

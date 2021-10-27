@@ -10,13 +10,12 @@ export interface BookmarksWrapperProps {
 
 export default ({ children }: BookmarksWrapperProps) => {
   const [bookmarkedNews, setBookmarkedNews] = React.useState<News[]>([])
-  console.log('bookmarkedNews:  ', bookmarkedNews)
   React.useEffect(() => {
     AsyncStorage.removeItem('our-news-bookmarks')
     AsyncStorage.getItem('our-news-bookmarks')
       .then(nb => nb && setBookmarkedNews(JSON.parse(nb)))
       .catch()
-  }, [bookmarkedNews])
+  }, [])
 
   return (
     <Box flex={1}>

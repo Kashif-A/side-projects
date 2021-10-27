@@ -4,13 +4,13 @@ import {
   extendTheme,
   NativeBaseProvider, View
 } from 'native-base'
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer, useNavigation } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import Home from './src/views/Home'
 import Header from './src/components/Header'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { ActivityIndicator, TouchableOpacity } from 'react-native'
+import { ActivityIndicator } from 'react-native'
 import { BookmarkIcon } from './src/svgs/BookmarkIcon'
 import { NewsIcon } from './src/svgs/NewsIcon'
 import { LatestNewsIcon } from './src/svgs/LatestNews'
@@ -100,33 +100,27 @@ const App = () => {
                   name='Latest News'
                   options={{
                     tabBarIcon: () =>
-                      <TouchableOpacity>
-                        <Box padding='2.5'>
-                          <LatestNewsIcon />
-                        </Box>
-                      </TouchableOpacity>
+                      <Box padding='2.5'>
+                        <LatestNewsIcon />
+                      </Box>
                   }}
                   component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
                 <Tab.Screen
                   name={'Today\'s Paper'}
                   options={{
                     tabBarIcon: () =>
-                      <TouchableOpacity>
-                        <Box padding='2.5'>
-                          <NewsIcon />
-                        </Box>
-                      </TouchableOpacity>
+                      <Box padding='2.5'>
+                        <NewsIcon />
+                      </Box>
                   }}
                   component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
                 <Tab.Screen
                   name='Saved'
                   options={{
                     tabBarIcon: () =>
-                      <TouchableOpacity>
-                        <Box padding='2.5'>
-                          <BookmarkIcon />
-                        </Box>
-                      </TouchableOpacity>
+                      <Box padding='2.5'>
+                        <BookmarkIcon />
+                      </Box>
                   }}
                   component={() => <Bookmarks news={news} />} />
               </Tab.Navigator>

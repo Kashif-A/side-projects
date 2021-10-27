@@ -14,8 +14,8 @@ import { Dimensions, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export interface CardProps extends News {
-  isBookmarked: boolean
   bookmarkedNews: News[]
+  isBookmarked?: boolean
   setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>
 }
 
@@ -24,12 +24,12 @@ const NewsCard = ({
   description,
   urlToImage,
   publishedAt,
-  isBookmarked,
   setBookmarkedNews,
   bookmarkedNews,
+  isBookmarked,
   ...rest
 }: CardProps) => {
-  const [bookmarked, setBookmarked] = React.useState<boolean>(isBookmarked)
+  const bookmarked = isBookmarked || bookmarkedNews.find((b) => b.title === title) ? true : false
 
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -42,7 +42,6 @@ const NewsCard = ({
       if (bookmarked) {
         payload = payload.filter(p => p.title !== title)
         await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))
-        setBookmarked(false)
       } else {
         payload.push({
           title,
@@ -52,7 +51,6 @@ const NewsCard = ({
           ...rest
         })
         await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))
-        setBookmarked(true)
       }
     } else {
       payload.push({
@@ -69,9 +67,7 @@ const NewsCard = ({
         publishedAt,
         ...rest
       }]))
-      setBookmarked(true)
     }
-    console.log('payload:  ', payload)
     setBookmarkedNews([...payload])
   }
 

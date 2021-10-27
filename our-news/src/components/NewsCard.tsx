@@ -13,8 +13,9 @@ import { ShareIcon } from '../svgs/ShareIcon'
 import { Dimensions, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export interface CardProps<T = string> extends News {
+export interface CardProps extends News {
   isBookmarked: boolean
+  bookmarkedNews: News[]
   bookmark: (add: boolean) => void
 }
 
@@ -25,6 +26,7 @@ const NewsCard = ({
   publishedAt,
   isBookmarked,
   bookmark,
+  bookmarkedNews,
   ...rest
 }: CardProps) => {
   const [bookmarked, setBookmarked] = React.useState<boolean>(isBookmarked)
@@ -34,10 +36,9 @@ const NewsCard = ({
   ]
 
   const onPress = async () => {
-    let payload: News[] = []
-    let tempPayload = await AsyncStorage.getItem('our-news-bookmarks')
-    if (tempPayload) {
-      payload = JSON.parse(tempPayload)
+    let payload: News[] = bookmarkedNews
+
+    if (bookmarkedNews.length > 0) {
       if (bookmarked) {
         payload = payload.filter(p => p.title !== title)
         await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))

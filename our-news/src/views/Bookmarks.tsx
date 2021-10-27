@@ -29,6 +29,7 @@ export default ({ bookmarkedNews, setBookmarkedNews }: HomeProps) => {
         {bookmarkedNews.map(b =>
           <NewsCard
             {...b}
+            bookmarkedNews={bookmarkedNews}
             bookmark={(add) => bookmark(add, b, bookmarkedNews, setBookmarkedNews)}
             isBookmarked={true}
             key={`${b.title}${b.source.id}`}

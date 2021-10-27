@@ -2,9 +2,9 @@ import React from 'react'
 import {
   Box,
   extendTheme,
-  NativeBaseProvider, View
+  NativeBaseProvider, Text, View
 } from 'native-base'
-import { NavigationContainer, useNavigation } from '@react-navigation/native'
+import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import Home from './src/views/Home'
@@ -14,7 +14,7 @@ import { ActivityIndicator } from 'react-native'
 import { BookmarkIcon } from './src/svgs/BookmarkIcon'
 import { NewsIcon } from './src/svgs/NewsIcon'
 import { LatestNewsIcon } from './src/svgs/LatestNews'
-import BookmarksWrapper from './src/components/BookmarksWrapper'
+import BookmarksProvider from './src/components/BookmarksProvider'
 import Bookmarks from './src/views/Bookmarks'
 
 export interface News {
@@ -87,10 +87,15 @@ const App = () => {
       })
   }, [])
 
+  const renderLabel = (text: string) =>
+    <Box marginBottom='-2.5'>
+      <Text fontSize='xs'>{text}</Text>
+    </Box>
+
   return (
     <SafeAreaProvider>
       <NativeBaseProvider theme={theme}>
-        <BookmarksWrapper>
+        <BookmarksProvider>
           {(news) =>
             <NavigationContainer>
               <Tab.Navigator screenOptions={{
@@ -99,33 +104,27 @@ const App = () => {
                 <Tab.Screen
                   name='Latest News'
                   options={{
-                    tabBarIcon: () =>
-                      <Box padding='2.5'>
-                        <LatestNewsIcon />
-                      </Box>
+                    tabBarLabel: () => renderLabel('Latest News'),
+                    tabBarIcon: () => <Box marginBottom='-2'><LatestNewsIcon /></Box>
                   }}
                   component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
                 <Tab.Screen
                   name={'Today\'s Paper'}
                   options={{
-                    tabBarIcon: () =>
-                      <Box padding='2.5'>
-                        <NewsIcon />
-                      </Box>
+                    tabBarLabel: () => renderLabel('Today\'s Paper'),
+                    tabBarIcon: () => <Box marginBottom='-2'><NewsIcon /></Box>
                   }}
                   component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
                 <Tab.Screen
                   name='Saved'
                   options={{
-                    tabBarIcon: () =>
-                      <Box padding='2.5'>
-                        <BookmarkIcon />
-                      </Box>
+                    tabBarLabel: () => renderLabel('Saved'),
+                    tabBarIcon: () => <Box marginBottom='-2'><BookmarkIcon /></Box>
                   }}
                   component={() => <Bookmarks news={news} />} />
               </Tab.Navigator>
             </NavigationContainer>}
-        </BookmarksWrapper>
+        </BookmarksProvider>
       </NativeBaseProvider>
     </SafeAreaProvider>
   )

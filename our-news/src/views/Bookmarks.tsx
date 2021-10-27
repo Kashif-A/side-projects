@@ -1,8 +1,8 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View, ViewStyle } from 'react-native'
 
 import {
-  Center,
+  Text,
   Heading,
   ScrollView
 } from 'native-base'
@@ -10,22 +10,45 @@ import {
 import { News } from '../../App'
 
 import { BookmarkIcon } from '../svgs/BookmarkIcon'
+import NewsCard from '../components/NewsCard'
+import { bookmark } from './Home'
 
 export interface HomeProps {
-  news: News[]
+  bookmarkedNews: News[]
+  setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>
 }
 
-export default ({ news }: HomeProps) =>
-  <ScrollView showsVerticalScrollIndicator={false} flex={1}>
-    {news ? (
-      <View style={{ padding: 20, backgroundColor: 'aqua' }} />
+export interface HomeStyles {
+  container: ViewStyle
+}
+
+export default ({ bookmarkedNews, setBookmarkedNews }: HomeProps) => {
+  return bookmarkedNews.length > 0
+    ? (
+      <ScrollView showsVerticalScrollIndicator={false} flex={1}>
+        {bookmarkedNews.map(b =>
+          <NewsCard
+            {...b}
+            bookmark={(add) => bookmark(add, b, bookmarkedNews, setBookmarkedNews)}
+            isBookmarked={true}
+            key={`${b.title}${b.source.id}`}
+          />)}
+      </ScrollView>
     )
-      : (
-        <Center>
-          <BookmarkIcon />
-          <Heading>Saved Articles</Heading>
-          <Text>Saved articles are stored here. Tap the icon on any article to add it to your collection.</Text>
-        </Center>
-      )
-    }
-  </ScrollView >
+    : (
+      <View style={styles.container}>
+        <BookmarkIcon />
+        <Heading marginTop='6'>Saved Articles</Heading>
+        <Text fontSize='md' textAlign='center' marginTop='4'>Saved articles are stored here. Tap the icon on any article to add it to your collection.</Text>
+      </View>
+    )
+}
+
+const styles: HomeStyles = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40
+  }
+}

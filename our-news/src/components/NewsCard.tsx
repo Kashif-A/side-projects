@@ -10,27 +10,64 @@ import {
 import { News } from '../../App'
 import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import { ShareIcon } from '../svgs/ShareIcon'
-import { Dimensions } from 'react-native'
+import { Dimensions, TouchableOpacity } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export interface CardProps<T = string> extends News {
+  isBookmarked: boolean
+  bookmark: (add: boolean) => void
 }
 
 const NewsCard = ({
-  source,
-  id,
-  name,
-  author,
   title,
   description,
-  url,
   urlToImage,
   publishedAt,
-  content
+  isBookmarked,
+  bookmark,
+  ...rest
 }: CardProps) => {
+  const [bookmarked, setBookmarked] = React.useState<boolean>(isBookmarked)
 
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ]
+
+  const onPress = async () => {
+    let payload: News[] = []
+    let tempPayload = await AsyncStorage.getItem('our-news-bookmarks')
+    if (tempPayload) {
+      payload = JSON.parse(tempPayload)
+      if (bookmarked) {
+        payload = payload.filter(p => p.title !== title)
+        await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))
+        bookmark(false)
+        setBookmarked(false)
+      } else {
+        payload.push({
+          title,
+          description,
+          urlToImage,
+          publishedAt,
+          ...rest
+        })
+        await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify(payload))
+        bookmark(true)
+        setBookmarked(true)
+      }
+    } else {
+      await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify([{
+        title,
+        description,
+        urlToImage,
+        publishedAt,
+        ...rest
+      }]))
+      bookmark(true)
+      setBookmarked(true)
+    }
+  }
+
   const date = new Date(publishedAt)
 
   return (
@@ -42,13 +79,15 @@ const NewsCard = ({
         <HStack paddingTop='4' justifyContent='space-between'>
           <Text marginTop='2'>{`${monthNames[date.getMonth()].toUpperCase()} ${date.getDate()}`}</Text>
           <HStack>
-            <BookmarkIcon />
+            <TouchableOpacity onPress={async () => await onPress()}>
+              <BookmarkIcon isBookmarked={bookmarked} />
+            </TouchableOpacity>
             <Box width='3' />
             <ShareIcon />
           </HStack>
         </HStack>
       </Box>
-    </Box>
+    </Box >
   )
 }
 

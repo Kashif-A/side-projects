@@ -2,7 +2,7 @@ import React from 'react'
 import {
   Box,
   extendTheme,
-  NativeBaseProvider, Text, View
+  NativeBaseProvider, Text
 } from 'native-base'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -14,7 +14,7 @@ import { ActivityIndicator } from 'react-native'
 import { BookmarkIcon } from './src/svgs/BookmarkIcon'
 import { NewsIcon } from './src/svgs/NewsIcon'
 import { LatestNewsIcon } from './src/svgs/LatestNews'
-import BookmarksProvider from './src/components/BookmarksProvider'
+import BookmarksWrapper from './src/components/BookmarksWrapper'
 import Bookmarks from './src/views/Bookmarks'
 
 export interface News {
@@ -69,7 +69,7 @@ const Tab = createBottomTabNavigator()
 
 const App = () => {
   const [loading, setLoading] = React.useState<boolean>(true)
-  const [data, setData] = React.useState<News[]>()
+  const [newsData, setNewsData] = React.useState<News[]>()
 
   React.useEffect(() => {
     fetch('https://newsapi.org/v2/everything?q=Apple&from=2021-10-25&sortBy=popularity&apiKey=fed9b93d26564ec2baf0c3226c3395dd')
@@ -78,7 +78,7 @@ const App = () => {
           resp.json().then(
             d => {
               if (d) {
-                setData(d.articles)
+                setNewsData(d.articles)
                 setLoading(false)
               }
             }
@@ -95,8 +95,8 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <NativeBaseProvider theme={theme}>
-        <BookmarksProvider>
-          {(news) =>
+        <BookmarksWrapper>
+          {(bookmarkedNews: News[], setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>) =>
             <NavigationContainer>
               <Tab.Navigator screenOptions={{
                 header: () => <Header />
@@ -107,24 +107,34 @@ const App = () => {
                     tabBarLabel: () => renderLabel('Latest News'),
                     tabBarIcon: () => <Box marginBottom='-2'><LatestNewsIcon /></Box>
                   }}
-                  component={() => data ? <Home data={data} /> : <ActivityIndicator />} />
+                  component={() => newsData
+                    ? <Home
+                      newsData={newsData}
+                      setBookmarkedNews={setBookmarkedNews}
+                      bookmarkedNews={bookmarkedNews} />
+                    : <ActivityIndicator />} />
                 <Tab.Screen
                   name={'Today\'s Paper'}
                   options={{
                     tabBarLabel: () => renderLabel('Today\'s Paper'),
                     tabBarIcon: () => <Box marginBottom='-2'><NewsIcon /></Box>
                   }}
-                  component={() => <View style={{ padding: 20, backgroundColor: 'red' }} />} />
+                  component={() => newsData
+                    ? <Home
+                      newsData={newsData}
+                      setBookmarkedNews={setBookmarkedNews}
+                      bookmarkedNews={bookmarkedNews} />
+                    : <ActivityIndicator />} />
                 <Tab.Screen
                   name='Saved'
                   options={{
                     tabBarLabel: () => renderLabel('Saved'),
                     tabBarIcon: () => <Box marginBottom='-2'><BookmarkIcon /></Box>
                   }}
-                  component={() => <Bookmarks news={news} />} />
+                  component={() => <Bookmarks setBookmarkedNews={setBookmarkedNews} bookmarkedNews={bookmarkedNews} />} />
               </Tab.Navigator>
             </NavigationContainer>}
-        </BookmarksProvider>
+        </BookmarksWrapper>
       </NativeBaseProvider>
     </SafeAreaProvider>
   )

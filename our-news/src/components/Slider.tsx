@@ -16,6 +16,7 @@ const Slider = () =>
   <ScrollView horizontal={true}>
     {titles.map(t =>
       <TouchableOpacity
+        key={t}
         onPress={() => { }}>
         <Box padding='3' paddingRight='3' paddingLeft='3'>
           <Text>{t}</Text>

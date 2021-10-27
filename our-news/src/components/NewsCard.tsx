@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 export interface CardProps extends News {
   isBookmarked: boolean
   bookmarkedNews: News[]
-  setBookmarkedNews: any
+  setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>
 }
 
 const NewsCard = ({
@@ -55,6 +55,13 @@ const NewsCard = ({
         setBookmarked(true)
       }
     } else {
+      payload.push({
+        title,
+        description,
+        urlToImage,
+        publishedAt,
+        ...rest
+      })
       await AsyncStorage.setItem('our-news-bookmarks', JSON.stringify([{
         title,
         description,
@@ -64,14 +71,15 @@ const NewsCard = ({
       }]))
       setBookmarked(true)
     }
-    setBookmarkedNews(payload)
+    console.log('payload:  ', payload)
+    setBookmarkedNews([...payload])
   }
 
   const date = new Date(publishedAt)
 
   return (
     <Box backgroundColor='white' marginTop='3'>
-      <Image source={{ uri: urlToImage }} style={styles.image} />
+      <Image alt='news' source={{ uri: urlToImage }} style={styles.image} />
       <Box padding='5' backgroundColor='white'>
         <Heading fontFamily='heading'>{title}</Heading>
         <Text paddingTop='2' fontSize='md'>{description}</Text>

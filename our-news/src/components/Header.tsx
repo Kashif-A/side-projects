@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Box, HamburgerIcon, HStack, Image, SearchIcon, View, VStack } from 'native-base'
+import { Box, HamburgerIcon, HStack, Image, SearchIcon, VStack } from 'native-base'
 
 import Slider from './Slider'
 
@@ -12,7 +12,7 @@ const Header = () =>
           <HamburgerIcon size='sm' />
         </Box>
         <Box flex='1' alignItems='center'>
-          <Image source={require('../../assets/images/logo.png')} resizeMode='contain' height='12' />
+          <Image alt='logo' source={require('../../assets/images/logo.png')} resizeMode='contain' height='12' />
         </Box>
         <Box padding='2.5'>
           <SearchIcon size='sm' />

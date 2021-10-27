@@ -13,6 +13,8 @@ export interface HomeProps {
 }
 
 export default ({ newsData, bookmarkedNews, setBookmarkedNews }: HomeProps) => {
+  console.log('bookmarkedNews:  ', bookmarkedNews)
+  console.log('bookmarkedNews:  ', bookmarkedNews)
   return (
     <ScrollView showsVerticalScrollIndicator={false} flex={1}>
       {newsData.map(d =>

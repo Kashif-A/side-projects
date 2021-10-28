@@ -1,13 +1,14 @@
 import React from 'react'
+import { NavigationContainer } from '@react-navigation/native'
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+
 import {
   extendTheme,
-  NativeBaseProvider,
-  View
+  NativeBaseProvider
 } from 'native-base'
-import { NavigationContainer } from '@react-navigation/native'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
+
 import MainTabNavigator from './src/navigators/MainTabNavigator'
-import { createDrawerNavigator } from '@react-navigation/drawer'
 import DrawerContent from './src/navigators/DrawerContent'
 
 export interface News {

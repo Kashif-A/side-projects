@@ -16,7 +16,7 @@ export default ({ }: HomeProps) => {
   const [newsData, setNewsData] = React.useState<News[]>()
 
   React.useEffect(() => {
-    fetch('https://newsapi.org/v2/everything?q=Apple&from=2021-10-25&sortBy=popularity&apiKey=fed9b93d26564ec2baf0c3226c3395dd')
+    fetch('https://newsapi.org/v2/everything?q=World&from=2021-10-25&sortBy=popularity&apiKey=fed9b93d26564ec2baf0c3226c3395dd')
       .then(resp => {
         if (resp) {
           resp.json().then(

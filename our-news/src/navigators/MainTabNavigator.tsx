@@ -27,18 +27,6 @@ const MainTabNavigator = () =>
         tabBarIcon: () => <Box marginBottom='-2'><LatestNewsIcon /></Box>
       }}
       component={() => <Home />} />
-    {/* <Tab.Screen
-                  name={'Today\'s Paper'}
-                  options={{
-                    tabBarLabel: () => renderLabel('Today\'s Paper'),
-                    tabBarIcon: () => <Box marginBottom='-2'><NewsIcon /></Box>
-                  }}
-                  component={() => newsData
-                    ? <Home
-                      newsData={newsData}
-                      setBookmarkedNews={setBookmarkedNews}
-                      bookmarkedNews={bookmarkedNews} />
-                    : <ActivityIndicator />} /> */}
     <Tab.Screen
       name='Saved'
       options={{

@@ -1,18 +1,14 @@
 import React from 'react'
 import {
-  Box,
   extendTheme,
-  NativeBaseProvider, Text
+  NativeBaseProvider,
+  View
 } from 'native-base'
 import { NavigationContainer } from '@react-navigation/native'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-
-import Home from './src/views/Home'
-import Header from './src/components/Header'
-import { BookmarkIcon } from './src/svgs/BookmarkIcon'
-import { LatestNewsIcon } from './src/svgs/LatestNews'
-import Bookmarks from './src/views/Bookmarks'
+import MainTabNavigator from './src/navigators/MainTabNavigator'
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import DrawerContent from './src/navigators/DrawerContent'
 
 export interface News {
   source: {
@@ -32,11 +28,11 @@ const theme = extendTheme({
   fontConfig: {
     TNR: {
       200: {
-        normal: 'Playfair-Regular',
+        normal: 'TimesNewRomanPSMT',
         italic: 'TimesNewRomanPS-ItalicMT'
       },
       300: {
-        normal: 'Playfair-Regular',
+        normal: 'TimesNewRomanPSMT',
         italic: 'TimesNewRomanPS-ItalicMT'
       },
       400: {
@@ -62,48 +58,22 @@ const theme = extendTheme({
   }
 })
 
-const Tab = createBottomTabNavigator()
+const Drawer = createDrawerNavigator()
 
 const App = () => {
-  const renderLabel = (text: string) =>
-    <Box marginBottom='-2.5'>
-      <Text fontSize='xs'>{text}</Text>
-    </Box>
-
   return (
     <SafeAreaProvider>
       <NativeBaseProvider theme={theme}>
         <NavigationContainer>
-          <Tab.Navigator screenOptions={{
-            header: () => <Header />
-          }}>
-            <Tab.Screen
-              name='Latest News'
+          <Drawer.Navigator
+            drawerContent={() => <DrawerContent />}>
+            <Drawer.Screen
               options={{
-                tabBarLabel: () => renderLabel('Latest News'),
-                tabBarIcon: () => <Box marginBottom='-2'><LatestNewsIcon /></Box>
+                header: () => null
               }}
-              component={() => <Home />} />
-            {/* <Tab.Screen
-                  name={'Today\'s Paper'}
-                  options={{
-                    tabBarLabel: () => renderLabel('Today\'s Paper'),
-                    tabBarIcon: () => <Box marginBottom='-2'><NewsIcon /></Box>
-                  }}
-                  component={() => newsData
-                    ? <Home
-                      newsData={newsData}
-                      setBookmarkedNews={setBookmarkedNews}
-                      bookmarkedNews={bookmarkedNews} />
-                    : <ActivityIndicator />} /> */}
-            <Tab.Screen
-              name='Saved'
-              options={{
-                tabBarLabel: () => renderLabel('Saved'),
-                tabBarIcon: () => <Box marginBottom='-2'><BookmarkIcon /></Box>
-              }}
-              component={() => <Bookmarks />} />
-          </Tab.Navigator>
+              name='MainTabs'
+              component={MainTabNavigator} />
+          </Drawer.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
     </SafeAreaProvider >

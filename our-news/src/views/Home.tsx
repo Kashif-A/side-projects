@@ -2,21 +2,14 @@ import React from 'react'
 import {
   ScrollView
 } from 'native-base'
+import { ActivityIndicator } from 'react-native'
 
 import { News } from '../../App'
 import NewsCard from '../components/NewsCard'
 import BookmarksWrapper from '../components/BookmarksWrapper'
-import { ActivityIndicator, Share } from 'react-native'
 
 export interface HomeProps {
 }
-
-
-export const shareMessage = (message: string, subject?: string) =>
-  Share.share({
-    message,
-    title: subject
-  }).catch()
 
 export default ({ }: HomeProps) => {
   const [loading, setLoading] = React.useState<boolean>(true)

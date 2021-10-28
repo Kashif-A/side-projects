@@ -1,4 +1,6 @@
 import React from 'react'
+import { Dimensions, TouchableOpacity } from 'react-native'
+
 import {
   Box,
   Heading,
@@ -10,7 +12,6 @@ import {
 import { News } from '../../App'
 import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import { ShareIcon } from '../svgs/ShareIcon'
-import { Dimensions, TouchableOpacity } from 'react-native'
 import { onPress, shareMessage } from '../util/util'
 
 export interface CardProps extends News {
@@ -19,7 +20,7 @@ export interface CardProps extends News {
   setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>
 }
 
-const NewsCard = ({
+export default ({
   title,
   description,
   urlToImage,
@@ -81,5 +82,3 @@ const styles = {
     maxHeight: 180
   }
 }
-
-export default NewsCard

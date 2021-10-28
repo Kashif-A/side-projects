@@ -4,7 +4,7 @@ import { ImageStyle, ViewStyle } from 'react-native'
 import { Box, Flex, Text, HStack, Image, Divider, Switch, ScrollView } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
-const DrawerContent = () =>
+export default () =>
   <>
 
     <ScrollView style={styles.container}>
@@ -138,5 +138,3 @@ const styles: {
     width: 23
   }
 }
-
-export default DrawerContent

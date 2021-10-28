@@ -7,7 +7,7 @@ import Header from '../components/Header'
 import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import { LatestNewsIcon } from '../svgs/LatestNews'
 import Bookmarks from '../views/Bookmarks'
-import Home from '../views/Home'
+import Home from '../views/LatestNews'
 
 const Tab = createBottomTabNavigator()
 
@@ -16,7 +16,7 @@ const renderLabel = (text: string) =>
     <Text fontSize='xs'>{text}</Text>
   </Box>
 
-const MainTabNavigator = () =>
+export default () =>
   <Tab.Navigator screenOptions={{
     header: () => <Header />
   }}>
@@ -35,5 +35,3 @@ const MainTabNavigator = () =>
       }}
       component={() => <Bookmarks />} />
   </Tab.Navigator>
-
-export default MainTabNavigator

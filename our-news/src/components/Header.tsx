@@ -1,12 +1,12 @@
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { DrawerActions, useNavigation } from '@react-navigation/core'
+import { DrawerActions, useNavigation } from '@react-navigation/native'
 
 import { Box, HamburgerIcon, HStack, Image, SearchIcon, VStack } from 'native-base'
 
 import Slider from './Slider'
 
-const Header = () => {
+export default () => {
   const nav = useNavigation()
   return (
     <>
@@ -26,7 +26,7 @@ const Header = () => {
         </HStack>
       </VStack>
 
-      <Slider />
+      <Slider navigation={nav as any} />
 
       <Box
         position='absolute'
@@ -39,5 +39,3 @@ const Header = () => {
     </>
   )
 }
-
-export default Header

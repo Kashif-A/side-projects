@@ -1,9 +1,10 @@
 import React from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useIsFocused, useNavigation } from '@react-navigation/core'
+
+import { Box } from 'native-base'
 
 import { News } from '../../App'
-import { Box } from 'native-base'
-import { useIsFocused, useNavigation } from '@react-navigation/core'
 import { AppState } from 'react-native'
 
 export interface BookmarksWrapperProps {
@@ -18,7 +19,6 @@ export default ({ children }: BookmarksWrapperProps) => {
 
   React.useEffect(() => {
     if (isFocused) {
-      console.log('her')
       AsyncStorage.getItem('our-news-bookmarks')
         .then(nb => nb && setBookmarkedNews(JSON.parse(nb)))
         .catch()

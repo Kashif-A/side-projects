@@ -13,14 +13,11 @@ import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import NewsCard from '../components/NewsCard'
 import BookmarksWrapper from '../components/BookmarksWrapper'
 
-export interface HomeProps {
-}
-
 export interface HomeStyles {
   container: ViewStyle
 }
 
-export default ({ }: HomeProps) => {
+export default () => {
   return (
     <BookmarksWrapper>
       {(bookmarkedNews: News[], setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>) =>

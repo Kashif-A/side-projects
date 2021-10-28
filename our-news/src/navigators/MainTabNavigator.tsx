@@ -2,6 +2,7 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import { Box, Text } from 'native-base'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import Header from '../components/Header'
 import { BookmarkIcon } from '../svgs/BookmarkIcon'

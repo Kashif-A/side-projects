@@ -1,13 +1,17 @@
 import React from 'react'
+import { ActivityIndicator } from 'react-native'
+import { RouteProp, useRoute } from '@react-navigation/core'
+
 import {
+  Box,
+  Flex,
+  Text,
   ScrollView
 } from 'native-base'
-import { ActivityIndicator } from 'react-native'
 
 import { News } from '../../App'
 import NewsCard from '../components/NewsCard'
 import BookmarksWrapper from '../components/BookmarksWrapper'
-import { RouteProp, useRoute } from '@react-navigation/core'
 
 type ParamList = {
   LatestNews: {
@@ -23,7 +27,7 @@ export default () => {
 
 
   React.useEffect(() => {
-    fetch('https://newsapi.org/v2/everything?q=World&from=2021-10-25&sortBy=popularity&apiKey=fed9b93d26564ec2baf0c3226c3395dd')
+    fetch(`https://newsapi.org/v2/everything?q=${route.params?.selected || 'world'}&from=2021-10-25&sortBy=popularity&apiKey=fed9b93d26564ec2baf0c3226c3395dd`)
       .then(resp => {
         if (resp) {
           resp.json().then(
@@ -36,25 +40,39 @@ export default () => {
           )
         }
       })
-  }, [])
+  }, [route.params?.selected])
 
   return (
     <BookmarksWrapper>
       {(bookmarkedNews: News[], setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>) =>
         !loading
           ? (
-            <ScrollView showsVerticalScrollIndicator={false} flex={1}>
-              {newsData?.map(d =>
-                <NewsCard
-                  {...d}
-                  key={`${d.title}${d.source.id}`}
-                  bookmarkedNews={bookmarkedNews}
-                  setBookmarkedNews={setBookmarkedNews}
-                />)}
-            </ScrollView >
+            <>
+              {route.params?.selected &&
+                <Box backgroundColor='black' padding='3'>
+                  <Text
+                    color='white'
+                    fontFamily='Arial'
+                    textAlign='center'
+                    fontSize='md'>
+                    Because the App uses a Free API, results may not reflect what you selected from the Slider above.
+                  </Text>
+                </Box>}
+              <ScrollView showsVerticalScrollIndicator={false} flex={1}>
+                {newsData?.map(d =>
+                  <NewsCard
+                    {...d}
+                    key={`${d.title}${d.source.id}${Math.random()}`}
+                    bookmarkedNews={bookmarkedNews}
+                    setBookmarkedNews={setBookmarkedNews}
+                  />)}
+              </ScrollView>
+            </>
           )
           : (
-            <ActivityIndicator size='large' />
+            <Flex flex={1} justifyContent='center' alignItems='center'>
+              <ActivityIndicator size='large' />
+            </Flex>
           )}
     </BookmarksWrapper>
   )

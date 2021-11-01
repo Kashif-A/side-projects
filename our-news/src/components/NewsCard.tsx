@@ -3,6 +3,7 @@ import { Dimensions, TouchableOpacity } from 'react-native'
 
 import {
   Box,
+  Divider,
   Heading,
   HStack,
   Image,
@@ -25,11 +26,13 @@ export default ({
   description,
   urlToImage,
   publishedAt,
+  source,
   setBookmarkedNews,
   bookmarkedNews,
   isBookmarked,
   ...rest
 }: CardProps) => {
+  const { name } = source
   const bookmarked = isBookmarked || bookmarkedNews.find((b) => b.title === title) ? true : false
 
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -44,6 +47,19 @@ export default ({
       <Box padding='5' backgroundColor='white'>
         <Heading fontFamily='heading'>{title}</Heading>
         <Text paddingTop='2' fontSize='md'>{description}</Text>
+
+        <Box paddingTop='3'>
+          <Divider />
+          <Text
+            bold={true}
+            paddingTop='1'
+            paddingBottom='1'
+            fontSize='sm'>
+            Source: {name}
+          </Text>
+          <Divider />
+        </Box>
+
         <HStack paddingTop='4' justifyContent='space-between'>
           <Text marginTop='2'>{`${monthNames[date.getMonth()].toUpperCase()} ${date.getDate()}`}</Text>
 
@@ -55,6 +71,7 @@ export default ({
               description,
               publishedAt,
               urlToImage,
+              source,
               ...rest
             }, setBookmarkedNews
             )}>

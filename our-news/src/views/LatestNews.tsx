@@ -55,7 +55,7 @@ export default () => {
                     fontFamily='Arial'
                     textAlign='center'
                     fontSize='md'>
-                    Because the App uses a Free API, results may not reflect what you selected from the Slider above.
+                    This is a demo app, therefore, results may not reflect what you selected from the Slider above.
                   </Text>
                 </Box>}
               <ScrollView showsVerticalScrollIndicator={false} flex={1}>

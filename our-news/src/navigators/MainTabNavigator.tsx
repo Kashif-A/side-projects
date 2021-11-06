@@ -2,13 +2,12 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import { Box, Text } from 'native-base'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 
 import Header from '../components/Header'
 import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import { LatestNewsIcon } from '../svgs/LatestNews'
 import Bookmarks from '../views/Bookmarks'
-import Home from '../views/LatestNews'
+import LatestNews from '../views/LatestNews'
 
 const Tab = createBottomTabNavigator()
 
@@ -27,7 +26,7 @@ export default () =>
         tabBarLabel: () => renderLabel('Latest News'),
         tabBarIcon: () => <Box marginBottom='-2'><LatestNewsIcon /></Box>
       }}
-      component={() => <Home />} />
+      component={() => <LatestNews />} />
     <Tab.Screen
       name='Saved'
       options={{

@@ -55,7 +55,7 @@ export default ({
             paddingTop='1'
             paddingBottom='1'
             fontSize='sm'>
-            Source: {name}
+            Source:  {name}
           </Text>
           <Divider />
         </Box>

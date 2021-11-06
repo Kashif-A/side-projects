@@ -10,7 +10,6 @@ export default () =>
     <ScrollView style={styles.container}>
       <Flex padding='6' justifyContent='center'>
 
-        <Text fontFamily='Arial' fontSize='lg'>Log In</Text>
         <Box padding='3' />
 
         <Divider />

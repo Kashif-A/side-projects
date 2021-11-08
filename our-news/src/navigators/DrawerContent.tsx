@@ -8,9 +8,7 @@ export default () =>
   <>
 
     <ScrollView style={styles.container}>
-      <Flex padding='6' justifyContent='center'>
-
-        <Box padding='3' />
+      <Flex paddingLeft='6' paddingRight='6' justifyContent='center'>
 
         <Divider />
 
@@ -23,6 +21,7 @@ export default () =>
             <HStack>
               <Box width='10'>
                 <Image
+                  alt='world'
                   style={styles.image}
                   resizeMode='contain'
                   source={require('../../assets/images/world.png')} />
@@ -37,6 +36,7 @@ export default () =>
           <HStack flex={1}>
             <Box width='10'>
               <Image
+                alt='moon'
                 style={styles.image}
                 resizeMode='contain'
                 source={require('../../assets/images/moon.png')} />
@@ -50,6 +50,7 @@ export default () =>
           <HStack flex={1}>
             <Box width='10'>
               <Image
+                alt='gallery'
                 style={styles.image}
                 resizeMode='contain'
                 source={require('../../assets/images/gallery.png')} />
@@ -63,6 +64,7 @@ export default () =>
           <HStack paddingTop='5' alignItems='center'>
             <Box width='10'>
               <Image
+                alt='folder'
                 style={styles.image}
                 resizeMode='contain'
                 source={require('../../assets/images/folder.png')} />
@@ -75,6 +77,7 @@ export default () =>
           <HStack paddingTop='5' alignItems='center'>
             <Box width='10'>
               <Image
+                alt='learn-more'
                 style={styles.image}
                 resizeMode='contain'
                 source={require('../../assets/images/learn-more.png')} />
@@ -87,6 +90,7 @@ export default () =>
           <HStack paddingTop='5' alignItems='center'>
             <Box width='10'>
               <Image
+                alt='info'
                 style={styles.image}
                 resizeMode='contain'
                 source={require('../../assets/images/info.png')} />
@@ -99,6 +103,7 @@ export default () =>
           <HStack paddingTop='5' alignItems='center'>
             <Box width='10'>
               <Image
+                alt='support'
                 style={styles.image}
                 resizeMode='contain'
                 source={require('../../assets/images/support.png')} />
@@ -110,8 +115,7 @@ export default () =>
       </Flex>
     </ScrollView>
 
-    <Box backgroundColor='gray.300' padding='5' paddingBottom='9'>
-      <Box paddingTop='9' />
+    <Box backgroundColor='gray.300' padding='6' paddingBottom='3'>
 
       <Text fontFamily='Arial' bold={true} fontSize='lg'>Contact Details</Text>
       <Box paddingTop='3' />

@@ -21,18 +21,25 @@ type ParamList = {
 
 export default () => {
   const [loading, setLoading] = React.useState<boolean>(true)
+  const [error, setError] = React.useState<boolean>(false)
   const [newsData, setNewsData] = React.useState<News[]>()
 
   const route = useRoute<RouteProp<ParamList>>()
 
-
   React.useEffect(() => {
-    fetch(`https://newsapi.org/v2/everything?q=${route.params?.selected || 'world'}&from=2021-10-25&sortBy=popularity&apiKey=fed9b93d26564ec2baf0c3226c3395dd`)
+    fetch(`https://newsapi.org/v2/${route.params?.selected || 'everything?domains=bbc.co.uk'}&sortBy=popularity&domains=cnn.com,bbc.co.uk&apiKey=fed9b93d26564ec2baf0c3226c3395dd`)
       .then(resp => {
         if (resp) {
           resp.json().then(
             d => {
               if (d) {
+                if (d.status === 'error') {
+                  setError(true)
+                  setTimeout(() => {
+                    setError(false)
+                  }, 1500)
+                  return
+                }
                 setNewsData(d.articles)
                 setLoading(false)
               }
@@ -40,24 +47,26 @@ export default () => {
           )
         }
       })
+      .catch()
   }, [route.params?.selected])
 
   return (
     <BookmarksWrapper>
       {(bookmarkedNews: News[], setBookmarkedNews: React.Dispatch<React.SetStateAction<News[]>>) =>
-        !loading
-          ? (
-            <>
-              {route.params?.selected &&
-                <Box backgroundColor='black' padding='3'>
-                  <Text
-                    color='white'
-                    fontFamily='Arial'
-                    textAlign='center'
-                    fontSize='md'>
-                    This is a demo app, therefore, results may not reflect what you selected from the Slider above.
-                  </Text>
-                </Box>}
+        <>
+          {error &&
+            <Box backgroundColor='red.300' padding='2'>
+              <Text
+                color='black'
+                bold={true}
+                fontFamily='Arial'
+                textAlign='center'
+                fontSize='md'>
+                Error fetching data.
+              </Text>
+            </Box>}
+          {!loading
+            ? (
               <ScrollView showsVerticalScrollIndicator={false} flex={1}>
                 {newsData?.map(d =>
                   <NewsCard
@@ -67,13 +76,13 @@ export default () => {
                     setBookmarkedNews={setBookmarkedNews}
                   />)}
               </ScrollView>
-            </>
-          )
-          : (
-            <Flex flex={1} justifyContent='center' alignItems='center'>
-              <ActivityIndicator size='large' />
-            </Flex>
-          )}
+            )
+            : (
+              <Flex flex={1} justifyContent='center' alignItems='center'>
+                <ActivityIndicator size='large' />
+              </Flex>
+            )}
+        </>}
     </BookmarksWrapper>
   )
 }

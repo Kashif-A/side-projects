@@ -8,13 +8,16 @@ import { BookmarkIcon } from '../svgs/BookmarkIcon'
 import { LatestNewsIcon } from '../svgs/LatestNews'
 import Bookmarks from '../views/Bookmarks'
 import LatestNews from '../views/LatestNews'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const Tab = createBottomTabNavigator()
 
 const renderLabel = (text: string) =>
-  <Box marginBottom='-2.5'>
-    <Text fontSize='xs'>{text}</Text>
-  </Box>
+  <TouchableOpacity>
+    <Box marginBottom='-1.5'>
+      <Text fontSize='xs'>{text}</Text>
+    </Box>
+  </TouchableOpacity>
 
 export default () =>
   <Tab.Navigator screenOptions={{
@@ -24,14 +27,22 @@ export default () =>
       name='Latest News'
       options={{
         tabBarLabel: () => renderLabel('Latest News'),
-        tabBarIcon: () => <Box marginBottom='-2'><LatestNewsIcon /></Box>
+        tabBarIcon: () => <TouchableOpacity><LatestNewsIcon /></TouchableOpacity>,
+        tabBarStyle: {
+          paddingBottom: 20,
+          height: 80
+        }
       }}
       component={() => <LatestNews />} />
     <Tab.Screen
       name='Saved'
       options={{
         tabBarLabel: () => renderLabel('Saved'),
-        tabBarIcon: () => <Box marginBottom='-2'><BookmarkIcon /></Box>
+        tabBarIcon: () => <TouchableOpacity><BookmarkIcon /></TouchableOpacity>,
+        tabBarStyle: {
+          paddingBottom: 20,
+          height: 80
+        }
       }}
       component={() => <Bookmarks />} />
   </Tab.Navigator>

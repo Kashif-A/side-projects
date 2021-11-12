@@ -14,7 +14,7 @@ const Tab = createBottomTabNavigator()
 
 const renderLabel = (text: string) =>
   <TouchableOpacity>
-    <Box marginBottom='-1.5'>
+    <Box>
       <Text fontSize='xs'>{text}</Text>
     </Box>
   </TouchableOpacity>

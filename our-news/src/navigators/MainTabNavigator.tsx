@@ -29,7 +29,8 @@ export default () =>
         tabBarLabel: () => renderLabel('Latest News'),
         tabBarIcon: () => <TouchableOpacity><LatestNewsIcon /></TouchableOpacity>,
         tabBarStyle: {
-          paddingBottom: 20,
+          paddingBottom: 15,
+          paddingTop: 5,
           height: 80
         }
       }}
@@ -40,7 +41,8 @@ export default () =>
         tabBarLabel: () => renderLabel('Saved'),
         tabBarIcon: () => <TouchableOpacity><BookmarkIcon /></TouchableOpacity>,
         tabBarStyle: {
-          paddingBottom: 20,
+          paddingBottom: 15,
+          paddingTop: 5,
           height: 80
         }
       }}

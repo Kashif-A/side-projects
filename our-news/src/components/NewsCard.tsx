@@ -30,6 +30,7 @@ export default ({
   setBookmarkedNews,
   bookmarkedNews,
   isBookmarked,
+  url,
   ...rest
 }: CardProps) => {
   const { name } = source
@@ -72,6 +73,7 @@ export default ({
               publishedAt,
               urlToImage,
               source,
+              url,
               ...rest
             }, setBookmarkedNews
             )}>
@@ -80,7 +82,7 @@ export default ({
 
             <Box width='3' />
 
-            <TouchableOpacity onPress={async () => await shareMessage(title)}>
+            <TouchableOpacity onPress={async () => await shareMessage(`${title}\n${url}`)}>
               <ShareIcon />
             </TouchableOpacity>
 

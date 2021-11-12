@@ -10,9 +10,9 @@ export default () => {
   const nav = useNavigation()
   return (
     <>
-      <VStack paddingBottom={4} safeAreaTop paddingLeft='3' paddingRight='3'>
+      <VStack paddingBottom={4} safeAreaTop paddingLeft='3' paddingRight='3' marginTop='2'>
         <HStack justifyContent='space-between'>
-          <Box position='absolute' top={2.5} left={3} zIndex={1}>
+          <Box position='absolute' top={3.5} left={3} zIndex={1}>
             <TouchableOpacity onPress={() => nav.dispatch(DrawerActions.openDrawer())}>
               <Box>
                 <HamburgerIcon size='sm' />
@@ -20,7 +20,7 @@ export default () => {
             </TouchableOpacity>
           </Box>
 
-          <Box flex='1' alignItems='center'>
+          <Box top={2} flex='1' alignItems='center'>
             <Image alt='logo' source={require('../../assets/images/logo.png')} resizeMode='contain' height='12' />
           </Box>
           {/* <TouchableOpacity>

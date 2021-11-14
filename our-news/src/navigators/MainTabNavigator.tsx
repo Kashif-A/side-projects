@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Profiler } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import { Box, Text } from 'native-base'
@@ -34,7 +34,7 @@ export default () =>
           height: 80
         }
       }}
-      component={() => <LatestNews />} />
+      component={LatestNews} />
     <Tab.Screen
       name='Saved'
       options={{
@@ -46,5 +46,5 @@ export default () =>
           height: 80
         }
       }}
-      component={() => <Bookmarks />} />
+      component={Bookmarks} />
   </Tab.Navigator>

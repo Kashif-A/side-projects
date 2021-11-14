@@ -10,7 +10,7 @@ export default () => {
   const nav = useNavigation()
   return (
     <>
-      <VStack paddingBottom={4} safeAreaTop paddingLeft='3' paddingRight='3' marginTop='2'>
+      <VStack paddingBottom={1} safeAreaTop paddingLeft='3' paddingRight='3' marginTop='2'>
         <HStack justifyContent='space-between'>
           <Box position='absolute' top={3.5} left={3} zIndex={1}>
             <TouchableOpacity onPress={() => nav.dispatch(DrawerActions.openDrawer())}>
@@ -20,7 +20,7 @@ export default () => {
             </TouchableOpacity>
           </Box>
 
-          <Box top={2} flex='1' alignItems='center'>
+          <Box flex='1' alignItems='center'>
             <Image alt='logo' source={require('../../assets/images/logo.png')} resizeMode='contain' height='12' />
           </Box>
           {/* <TouchableOpacity>

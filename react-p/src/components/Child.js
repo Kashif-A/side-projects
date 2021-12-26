@@ -10,6 +10,7 @@ const Child = (props) => {
         padding: 15,
         backgroundColor: 'aqua'
       }} />
+      {props.children && props.children()}
     </div>
   )
 }

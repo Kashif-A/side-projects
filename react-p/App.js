@@ -19,23 +19,28 @@ const styles = {
 const Tree = (props) => {
   const { tree } = props
   return (
-    <Child name={`${tree}.1`}>
-      <Child name={`${tree}.2`}>
-        <Child name={`${tree}.3`} />
-      </Child>
-    </Child>
+    <div>
+      {props => <Child {...props} name={`${tree}.1`}>
+        {props => <Child {...props} name={`${tree}.2`}>
+          {props => <Child {...props} name={`${tree}.3`} />}
+        </Child>}
+      </Child>}
+    </div>
   )
 }
 
 const Child = (props) => {
   console.log(`Child ${props.name}`)
+  console.log('props:  ', props)
   const [num, setNum] = React.useState(0)
   return (
     <div style={styles.child}>
       <h3>Child {props.name}</h3>
       {/* <h6>Num {props.name}</h6> */}
       <button onClick={() => setNum(num + 1)} style={styles.buttonB} />
-      {props.children && props.children}
+      {props.children && props.children({
+        num
+      })}
     </div>
   )
 }
